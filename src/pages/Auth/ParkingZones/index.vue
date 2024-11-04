@@ -24,8 +24,9 @@
             <template v-if="map_api_key.length > 0">
                 <GoogleMap :api-key="map_api_key" :center="{ lat: center.lat, lng: center.lng }" :zoom="12"
                     class="w-full h-full">
-                    <Marker v-for="zone in parking_zones" :key="zone.id" @click="() => _edit(zone)"
-                        :options="{ position: { lat: parseFloat(zone.latitude), lng: parseFloat(zone.longitude) }, label: { text: zone.name, className: 'mb-[60%] font-normal' }, title: zone.name }" />
+                    <Marker v-for="zone in rows" :key="zone.id" @click="() => _edit(zone)"
+                        :options="{ position: { lat: parseFloat(zone.latitude), lng: parseFloat(zone.longitude) }, label: { text: zone.name, className: 'mb-[160%] font-normal' }, title: zone.name }" />
+
                 </GoogleMap>
             </template>
         </div>
@@ -208,7 +209,7 @@ const selectAll = async () => {
     }
 }
 
-onMounted(async () => {
-    await fetchParkingZones()
+onMounted(() => {
+    fetchParkingZones()
 })
 </script>
