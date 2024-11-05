@@ -50,7 +50,7 @@
                             :center="{ lat: parseFloat(form.latitude), lng: parseFloat(form.longitude) }" :zoom="16"
                             class="w-[500px] h-[500px]" @click="setPosition">
                             <Marker
-                                :options="{ position: { lat: parseFloat(form.latitude), lng: parseFloat(form.longitude) }, label: { text: form.name, className: 'mb-[60%] font-normal' }, title: form.name }" />
+                                :options="{ position: { lat: parseFloat(form.latitude), lng: parseFloat(form.longitude) }, label: { text: form.name, className: 'mb-[160%] font-normal' }, title: form.name }" />
                         </GoogleMap>
                     </template>
                 </div>

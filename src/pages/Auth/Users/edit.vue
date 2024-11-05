@@ -38,7 +38,6 @@ const message = ref()
 const props = defineProps(['item'])
 
 onMounted(() => {
-    console.log(props)
     form.value.name = props.item.name
     form.value.email = props.item.email
     form.value.phone = props.item.phone

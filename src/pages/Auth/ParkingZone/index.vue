@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-2" v-if="form">
         <div v-if="form" class="flex flex-row gap-4 items-center">
             <p class="font-semibold text-xl" v-if="!editing_name">
                 {{ form.name }}
@@ -14,6 +14,65 @@
                     @click="() => editing_name = false" />
             </div>
         </div>
+
+        <!-- GENERAL -->
+
+        <div class="border flex flex-col p-2">
+            <div class="flex flex-row justify-between border-b">
+                <p class="font-semibold">GENERAL</p>
+                <button class="border bg-blue-400 hover:bg-blue-500 text-white rounded-md px-2 py-1"
+                    @click="saveParkingZone">SAVE</button>
+            </div>
+            <div class="flex flex-col">
+                <div class="flex items-center py-2 gap-4">
+                    <p>CAPACITY :</p>
+                    <input type="text" v-model="form.capacity_total" class="p-1 border">
+                </div>
+            </div>
+        </div>
+
+        <!-- CAPACITIES -->
+
+        <div class="border flex flex-col p-2">
+            <div class="flex flex-row justify-between border-b">
+                <p class="font-semibold">CAPACITY</p>
+                <div class="flex flex-row items-center justify-between">
+
+                </div>
+                <div class="gap-4">
+                    <button class="border bg-blue-400 hover:bg-blue-500 text-white rounded-md px-2 py-1"
+                        @click="addCapacity">ADD</button>
+                    <button class="border bg-blue-400 hover:bg-blue-500 text-white rounded-md px-2 py-1"
+                        @click="saveCapacity">SAVE</button>
+                </div>
+            </div>
+            <div class="flex flex-col">
+                <div class="flex items-center py-2 gap-4">
+                    <p class="w-full">VEHICLE TYPE</p>
+                    <p class="w-full">ALOTTED SPACE</p>
+                    <p class="w-full">RESERVED</p>
+                </div>
+                <div class="flex items-center py-2 gap-4" v-for="capacity, index in form.parking_capacity"
+                    :key="capacity.id">
+                    <select v-model="form.parking_capacity[index].vehicle_type_id" class="border w-full p-2">
+                        <option value="" disabled>Select Vehicle Type</option>
+                        <option v-for="type in vehicle_types" :key="type.value" :value="type.value">
+                            {{ type.label }}
+                        </option>
+                    </select>
+                    <input type="text" v-model="form.parking_capacity[index].capacity" class="p-1 border w-full">
+                    <div class="w-full">
+                        <input type="checkbox" v-model="form.parking_capacity[index].reserved"
+                            class="p-2 h-4 w-4 border">
+                    </div>
+                    <font-awesome-icon :icon="['far', 'trash-can']"
+                        class="text-red-700 w-5 h-5 mt-2 hover:text-red-500 "
+                        @click="() => openDeleteCapacity(capacity.id)" />
+                </div>
+            </div>
+        </div>
+
+        <!-- RATES -->
         <div class="border flex flex-col">
             <div class="flex flex-col p-2">
                 <div class="flex flex-row justify-between">
@@ -72,21 +131,65 @@
         <!-- PAYMENT SETTINGS -->
 
         <div class="p-2 border">
-            <div class="flex flex-row justify-between border-b">
+            <div class="flex flex-row items-center justify-between border-b">
                 <p class="font-semibold">PAYMENT SETTINGS</p>
+                <button class="border bg-blue-400 hover:bg-blue-500 text-white rounded-md px-2 py-1"
+                    @click="saveParkingZone">SAVE</button>
             </div>
-            <div class="flex flex-col items-center justify-center p-2">
-                <div class="w-[300px] h-[300px] bg-slate-200">
+            <div class="flex flex-col items-start justify-evenly p-2 gap-4">
+                <dInput label="UPI ID" placeholder="xyz@iciciok" v-model="form.upi_id" class="w-[300px]" />
+
+                <div class="w-[300px] h-[300px] bg-slate-200" v-if="qr_code">
                     <img :src="qr_code" alt="QR CODE" class="text-center w-full h-full">
+                    <!-- <input type="file" accept="image/*" class="mt-2" @change="setFile"> -->
                 </div>
-                <input type="file" accept="image/*" class="mt-2">
+
             </div>
+        </div>
+
+        <!-- MANAGERS -->
+
+        <div class="p-2 border">
+            <div class="flex flex-row items-center justify-between border-b">
+                <p class="font-semibold">MANAGERS</p>
+                <button class="border bg-blue-400 hover:bg-blue-500 text-white rounded-md px-2 py-1"
+                    @click="addManager">ADD</button>
+            </div>
+            <d-table :columns="manager_columns" :rows="form.managers" :pagination="pagination">
+                <template #actions="{ row }">
+                    <td align="right" class="py-4">
+                        <div class="flex flex-row items-center justify-end pr-2 gap-2">
+                            <button @click="() => deleteManager(row.laravel_through_key)"
+                                class="rounded-full hover:bg-slate-100">
+                                <font-awesome-icon :icon="['far', 'trash-can']"
+                                    class="text-red-700 w-5 h-5 hover:text-red-500 " />
+                            </button>
+                        </div>
+                    </td>
+                </template>
+            </d-table>
         </div>
 
         <!-- MODALS -->
         <Modal v-model:open="openCreateRate">
             <create_rate :parking-zone-id="parking_zone_id"
                 @close="async () => { await getRates(); openCreateRate = !openCreateRate }"></create_rate>
+        </Modal>
+
+        <Modal v-model:open="open_create_manager">
+            <create_manager :parking-zone-id="parking_zone_id"
+                @close="async () => { await getParkingZone(); open_create_manager = !open_create_manager }">
+            </create_manager>
+        </Modal>
+
+        <Modal v-model:open="open_delete_capacity">
+            <div class="bg-white p-6">
+                <p>DELETE</p>
+                <p>Are you sure you want to delete the capacity?</p>
+                <div class="w-full flex items-center justify-end mt-4">
+                    <button @click="confirmDeleteCapacity" class="bg-red-500 text-white p-2 px-4">Confirm</button>
+                </div>
+            </div>
         </Modal>
 
         <Modal v-model:open="open_delete_rate">
@@ -109,6 +212,16 @@
             </div>
         </Modal>
 
+        <Modal v-model:open="open_delete_manager">
+            <div class="bg-white p-6">
+                <p>DELETE</p>
+                <p>Are you sure you want to delete the manager?</p>
+                <div class="w-full flex items-center justify-end mt-4">
+                    <button @click="confirmDeleteManager" class="bg-red-500 text-white p-2 px-4">Confirm</button>
+                </div>
+            </div>
+        </Modal>
+
     </div>
 </template>
 
@@ -118,15 +231,26 @@ import api from '../../../boot/api';
 import useAuth from '../../../scripts/auth';
 import Modal from '../../../components/Modal.vue';
 import create_rate from './create_rate.vue';
+import dInput from '../../../components/d-input.vue';
 import useNotification from '../../../scripts/notification';
+import Create_manager from './create_manager.vue';
 
 const { parking_zone_id } = useAuth()
 
 const { notify } = useNotification()
 
+const manager_columns = [
+    { name: 'name', label: 'NAME', field: 'name' },
+    { name: 'email', label: 'EMAIL', field: 'email' },
+    { name: 'phone', label: 'PHONE', field: 'phone' },
+]
+
 const openCreateRate = ref(false)
 const open_delete_rate = ref(false)
 const open_delete_interval = ref(false)
+const open_create_manager = ref(false)
+const open_delete_manager = ref(false)
+const open_delete_capacity = ref(false)
 
 const qr_code = ref(null)
 
@@ -138,6 +262,8 @@ const rates = ref(null)
 
 const rateToDelete = ref(null)
 const intervalToDelete = ref(null)
+const managerToDelete = ref(null)
+const capacityToDelete = ref(null)
 
 const editing_name = ref(false)
 
@@ -174,6 +300,11 @@ const confirmDeleteInterval = async () => {
     intervalToDelete.value = null
     await getRates()
 }
+
+const getVehicleTypeLabel = (vehicleTypeId) => {
+    const type = vehicle_types.value.find(vt => vt.value === vehicleTypeId);
+    return type ? type.label : 'Unknown';
+};
 
 const discardInterval = (rateId, intervalIndex) => {
     const rate = rates.value.find(r => r.id === rateId);
@@ -232,6 +363,8 @@ const saveParkingZone = async () => {
     }
     fd.append('_method', 'PATCH')
     const { data } = await api.post(`parking-zones/${parking_zone_id.value}`, fd);
+
+    notify({ type: 'success', message: data.message })
 }
 
 const getRates = async () => {
@@ -254,10 +387,109 @@ const getIntervalSettings = async () => {
     })
 }
 
-onMounted(async () => {
+
+const addCapacity = () => {
+    form.value.parking_capacity.push({
+        id: null,
+        parking_zone: parking_zone_id.value,
+        vehicle_type_id: '',
+        capacity: '',
+        reserved: false
+    })
+}
+
+const vehicle_types = ref(null)
+
+const getVehicleTypes = async () => {
+    const { data } = await api.get('vehicle-types')
+    vehicle_types.value = data.vehicle_types.data.map((element) => {
+        return { value: element.id, label: element.name }
+    })
+}
+
+const saveCapacity = async () => {
+    for (let capacity of form.value.parking_capacity) {
+        console.log(capacity)
+        if (capacity.id == null) {
+            const { data } = await api.post(`parking-zone/${parking_zone_id.value}/parking-capacity`, {
+                parking_zone_id: parking_zone_id.value,
+                vehicle_type_id: capacity.vehicle_type_id,
+                capacity: capacity.capacity,
+                reserved: capacity.reserved
+            })
+            notify({ type: 'error', message: data.message })
+        } else {
+            const fd = new FormData()
+            for (let key in capacity) {
+                fd.append(key, capacity[key])
+            }
+            fd.append('_method', 'PATCH')
+            const { data } = await api.post(`parking-zone/${parking_zone_id.value}/parking-capacity/${capacity.id}`, fd)
+
+            notify({ type: 'success', message: data.message })
+        }
+    }
+    await getParkingZone()
+}
+
+const setFile = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        qr_code.value = URL.createObjectURL(file);
+        const fd = new FormData();
+        fd.append('qr_code', file);
+        api.post(`payment-qr/${parking_zone_id.value}`, fd);
+    }
+};
+
+const getQrCode = async () => {
+    const { data } = await api.get('payment-qr', { params: { parking_zone_id: parking_zone_id.value } })
+    qr_code.value = data
+}
+
+const addManager = () => {
+    open_create_manager.value = true
+}
+
+const getParkingZone = async () => {
     const { data } = await api.get(`parking-zones/${parking_zone_id.value}`)
+    console.log(data)
     form.value = data
+}
+
+const deleteManager = (id) => {
+    open_delete_manager.value = true
+    managerToDelete.value = id
+}
+
+const confirmDeleteManager = async () => {
+    const fd = new FormData()
+    fd.append('_method', "DELETE")
+    const { data } = await api.post(`managers/${managerToDelete.value}`, fd)
+
+    notify({ type: 'success', message: data.message })
+    await getParkingZone()
+}
+
+const openDeleteCapacity = (id) => {
+    capacityToDelete.value = id
+    open_delete_capacity.value = true
+}
+
+const confirmDeleteCapacity = async () => {
+    const fd = new FormData()
+    fd.append('_method', "DELETE")
+    const { data } = await api.post(`parking-zone/${parking_zone_id.value}/parking-capacity/${capacityToDelete.value}`, fd)
+
+    notify({ type: 'success', message: data.message })
+    await getParkingZone()
+}
+
+onMounted(async () => {
+    await getParkingZone()
     await getRates()
     await getIntervalSettings()
+    await getVehicleTypes()
+    await getQrCode()
 })
 </script>
