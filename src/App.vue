@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col items-center justify-start">
+  <div>
     <div id="notification-card"
       :class="['fixed w-[300px] h-[60px] flex items-center top-0 justify-center bg-green-400 text-white rounded-sm font-semibold bottom-0 transition-all duration-300', _message !== '' ? 'translate-y-4' : '-translate-y-full']">
       {{ _message }}
