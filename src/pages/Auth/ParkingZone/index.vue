@@ -54,7 +54,7 @@
                 </div>
                 <div class="flex items-center py-2 gap-4" v-for="capacity, index in form.parking_capacity"
                     :key="capacity.id">
-                    <select v-model="form.parking_capacity[index].vehicle_type.id" class="border w-full p-2">
+                    <select v-model="form.parking_capacity[index].vehicle_type_id" class="border w-full p-2">
                         <option value="" disabled>Select Vehicle Type</option>
                         <option v-for="type in vehicle_types" :key="type.value" :value="type.value">
                             {{ type.label }}
@@ -392,7 +392,7 @@ const addCapacity = () => {
     form.value.parking_capacity.push({
         id: null,
         parking_zone: parking_zone_id.value,
-        vehicle_type: '',
+        vehicle_type_id: '',
         capacity: '',
         reserved: false
     })
@@ -412,8 +412,8 @@ const saveCapacity = async () => {
         console.log(capacity)
         if (capacity.id == null) {
             const { data } = await api.post(`parking-zone/${parking_zone_id.value}/parking-capacity`, {
-                parking_zone: parking_zone_id.value,
-                vehicle_type: capacity.vehicle_type,
+                parking_zone_id: parking_zone_id.value,
+                vehicle_type_id: capacity.vehicle_type_id,
                 capacity: capacity.capacity,
                 reserved: capacity.reserved
             })
