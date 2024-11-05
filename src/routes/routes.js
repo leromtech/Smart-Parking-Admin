@@ -23,7 +23,17 @@ const routes = [
           { name: 'Wallet', path: 'wallet', component: () => import('../pages/Customer/Wallet/index.vue') },
           { name: 'Profile', path: 'profile', component: () => import('../pages/Customer/Profile/index.vue') },
         ]
-      }
+    },
+    {
+        name: 'ManagerLayout',
+        path: '/manager',
+        meta: { requiresAuth: true, roles: ['manager'] },
+        component: () => import('../layouts/ManagerLayout.vue'),
+        children: [
+            { name: 'Checkout', path: 'checkout', component: () => import('../pages/Manager/Checkout/index.vue') },
+            { name: 'Scan', path: 'scan', component: () => import('../pages/Manager/Scan/index.vue') },
+        ]
+    }
       
 ];
 
