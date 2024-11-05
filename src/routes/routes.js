@@ -22,6 +22,8 @@ const routes = [
           { name: 'Parking', path: 'parking', component: () => import('../pages/Customer/Parking/index.vue') },
           { name: 'Wallet', path: 'wallet', component: () => import('../pages/Customer/Wallet/index.vue') },
           { name: 'Profile', path: 'profile', component: () => import('../pages/Customer/Profile/index.vue') },
+          { name: 'Add Vehicle', path: 'profile/add-vehicle', component: () => import('../pages/Customer/Profile/addVehicle.vue') },
+          { name: 'Customer Scan Qr', path: 'profile/scan-qr', component: () => import('../pages/Customer/Profile/scanQrCode.vue') },
         ]
       }
       

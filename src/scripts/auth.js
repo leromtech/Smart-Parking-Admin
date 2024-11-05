@@ -34,7 +34,7 @@ const fetchUser = async () => {
 }
 
 const login = async (fd) => {
-    await axios.get('https://api.leromtech.com/sanctum/csrf-cookie')
+    await axios.get('http://localhost:8000/sanctum/csrf-cookie')
     const {data} = await api.post('login', fd);
     if(data.success){
         localStorage.setItem('auth_token', data.token)
