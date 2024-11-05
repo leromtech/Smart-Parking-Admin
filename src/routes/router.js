@@ -47,6 +47,14 @@ router.beforeEach(async (to, from, next) => {
       }
       return next('/'); // Redirect to a 'Not Authorized' page or fallback for other roles
     }
+
+    if (!hasRequiredRole) {
+      // Redirect customers to the CustomerLayout route if they don't have access to the current route
+      if (userRoles.includes('manager')) {
+        return next('/manager'); // Redirect to CustomerLayout
+      }
+      return next('/'); // Redirect to a 'Not Authorized' page or fallback for other roles
+    }
   }
 
   // If everything is fine, allow navigation

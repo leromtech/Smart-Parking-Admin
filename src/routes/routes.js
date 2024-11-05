@@ -25,7 +25,17 @@ const routes = [
           { name: 'Add Vehicle', path: 'profile/add-vehicle', component: () => import('../pages/Customer/Profile/addVehicle.vue') },
           { name: 'Customer Scan Qr', path: 'profile/scan-qr', component: () => import('../pages/Customer/Profile/scanQrCode.vue') },
         ]
-      }
+    },
+    {
+        name: 'ManagerLayout',
+        path: '/manager',
+        meta: { requiresAuth: true, roles: ['manager'] },
+        component: () => import('../layouts/ManagerLayout.vue'),
+        children: [
+            { name: 'Checkout', path: 'checkout', component: () => import('../pages/Manager/Checkout/index.vue') },
+            { name: 'Scan', path: 'scan', component: () => import('../pages/Manager/Scan/index.vue') },
+        ]
+    }
       
 ];
 
