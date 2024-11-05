@@ -3,7 +3,7 @@
         <div class="w-full items-center grid grid-cols-5 h-[60px] border-b-2">
             <!-- Logo -->
             <div class="justify-self-end col-span-1 md:flex hidden">
-
+                
             </div>
 
             <!-- Navigation (hidden on small screens) -->
@@ -98,10 +98,10 @@ const profileMenuOpen = ref(false)
 const menuOpen = ref(false)  // This controls the mobile menu open/close state
 
 const navItems = [
-    { name: 'Users', link: 'users', role: 'superadmin' },
-    { name: 'Parking Zones', link: 'parking-zones', role: 'superadmin' },
-    { name: 'Vehicles', link: 'vehicles', role: 'superadmin' },
-    { name: 'Vehicle Types', link: 'vehicle-types', role: 'superadmin' },
-    { name: 'Parking Zone', link: 'parking-zone', role: 'owner' },
+    { name: 'Users', link: '/auth/users', role: 'superadmin' },
+    { name: 'Parking Zones', link: '/auth/parking-zones', role: 'superadmin' },
+    { name: 'Vehicles', link: '/auth/vehicles', role: 'superadmin' },
+    { name: 'Vehicle Types', link: '/auth/vehicle-types', role: 'superadmin' },
+    { name: 'Parking Zone', link: '/auth/parking-zone', role: 'owner' },
 ]
 </script>

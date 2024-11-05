@@ -12,6 +12,7 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const requiredRoles = to.meta.roles; // Roles required by the route
+
   // Check if the route requires authentication
   if (requiresAuth && !loggedIn()) {
     return next('/'); // Redirect to home or login if not logged in
@@ -31,16 +32,26 @@ router.beforeEach(async (to, from, next) => {
   if (requiredRoles && user.value) {
     const userRoles = user.value.roles.map(role => role.name); // Extract role names
 
-    // Check if the user has at least one of the required roles
+    // Allow superadmin role to access any route
+    if (userRoles.includes('superadmin')) {
+      return next();
+    }
+
+    // Check if the user has at least one of the required roles for non-superadmin roles
     const hasRequiredRole = requiredRoles.some(role => userRoles.includes(role));
 
     if (!hasRequiredRole) {
-      return next('/'); // Redirect to a 'Not Authorized' page or any fallback
+      // Redirect customers to the CustomerLayout route if they don't have access to the current route
+      if (userRoles.includes('customer')) {
+        return next('/customer'); // Redirect to CustomerLayout
+      }
+      return next('/'); // Redirect to a 'Not Authorized' page or fallback for other roles
     }
   }
 
   // If everything is fine, allow navigation
   next();
 });
+
 
 export default router;
