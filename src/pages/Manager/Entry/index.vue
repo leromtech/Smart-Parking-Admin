@@ -11,14 +11,9 @@
 
         <label class="mt-8">Vehicle Registration No.</label>
         <input type="text" v-model="form.registration_no"
-            class="p-2 border border-[#8B8B8B] bg-[#0B0B0B] rounded-lg mt-2 focus:outline-none focus:ring-2 focus:ring-[#7F00FF]">
+            class="p-2 border border-[#8B8B8B] bg-[#0B0B0B] rounded-lg mt-2">
 
-        <label class="mt-8">Vehicle Model</label>
-        <input type="text" v-model="form.vehicle_model"
-            class="p-2 border border-[#8B8B8B] bg-[#0B0B0B] rounded-lg mt-2 focus:outline-none focus:ring-2 focus:ring-[#7F00FF]"
-            placeholder="eg. Hero Xoom">
-
-        <button class="border-[#7F00FF] border p-2 rounded-lg mt-auto" @click="submit">Add Vehicle</button>
+        <button class="bg-[#7F00FF] p-2 rounded-full mt-auto" @click="submit">Submit</button>
     </div>
 </template>
 
@@ -35,8 +30,7 @@ const { user } = useAuth()
 
 const form = ref({
     vehicle_type_id: '',
-    registration_no: '',
-    vehicle_model: ''
+    registration_no: ''
 })
 
 const submit = async () => {

@@ -17,7 +17,6 @@ router.beforeEach(async (to, from, next) => {
   if (requiresAuth && !loggedIn()) {
     return next('/'); // Redirect to home or login if not logged in
   }
-
   try {
     // If user is logged in but user data is not fetched, fetch it
     if (loggedIn() && !user.value) {

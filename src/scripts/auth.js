@@ -34,13 +34,14 @@ const fetchUser = async () => {
 }
 
 const login = async (fd) => {
-    await axios.get('http://localhost:8000/sanctum/csrf-cookie')
+    await axios.get('https://api.leromtech.com/sanctum/csrf-cookie')
     const {data} = await api.post('login', fd);
     if(data.success){
         localStorage.setItem('auth_token', data.token)
         user.value = data.user
         roles.value = user.value.roles.map((item) => item.name)
-        const route = data.user.roles[0] == 'customer' ? '/app' : '/auth'
+        let route = data.user.roles[0].name == 'customer' ? '/customer' : '/auth'
+         route = data.user.roles[0].name == 'manager' ?? '/manager'
         router.replace(route)
     }else{
         return data.message

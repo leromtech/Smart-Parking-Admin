@@ -4,6 +4,7 @@
 
         <Head title="Welcome" />
         <NavBar v-model:login-dialog="loginDialogOpen" v-model:register-dialog="registerDialogOpen" />
+        <router-link to="/root-scan">scan</router-link>
         <section class="">
             <div class="px-2 py-16 mx-auto sm:max-w-xl md:max-w-full lg:max-w-screen-xl md:px-24 lg:px-8 lg:py-20">
                 <div class="flex flex-col items-center justify-between lg:flex-row">
