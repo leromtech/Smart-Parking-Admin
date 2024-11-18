@@ -1,37 +1,34 @@
 <template>
     <div class="w-full h-dvh flex p-8 pt-16 justify-center items-center flex-col bg-[#0B0B0B]">
         <div class="qr-container relative">
-            <qrcode-stream @decode="onDecode" @init="onInit">
+            <video id="video" width="300" height="300" autoplay>
                 <div class="corner top-left"></div>
                 <div class="corner top-right"></div>
                 <div class="corner bottom-left"></div>
                 <div class="corner bottom-right"></div>
-            </qrcode-stream>
+            </video>
+            <p v-if="qrCodeData">QR Code Data: {{ qrCodeData }}</p>
+
         </div>
         <p class="text-white">QR Code Data: {{ qrCodeData }}</p>
     </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { QrcodeStream } from 'vue-qrcode-reader';
+import { onMounted, ref } from 'vue';
+import { BrowserQRCodeReader } from '@zxing/browser';
 
 const qrCodeData = ref(null);
 
-const onDecode = async (data) => {
-    qrCodeData.value = data;
-    await sendQrCodeData();
-};
-
-const onInit = (promise) => {
-    promise.catch(error => {
-        console.error('Could not initialize camera', error);
-    });
-};
-
-const sendQrCodeData = async () => {
-    console.log(qrCodeData.value)
-};
+onMounted(() => {
+    const codeReader = new BrowserQRCodeReader();
+    codeReader.decodeOnceFromVideoDevice(undefined, 'video')
+        .then(result => {
+            console.log(result);
+            qrCodeData.value = result.text;
+        })
+        .catch(err => console.error(err));
+});
 </script>
 
 <style scoped>
