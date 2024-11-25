@@ -1,130 +1,138 @@
 <template>
-    <div class="min-h-screen flex flex-col bg-gray-900 text-white">
-      <div class="text-center my-6">
-        <h1 class="text-2xl font-bold mt-2">Parking Detail & History</h1>
-      </div>
-  
-      <div class="flex w-full justify-center items-center py-2">
-        <div class="flex-1 text-center px-4">
-          <button class="w-full py-2 bg-gray-600 text-white rounded-full">Ongoing</button>
-        </div>
-        <div class="flex-1 text-center px-4">
-          <button class="w-full py-2 bg-gray-600 text-white rounded-full">Completed</button>
-        </div>
-        <div class="flex-1 text-center px-4">
-          <button class="w-full py-2 bg-gray-600 text-white rounded-full">Canceled</button>
-        </div>
-      </div>
-  
-      <div class="flex items-center justify-center h-auto my-8">
-        <div class="relative flex items-center justify-center">
-          <!-- Outer Ring -->
-          <div class="absolute w-56 h-56 rounded-full border-8 border-gray-300"></div>
-          
-          <!-- SVG Circle for Countdown Progress -->
-          <svg class="w-48 h-48 transform -rotate-90" viewBox="0 0 200 200">
-            <circle class="text-gray-300" cx="100" cy="100" r="90" stroke-width="10" fill="none" />
-            <circle
-              class="text-green-500 transition-all duration-1000 ease-linear"
-              cx="100"
-              cy="100"
-              r="90"
-              :stroke-dasharray="circumference"
-              :stroke-dashoffset="progressOffset"
-              stroke-width="10"
-              fill="none"
-              stroke-linecap="round"
-            />
-          </svg>
-          
-          <!-- Countdown Text (Hours:Minutes:Seconds) -->
-          <div class="absolute text-2xl font-bold text-gray-700">
-            {{ hours }}:{{ minutes }}:{{ seconds }}
-          </div>
-        </div>
-      </div>
-  
-      <div class="w-full h-auto mt-4">
-        <div class="bg-gray-800 mx-6 rounded-lg">
-          <div class="flex justify-center items-center">
-            <div class="flex-1 mx-4 py-4">
-              <label class="">Parking Area</label>
-              <div class="text-lg py-1">
-                <h1>Millennium Center</h1>
-              </div>
-            </div>
-            <div class="flex-1 mx-4 py-4">
-              <label class="">Vehicle Type</label>
-              <div class="text-lg py-1">
-                <h1>Four Wheeler</h1>
-              </div>
-            </div>
-          </div>
-          <div class="flex justify-center items-center">
-            <div class="flex-1 mx-4 py-4">
-              <label class="">Duration</label>
-              <div class="text-lg py-1">
-                <h1>2 Hours</h1>
-              </div>
-            </div>
-            <div class="flex-1 mx-4 py-4">
-              <label class="">Date</label>
-              <div class="text-lg py-1">
-                <h1>8th October 2024</h1>
-              </div>
-            </div>
-          </div>
-          <div class="flex justify-center items-center">
-            <div class="flex-1 mx-4 py-4">
-              <label class="">Time</label>
-              <div class="text-lg py-1">
-                <h1>4:00PM to 6:00PM</h1>
-              </div>
-            </div>
-            <div class="flex-1 mx-4 py-4">
-              <label class=""></label>
-              <div class="text-lg py-1">
-                <h3 class="text-[#F0E573]">Expand Parking Time</h3>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-      </div>
-  
+  <div class="h-full w-full flex flex-col bg-[#0B0B0B] text-white relative overflow-hidden">
+    <div class="text-center my-6">
+      <h1 class="text-2xl font-bold mt-2">Parking Detail & History</h1>
     </div>
-  </template>
-  
-  
+
+    <div class="flex w-full justify-center items-center py-2 px-4 gap-2">
+      <button class="w-full py-2 bg-[#1D1D1D] text-white rounded-full"
+        @click="() => selectFilter('ongoing')">Ongoing</button>
+      <button class="w-full py-2 bg-[#1D1D1D] text-white rounded-full"
+        @click="() => selectFilter('completed')">Completed</button>
+      <button class="w-full py-2 bg-[#1D1D1D] text-white rounded-full"
+        @click="() => selectFilter('canceled')">Canceled</button>
+    </div>
+
+    <div class="w-full h-full flex flex-col px-2 mt-6">
+      <div class="flex flex-col w-full p-4 bg-[#14141480] border-2 border-[#1D1D1D] rounded-lg"
+        v-for="parkingRecord in parkingRecords" :key="parkingRecord.id">
+        <span>
+          Time until check-out
+        </span>
+        <div class="font-semibold tracking-widest text-[2rem] text-blue-600" v-if="parkingRecord.end_time === null">
+          {{ formatTime(parkingRecord.elapsedTime) }}
+        </div>
+        <div class="bg-[#1D1D1D] p-2 mt-2 gap-2 flex flex-col rounded-lg">
+          <span class="font-semibold">
+            {{ parkingRecord.parking_zone.name }}
+          </span>
+          <div class="flex flex-row items-center justify-between">
+            <p>Check-in time</p>
+            <p>{{ parkingRecord.start_time }}</p>
+          </div>
+          <div class="flex flex-row items-center justify-between">
+            <p>Vehicle Reg. Number</p>
+            <p>{{ parkingRecord.vehicle.registration_no }}</p>
+          </div>
+          <div class="flex flex-row items-center justify-between">
+            <p>Vehicle Type</p>
+            <p>{{ parkingRecord.vehicle_type.name }}</p>
+          </div>
+          <button class="bg-[#0e991a] p-2 rounded-lg mt-4" @click="() => checkOut(parkingRecord.id)">Checkout</button>
+        </div>
+      </div>
+    </div>
+
+    <Modal v-model:open="checkOutOpen">
+      <div class="flex flex-col p-6 bg-[#272727] rounded-lg">
+        <span class="font-bold text-[1.2rem] mb-2">Check-Out</span>
+        <div class="fkex flex-col justify-center p-6 bg-[#414141] rounded-lg">
+          <div class="flex items-center justify-center p-2 bg-black">
+            <img src="" alt="qr" class="w-[300px] h-[300px]">
+          </div>
+          <div class="flex flex-row justify-between w-full mt-2">
+            <p>Reg No.</p>
+            <p>{{ parkingRecords[selectedParkingRecord].vehicle.registration_no }}</p>
+          </div>
+          <div class="flex flex-row justify-between w-full mt-2">
+            <p>Type</p>
+            <p>{{ parkingRecords[selectedParkingRecord].vehicle_type.name }}</p>
+          </div>
+          <div class="flex flex-row justify-between w-full mt-2">
+            <p>Token</p>
+            <p>{{ parkingRecords[selectedParkingRecord].otp_code }}</p>
+          </div>
+        </div>
+        <div class="my-4 self-center">
+          OR
+        </div>
+        <button class="rounded-full p-3 w-full bg-blue-700">Scan</button>
+      </div>
+    </Modal>
+
+  </div>
+</template>
+
 <script setup>
-  import { ref, computed } from 'vue';
-  
-  const countdownTime = ref(10 * 60); // Default: 10 minutes in seconds
-  const remainingTime = ref(countdownTime.value);
-  const countingDown = ref(false); // Countdown state
-  const radius = 90;
-  const circumference = 2 * Math.PI * radius;
-  
-  // Computed properties for hours, minutes, and seconds
-  const hours = computed(() => String(Math.floor(remainingTime.value / 3600)).padStart(2, '0'));
-  const minutes = computed(() => String(Math.floor((remainingTime.value % 3600) / 60)).padStart(2, '0'));
-  const seconds = computed(() => String(remainingTime.value % 60).padStart(2, '0'));
-  
-  // Computed property for progress offset
-  const progressOffset = computed(() => circumference - (remainingTime.value / countdownTime.value) * circumference);
-  
-  // Start countdown function
-  function startCountdown() {
-    if (countingDown.value) return; // Prevent multiple countdowns
-  
-    countingDown.value = true;
-    const interval = setInterval(() => {
-      if (remainingTime.value > 0) {
-        remainingTime.value -= 1;
-      } else {
-        clearInterval(interval);
-        countingDown.value = false;
-      }
-    }, 1000);
-  }
+import { ref, computed, onMounted, triggerRef } from 'vue';
+import api from '../../../boot/api';
+import useAuth from '../../../scripts/auth';
+import Drawer from '../../../components/Drawer.vue';
+import Modal from '../../../components/Modal.vue';
+
+const { user } = useAuth()
+
+const filter = ref('ongoing')
+const parkingRecords = ref([])
+const checkOutOpen = ref(false)
+const selectedParkingRecord = ref(null)
+
+const selectFilter = async (value) => {
+  filter.value = value
+  await getParkingRecords()
+}
+
+const checkOut = (id) => {
+  selectedParkingRecord.value = parkingRecords.value.findIndex((item) => { return item.id === id })
+  checkOutOpen.value = true
+}
+
+const getParkingRecords = async () => {
+  const { data } = await api.get('customer/get-parking-record', {
+    params: {
+      user_id: user.value.id,
+      filter: filter.value
+    }
+  })
+
+  parkingRecords.value = data.map((record) => {
+    const startTime = new Date(record.start_time); // Convert start_time to Date
+    const elapsed = Math.floor((Date.now() - startTime) / 1000); // Elapsed time in seconds
+    return { ...record, elapsedTime: elapsed };
+  });
+
+  beginTimer();
+}
+
+const formatTime = (seconds) => {
+  const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+  const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+  const s = (seconds % 60).toString().padStart(2, '0');
+  return `${h}:${m}:${s}`;
+};
+
+let timerInterval;
+
+const beginTimer = () => {
+  if (timerInterval) clearInterval(timerInterval); // Clear previous timer if it exists
+  timerInterval = setInterval(() => {
+    parkingRecords.value = parkingRecords.value.map((record) => {
+      return { ...record, elapsedTime: record.elapsedTime + 1 };
+    });
+  }, 1000);
+};
+
+onMounted(() => {
+  getParkingRecords()
+})
 </script>

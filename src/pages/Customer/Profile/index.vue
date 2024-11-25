@@ -14,7 +14,7 @@
         {{ vehicle.registration_no }}
       </div>
     </div>
-    <div class="m-6 flex rounded-lg bg-[#1D1D1D] p-4" v-if="vehicleQrCode">
+    <div class="m-6 flex rounded-lg bg-[#1D1D1D] p-4 items-center justify-center" v-if="vehicleQrCode">
       <img :src="vehicleQrCode" alt="" class="border-4 border-white">
     </div>
     <div class="flex flex-row items-center justify-center gap-2 text-yellow-300">

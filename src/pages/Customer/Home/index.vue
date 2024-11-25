@@ -326,6 +326,18 @@ onMounted(() => {
     getUserLocation(); // Fetch initial location
     getUserPositionTick();
     getParkingZones()
+
+    Echo.channel('parking-zones').listen('ParkingAvailabilityUpdated', (data) => {
+        const { parking_zone_id, real_time_availability, allowed_vehicle_types } = data;
+
+        const zoneIndex = parkingZones.value.findIndex(zone => zone.id === parseInt(parking_zone_id));
+        console.log(zoneIndex)
+        if (zoneIndex !== -1) {
+            parkingZones.value[zoneIndex].availability.real_time_availability = real_time_availability;
+            parkingZones.value[zoneIndex].availability.allowed_vehicle_types = allowed_vehicle_types;
+        }
+        console.log(parkingZones.value[zoneIndex])
+    });
 });
 
 onUnmounted(() => {
@@ -333,5 +345,7 @@ onUnmounted(() => {
         clearInterval(intervalId.value);
         intervalId.value = null;
     }
+
+    Echo.leaveChannel('parking-zones');
 });
 </script>

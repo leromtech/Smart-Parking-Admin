@@ -17,8 +17,8 @@
 <script setup>
 const menuOptions = [
   { name: 'Home', link: '/customer' },
-  { name: 'Parking', link: 'customer/parking' },
-  { name: 'Wallet', link: 'customer/wallet' },
-  { name: 'Profile', link: 'customer/profile' },
+  { name: 'Parking', link: '/customer/parking' },
+  { name: 'Wallet', link: '/customer/wallet' },
+  { name: 'Profile', link: '/customer/profile' },
 ]
 </script>

@@ -24,6 +24,7 @@ const routes = [
           { name: 'Parking', path: 'parking', component: () => import('../pages/Customer/Parking/index.vue') },
           { name: 'Wallet', path: 'wallet', component: () => import('../pages/Customer/Wallet/index.vue') },
           { name: 'Profile', path: 'profile', component: () => import('../pages/Customer/Profile/index.vue') },
+          { name: 'Park', path: '/park', component: () => import('../pages/Customer/Parking/create.vue') },
         ]
     },
     {

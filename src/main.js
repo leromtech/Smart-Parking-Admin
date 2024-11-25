@@ -8,6 +8,7 @@ import { fas } from '@fortawesome/free-solid-svg-icons'
 import { far } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import dTable from './components/d-table.vue'
+import clickOutside from './directives/clickOutside'
 library.add(fas)
 library.add(far)
 
@@ -33,6 +34,8 @@ window.Echo = new Echo({
     enabledTransports: ['ws', 'wss'],
 });
 
+
+app.directive('click-outside', clickOutside);
 app.component('Modal', Modal)
 app.component('d-table', dTable)
 app.component('font-awesome-icon', FontAwesomeIcon)
