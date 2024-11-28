@@ -41,8 +41,8 @@ const login = async (fd) => {
         user.value = data.user
         roles.value = user.value.roles.map((item) => item.name)
         let route = data.user.roles[0].name == 'customer' ? '/customer' : '/auth'
-         route = data.user.roles[0].name == 'manager' ?? '/manager'
-        router.replace(route)
+        route = data.user.roles[0].name == 'manager' ? '/manager' : route
+        router.push(route)
     }else{
         return data.message
     }
