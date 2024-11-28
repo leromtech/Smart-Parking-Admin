@@ -37,7 +37,7 @@
       </div>
     </div>
     <div class="flex items-center justify-center">
-      <button class="text-[#B469FF]">Sign Out</button>
+      <button class="text-[#B469FF]" @click="logout">Sign Out</button>
     </div>
   </div>
 </template>
@@ -45,6 +45,9 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue';
 import api from '../../../boot/api';
+import useAuth from '../../../scripts/auth';
+
+const { logout } = useAuth()
 
 const user = ref(null)
 

@@ -76,9 +76,14 @@
                 <p class="mt-4">Booking Time</p>
                 <p class="font-normal text-sm">{{ getDateTime() }}</p>
                 <p class="mt-4">Select Your Vehicle</p>
-                <div class="w-full h-full flex flex-col items-center" mt-2>
-
+                <div :class="['w-full flex flex-row items-center gap-4 my-2 p-2 rounded-lg', bookingVehicle == vehicle.registration_no ? 'bg-[#FF9500]' : 'bg-[#1d1d1d]']"
+                    v-for="vehicle in user.vehicle">
+                    <input :id='vehicle.registration_no' type="radio" :value="vehicle.registration_no"
+                        v-model="bookingVehicle">
+                    <label :for="vehicle.registration_no" class="w-full">{{ vehicle.registration_no }}</label>
                 </div>
+
+                <button class="w-full p-2 rounded-lg bg-[#7F00FF] mt-auto">Confirm Booking</button>
             </div>
         </Modal>
     </div>
@@ -91,10 +96,15 @@ import { computed, onMounted, onUnmounted, reactive, ref, useTemplateRef, watch 
 import useMap from '../../../scripts/map';
 import { Circle, GoogleMap, Marker } from 'vue3-google-map';
 import api from '../../../boot/api';
+import useAuth from '../../../scripts/auth';
+
+const { user } = useAuth()
 
 const modalOpen = ref(false)
 const selected = ref(null)
 const openBookingInfo = ref(false)
+
+const bookingVehicle = ref()
 
 const searchQuery = ref('')
 const theme = ref('dark')
