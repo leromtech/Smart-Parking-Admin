@@ -45,7 +45,7 @@ const routes = [
         meta: { requiresAuth: true, roles: ['manager'] },
         component: () => import('../layouts/ManagerLayout.vue'),
         children: [
-            { name: 'Checkout', path: 'checkout', component: () => import('../pages/Manager/Checkout/index.vue') },
+            { name: 'Parking', path: '', component: () => import('../pages/Manager/index.vue') },
             { name: 'Scan', path: 'scan', component: () => import('../pages/Manager/Scan/index.vue') },
             { name: 'Entry', path: 'entry', component: () => import('../pages/Manager/Entry/index.vue') },
         ]
