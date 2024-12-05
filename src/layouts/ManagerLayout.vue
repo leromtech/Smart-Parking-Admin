@@ -17,7 +17,7 @@
 <script setup>
 const menuOptions = [
   { name: 'Parking', link: '/manager' },
-  { name: 'Entry', link: '/customer/entry' },
-  { name: 'Profile', link: '/customer/profile' },
+  { name: 'Entry', link: '/manager/entry' },
+  { name: 'Profile', link: '/manager/profile' },
 ]
 </script>

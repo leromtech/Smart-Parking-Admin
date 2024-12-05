@@ -44,32 +44,29 @@
                 </div>
             </div>
         </div>
-        <Modal v-model:open="modalOpen" class="z-50">
-            <div
-                class="w-[90%] h-[70%] flex flex-col items-center bg-[#1a1919e8] border border-stone-700 rounded-lg p-2">
-                <img src="" alt="" class="w-full h-[45%] rounded-lg bg-stone-950 my-2">
-                <div class="flex flex-col w-full h-[40%] text-white px-2 mt-2 gap-2">
-                    <p>{{ selected.name }}</p>
-                    <div class="flex flex-row items-center justify-between">
-                        <p>Location</p>
-                        <p>{{ selected.address }}</p>
-                    </div>
-                    <div class="flex flex-row items-center justify-between">
-                        <p>availability</p>
-                        <p>{{ selected.availability.real_time_availability }}</p>
-                    </div>
+        <Modal v-model="modalOpen" class="flex flex-col bg-black p-6 rounded-lg border">
+            <img src="" alt="unavailable" class="min-w-full min-h-[300px] rounded-lg bg-stone-950 my-2 border">
+            <div class="flex flex-col w-full h-[40%] text-white px-2 mt-2 gap-2">
+                <p>{{ selected.name }}</p>
+                <div class="flex flex-row items-center justify-between">
+                    <p>Location</p>
+                    <p>{{ selected.address }}</p>
                 </div>
-                <div class="mt-auto flex gap-2 justify-between text-white w-full px-2">
-                    <button class="border border-[#7F00FF] bg-[#7F00FF] p-2  rounded-md font-normal w-full"
-                        @click="displayBookingInfo">Continue to
-                        book</button>
-                    <button class="border border-[#7F00FF] p-2  rounded-md font-normal w-full">Start
-                        navigation</button>
+                <div class="flex flex-row items-center justify-between">
+                    <p>availability</p>
+                    <p>{{ selected.availability.real_time_availability }}</p>
                 </div>
+            </div>
+            <div class="mt-8 flex gap-2 justify-between text-white w-full px-2">
+                <button class="border border-[#7F00FF] bg-[#7F00FF] p-2  rounded-md font-normal w-full"
+                    @click="displayBookingInfo">Continue to
+                    book</button>
+                <button class="border border-[#7F00FF] p-2  rounded-md font-normal w-full">Start
+                    navigation</button>
             </div>
         </Modal>
 
-        <Modal v-model:open="openBookingInfo">
+        <Modal v-model="openBookingInfo">
             <div
                 class="w-[90%] h-[70%] flex flex-col bg-[#1a1919e8] border border-stone-700 rounded-lg p-6 text-white font-medium">
                 <p>Booking Information</p>

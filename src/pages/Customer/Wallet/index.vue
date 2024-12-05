@@ -1,66 +1,63 @@
 <template>
-    <div class="bg-gray-900 min-h-screen p-5 text-white">
-      <!-- Wallet Balance Section -->
-      <div class="bg-gray-800 rounded-lg p-4 flex items-center justify-between mb-8">
+  <div class="wallet-page bg-black text-white flex flex-col min-h-screen">
+    <!-- Header -->
+    <header class="text-center text-2xl font-bold py-4">Wallet</header>
+
+    <!-- Wallet Balance Section -->
+    <section class="mb-8 px-4">
+      <div class="bg-[#1D1D1D] rounded-lg p-4 flex justify-between items-center">
         <div>
-          <p class="text-sm font-semibold">Your Wallet Balance</p>
-          <p class="text-4xl font-bold text-purple-500">1500 <span class="text-base text-gray-300">coins</span></p>
+          <p class="text-gray-400 text-sm">Your Wallet Balance</p>
+          <h1 class="text-4xl text-purple-400 font-bold">
+            {{ wallet.balance }} <span class="text-lg">coins</span>
+          </h1>
+        </div>
+        <div>
+          <img src="" alt="Wallet Icon" class="w-12" />
         </div>
       </div>
-  
-      <!-- Recharge Plan Section -->
-      <div>
-        <p class="text-sm font-semibold">Our Plan</p>
-        <h2 class="text-2xl font-bold mb-4">Recharge now</h2>
-        
-        <div class="space-y-4">
-          <!-- Each plan card -->
-          <div class="bg-gray-800 rounded-lg p-4 flex items-center justify-between">
-            <div>
-              <p class="font-semibold">Lorem ipsum</p>
-              <p class="text-gray-400 text-sm">Rs. Lorem ipsum</p>
-            </div>
-            <button class="bg-purple-500 rounded-full p-2">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-white">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 12H6.75m6.75-6.75L17.25 12l-4.5 6.75" />
-              </svg>
-            </button>
+    </section>
+
+    <!-- Recharge Section -->
+    <section class="flex-1 px-4">
+      <h2 class="text-lg text-gray-400 mb-1">Our Plan</h2>
+      <h3 class="text-2xl font-semibold mb-4">Recharge now</h3>
+      <div class="space-y-4">
+        <div v-for="plan in rechargePlans" :key="plan.id"
+          class="bg-[#1D1D1D] rounded-lg p-4 flex justify-between items-center">
+          <div>
+            <p class="text-lg font-semibold">{{ plan.title }}</p>
+            <p class="text-sm text-gray-400">{{ plan.description }}</p>
           </div>
-  
-          <!-- Repeat similar plan cards -->
-          <div class="bg-gray-800 rounded-lg p-4 flex items-center justify-between">
-            <div>
-              <p class="font-semibold">Lorem ipsum</p>
-              <p class="text-gray-400 text-sm">Rs. Lorem ipsum</p>
-            </div>
-            <button class="bg-purple-500 rounded-full p-2">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-white">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 12H6.75m6.75-6.75L17.25 12l-4.5 6.75" />
-              </svg>
-            </button>
+          <div class="text-right">
+            <p class="font-semibold">Rs. {{ plan.price }}</p>
           </div>
-  
-          <div class="bg-gray-800 rounded-lg p-4 flex items-center justify-between">
-            <div>
-              <p class="font-semibold">Lorem ipsum</p>
-              <p class="text-gray-400 text-sm">Rs. Lorem ipsum</p>
-            </div>
-            <button class="bg-purple-500 rounded-full p-2">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-white">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 12H6.75m6.75-6.75L17.25 12l-4.5 6.75" />
-              </svg>
-            </button>
-          </div>
+          <button class="ml-4 bg-purple-400 text-white w-10 h-10 flex items-center justify-center rounded-full">
+            →
+          </button>
         </div>
       </div>
-  
-    </div>
-  </template>
-  
-  <script setup>
-  </script>
-  
-  <style scoped>
-  /* Optional: Add any specific styling if needed */
-  </style>
-  
+    </section>
+  </div>
+</template>
+
+<script setup>
+import { onMounted, ref } from 'vue';
+import api from '../../../boot/api';
+import useAuth from '../../../scripts/auth';
+
+const { user } = useAuth()
+
+
+
+const wallet = ref(0)
+
+const getWalletBalance = async () => {
+  const { data } = await api.get('wallet', { params: { user_id: user.value.id } })
+  wallet.value = data
+}
+
+onMounted(() => {
+  getWalletBalance()
+})
+</script>

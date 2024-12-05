@@ -24,7 +24,7 @@ const routes = [
           { name: 'Parking', path: 'parking', component: () => import('../pages/Customer/Parking/index.vue') },
           { name: 'Wallet', path: 'wallet', component: () => import('../pages/Customer/Wallet/index.vue') },
           { name: 'Profile', path: 'profile', component: () => import('../pages/Customer/Profile/index.vue') },
-          { name: 'Park', path: '/park', component: () => import('../pages/Customer/Parking/create.vue') },
+          { name: 'Park', path: 'park', component: () => import('../pages/Customer/Parking/create.vue') },
         ]
     },
     {
@@ -45,8 +45,9 @@ const routes = [
         meta: { requiresAuth: true, roles: ['manager'] },
         component: () => import('../layouts/ManagerLayout.vue'),
         children: [
-            { name: 'Parking', path: '', component: () => import('../pages/Manager/index.vue') },
-            { name: 'Scan', path: 'scan', component: () => import('../pages/Manager/Scan/index.vue') },
+            { name: 'ManagerParking', path: '', component: () => import('../pages/Manager/index.vue') },
+            { name: 'Check-in', path: 'scan/check-in', component: () => import('../pages/Manager/Scan/checkIn.vue') },
+            { name: 'Check-out', path: 'scan/check-out', component: () => import('../pages/Manager/Scan/checkOut.vue') },
             { name: 'Entry', path: 'entry', component: () => import('../pages/Manager/Entry/index.vue') },
         ]
     }

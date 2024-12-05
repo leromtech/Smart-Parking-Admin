@@ -1,19 +1,16 @@
 <template>
-    <div class="flex flex-col w-full h-screen bg-[#0B0B0B] p-8 text-white">
-        <p class="text-[24px] font-normal mt-2">ADD VEHICLE</p>
-
-        <p class="mt-4">Vehicle Type</p>
-        <select class="border bg-[#0B0B0B] border-[#8B8B8B] p-3 mt-2 rounded-lg" v-model="form.vehicle_type_id">
-            <option v-for="option in vehicle_type_options" :key="option.value" :value="option.value">
-                {{ option.label }}
-            </option>
-        </select>
-
-        <label class="mt-8">Vehicle Registration No.</label>
-        <input type="text" v-model="form.registration_no"
-            class="p-2 border border-[#8B8B8B] bg-[#0B0B0B] rounded-lg mt-2">
-
-        <button class="bg-[#7F00FF] p-2 rounded-full mt-auto" @click="submit">Submit</button>
+    <div class="flex flex-col w-full h-screen bg-[#0B0B0B] p-8 text-white gap-4">
+        <span class="text-lg font-semibold">ENTRY</span>
+        <router-link to="scan/check-in"
+            class="w-full items-center justify-center flex bg-green-500 md:py-[5%] py-[20%] rounded-lg gap-2">
+            <font-awesome-icon :icon="['fas', 'qrcode']" class="text-[#ffffff] w-6 h-6" />
+            <p>Check-In</p>
+        </router-link>
+        <router-link to="scan/check-out"
+            class="w-full items-center justify-center flex bg-red-500 md:py-[5%] py-[20%] rounded-lg gap-2">
+            <font-awesome-icon :icon="['fas', 'qrcode']" class="text-[#ffffff] w-6 h-6" />
+            <p>Check-Out</p>
+        </router-link>
     </div>
 </template>
 

@@ -484,8 +484,8 @@
 
         <Login v-model:open="loginDialogOpen" class="absolute flex" />
 
-        <Modal v-model:open="registerDialogOpen">
-            <Register class="lg:w-[30%] w-[95%]" @close="registerDialogOpen = false" />
+        <Modal v-model="registerDialogOpen" class="lg:w-[30%] md:w-[70%] w-[90%]">
+            <Register @close="registerDialogOpen = false" />
         </Modal>
     </div>
 </template>
