@@ -3,7 +3,7 @@
         <div class="w-full items-center grid grid-cols-5 h-[60px] border-b-2">
             <!-- Logo -->
             <div class="justify-self-end col-span-1 md:flex hidden">
-                
+
             </div>
 
             <!-- Navigation (hidden on small screens) -->
@@ -102,6 +102,7 @@ const navItems = [
     { name: 'Parking Zones', link: '/auth/parking-zones', role: 'superadmin' },
     { name: 'Vehicles', link: '/auth/vehicles', role: 'superadmin' },
     { name: 'Vehicle Types', link: '/auth/vehicle-types', role: 'superadmin' },
+    { name: 'Admin Wallet', link: '/auth/wallet', role: 'superadmin' },
     { name: 'Parking Zone', link: '/auth/parking-zone', role: 'owner' },
 ]
 </script>
