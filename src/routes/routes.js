@@ -11,6 +11,7 @@ const routes = [
             { name: 'Parking Zones', path: 'parking-zones', component: () => import('../pages/Auth/ParkingZones/index.vue') },
             { name: 'Vehicles', path: 'vehicles', component: () => import('../pages/Auth/Vehicles/index.vue') },
             { name: 'Vehicle Types', path: 'vehicle-types', component: () => import('../pages/Auth/VehicleTypes/index.vue') },
+            { name: 'Admin Wallet', path: 'wallet', component: () => import('../pages/Auth/Wallet/index.vue') },
             { name: 'Parking Zone', path: 'parking-zone', component: () => import('../pages/Auth/ParkingZone/index.vue') }
         ]
     },
