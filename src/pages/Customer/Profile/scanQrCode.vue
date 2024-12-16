@@ -8,6 +8,7 @@
             <div class="corner bottom-right"></div>
             <video id="video" class="video-feed" autoplay></video>
         </div>
+        <p>{{ success }}</p>
     </div>
 </template>
 
@@ -20,7 +21,7 @@ import router from '../../../routes/router';
 import useAuth from '../../../scripts/auth';
 
 const { initParkingCustomer, selected_vehicle } = useParking()
-
+const success = ref()
 const { user } = useAuth()
 
 const form = ref({
@@ -30,8 +31,8 @@ const form = ref({
 const parkingZoneId = ref(null)
 
 const onScanQr = async (qrCodeData) => {
-    console.log(qrCodeData)
-    initParking(parkingZoneId.value, qrCodeData.value.user.id)
+    const data = await initParkingCustomer(parkingZoneId.value, qrCodeData.value.vehicle_id, qrCodeData.value.user_id)
+    success.value = data
 }
 
 onMounted(() => {
