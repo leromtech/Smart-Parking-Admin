@@ -18,7 +18,7 @@ const initParkingCustomer = async (parkingZoneId, vehicle_registration_no, vehic
     fd.append('vehicle_registration_no', vehicle_registration_no)
     fd.append('vehicle_type', vehicle_type)
 
-    const {data} = api.post('parking/initiate', fd)
+    const {data} = await api.post('parking/initiate', fd)
 
     return data
 }
@@ -31,7 +31,7 @@ const initParkingManager = async (user_id, vehicle_registration_no, vehicle_type
     fd.append('parking_zone_id', user.value.parking_zone_managed.id)
     console.log(fd)
 
-    const {data} = api.post('manager/initiate')
+    const {data} = await api.post('manager/initiate')
 }
 
 export default function useParking(){
