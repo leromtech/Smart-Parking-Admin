@@ -18,7 +18,7 @@
         <!-- GENERAL -->
 
         <div class="border flex flex-col p-2">
-            <div class="flex flex-row justify-between border-b">
+            <div class="flex flex-row justify-between items-center border-b py-2">
                 <p class="font-semibold">GENERAL</p>
                 <button class="border bg-blue-400 hover:bg-blue-500 text-white rounded-md px-2 py-1"
                     @click="saveParkingZone">SAVE</button>
@@ -28,46 +28,9 @@
                     <p>CAPACITY :</p>
                     <input type="text" v-model="form.capacity_total" class="p-1 border">
                 </div>
-            </div>
-        </div>
-
-        <!-- CAPACITIES -->
-
-        <div class="border flex flex-col p-2">
-            <div class="flex flex-row justify-between border-b">
-                <p class="font-semibold">CAPACITY</p>
-                <div class="flex flex-row items-center justify-between">
-
-                </div>
-                <div class="gap-4">
-                    <button class="border bg-blue-400 hover:bg-blue-500 text-white rounded-md px-2 py-1"
-                        @click="addCapacity">ADD</button>
-                    <button class="border bg-blue-400 hover:bg-blue-500 text-white rounded-md px-2 py-1"
-                        @click="saveCapacity">SAVE</button>
-                </div>
-            </div>
-            <div class="flex flex-col">
                 <div class="flex items-center py-2 gap-4">
-                    <p class="w-full">VEHICLE TYPE</p>
-                    <p class="w-full">ALOTTED SPACE</p>
-                    <p class="w-full">RESERVED</p>
-                </div>
-                <div class="flex items-center py-2 gap-4" v-for="capacity, index in form.parking_capacity"
-                    :key="capacity.id">
-                    <select v-model="form.parking_capacity[index].vehicle_type_id" class="border w-full p-2">
-                        <option value="" disabled>Select Vehicle Type</option>
-                        <option v-for="type in vehicle_types" :key="type.value" :value="type.value">
-                            {{ type.label }}
-                        </option>
-                    </select>
-                    <input type="text" v-model="form.parking_capacity[index].capacity" class="p-1 border w-full">
-                    <div class="w-full">
-                        <input type="checkbox" v-model="form.parking_capacity[index].reserved"
-                            class="p-2 h-4 w-4 border">
-                    </div>
-                    <font-awesome-icon :icon="['far', 'trash-can']"
-                        class="text-red-700 w-5 h-5 mt-2 hover:text-red-500 "
-                        @click="() => openDeleteCapacity(capacity.id)" />
+                    <p>RESERVED:</p>
+                    <input type="text" v-model="form.capacity_total" class="p-1 border">
                 </div>
             </div>
         </div>
@@ -171,18 +134,18 @@
         </div>
 
         <!-- MODALS -->
-        <Modal v-model:open="openCreateRate">
+        <Modal v-model="openCreateRate">
             <create_rate :parking-zone-id="parking_zone_id"
                 @close="async () => { await getRates(); openCreateRate = !openCreateRate }"></create_rate>
         </Modal>
 
-        <Modal v-model:open="open_create_manager">
+        <Modal v-model="open_create_manager">
             <create_manager :parking-zone-id="parking_zone_id"
                 @close="async () => { await getParkingZone(); open_create_manager = !open_create_manager }">
             </create_manager>
         </Modal>
 
-        <Modal v-model:open="open_delete_capacity">
+        <Modal v-model="open_delete_capacity">
             <div class="bg-white p-6">
                 <p>DELETE</p>
                 <p>Are you sure you want to delete the capacity?</p>
@@ -192,7 +155,7 @@
             </div>
         </Modal>
 
-        <Modal v-model:open="open_delete_rate">
+        <Modal v-model="open_delete_rate">
             <div class="bg-white p-6">
                 <p>DELETE</p>
                 <p>Are you sure you want to delete the rate?</p>
@@ -202,7 +165,7 @@
             </div>
         </Modal>
 
-        <Modal v-model:open="open_delete_interval">
+        <Modal v-model="open_delete_interval">
             <div class="bg-white p-6">
                 <p>DELETE</p>
                 <p>Are you sure you want to delete the rate interval?</p>
@@ -212,7 +175,7 @@
             </div>
         </Modal>
 
-        <Modal v-model:open="open_delete_manager">
+        <Modal v-model="open_delete_manager">
             <div class="bg-white p-6">
                 <p>DELETE</p>
                 <p>Are you sure you want to delete the manager?</p>
@@ -453,7 +416,6 @@ const addManager = () => {
 
 const getParkingZone = async () => {
     const { data } = await api.get(`parking-zones/${parking_zone_id.value}`)
-    console.log(data)
     form.value = data
 }
 
