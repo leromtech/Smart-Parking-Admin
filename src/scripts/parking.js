@@ -16,12 +16,12 @@ const form = ref({
 
 const initParkingCustomer = (parkingZoneId) => {
     form.value.parking_zone_id = parkingZoneId
+    form.value.vehicle_registration_no = selected_vehicle.registration_no
     if(user.value){
-        form.value.vehicle_registration_no = selected_vehicle.registration_no
         form.value.user_id = user.value.id
         form.value.phone = user.value.phone
     }
-    router.push('/park')
+    router.push('/customer/park')
 }
 
 const initParkingManager = async (user_id, vehicle_registration_no, vehicle_type) => {
