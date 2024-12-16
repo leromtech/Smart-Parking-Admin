@@ -47,8 +47,8 @@ onMounted(() => {
     const codeReader = new BrowserQRCodeReader();
     codeReader.decodeOnceFromVideoDevice(undefined, 'video')
         .then(result => {
-            onScanQr(JSON.parse(result.text))
-            po.value = 'Zo'
+            po.value = result
+            onScanQr(result)
         })
         .catch(err => console.error(err));
 });
