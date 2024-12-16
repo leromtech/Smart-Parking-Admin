@@ -28,7 +28,7 @@ onMounted(() => {
     codeReader.decodeOnceFromVideoDevice(undefined, 'video')
         .then(result => {
             qrCodeData.value = result.text
-            initParkingCustomer(result)
+            // initParkingCustomer(result)
         })
         .catch(err => console.error(err));
 
