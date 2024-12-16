@@ -9,6 +9,7 @@
             <video id="video" class="video-feed" autoplay></video>
         </div>
         <p class="text-white mb-8 font-semibold text-lg">{{ success }}</p>
+        <p class="text-white mb-8 font-semibold text-lg">{{ po ?? 'Nothig' }}</p>
     </div>
 </template>
 
@@ -24,6 +25,8 @@ const { initParkingCustomer, selected_vehicle } = useParking()
 const success = ref()
 const { user } = useAuth()
 
+const po = ref()
+
 const form = ref({
     vehicle_registration_no: null,
 })
@@ -31,6 +34,7 @@ const form = ref({
 const parkingZoneId = ref(null)
 
 const onScanQr = async (qrCodeData) => {
+    po.value = qrCodeData
     const data = await initParkingCustomer(parkingZoneId.value, qrCodeData.value.vehicle_id, qrCodeData.value.user_id)
     success.value = data
 }
