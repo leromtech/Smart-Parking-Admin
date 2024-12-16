@@ -98,11 +98,11 @@ const profileMenuOpen = ref(false)
 const menuOpen = ref(false)  // This controls the mobile menu open/close state
 
 const navItems = [
-    { name: 'Users', link: '/auth/users', role: 'superadmin' },
-    { name: 'Parking Zones', link: '/auth/parking-zones', role: 'superadmin' },
-    { name: 'Vehicles', link: '/auth/vehicles', role: 'superadmin' },
-    { name: 'Vehicle Types', link: '/auth/vehicle-types', role: 'superadmin' },
-    { name: 'Admin Wallet', link: '/auth/wallet', role: 'superadmin' },
-    { name: 'Parking Zone', link: '/auth/parking-zone', role: 'owner' },
+    { name: 'Users', link: '/admin/users', role: 'superadmin' },
+    { name: 'Parking Zones', link: '/admin/parking-zones', role: 'superadmin' },
+    { name: 'Vehicles', link: '/adminh/vehicles', role: 'superadmin' },
+    { name: 'Vehicle Types', link: '/admin/vehicle-types', role: 'superadmin' },
+    { name: 'Admin Wallet', link: '/admin/wallet', role: 'superadmin' },
+    { name: 'Parking Zone', link: '/parking-zone', role: 'owner' },
 ]
 </script>

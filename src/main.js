@@ -34,7 +34,6 @@ window.Echo = new Echo({
     enabledTransports: ['ws', 'wss'],
 });
 
-
 app.directive('click-outside', clickOutside);
 app.component('Modal', Modal)
 app.component('d-table', dTable)

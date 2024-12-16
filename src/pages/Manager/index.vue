@@ -77,7 +77,8 @@
                     <label for="upi">UPI</label>
                 </div>
             </div>
-            <button class="p-2 w-full rounded-2xl bg-blue-700 text-white text-lg font-semibold mt-6">Confirm
+            <button class="p-2 w-full rounded-2xl bg-blue-700 text-white text-lg font-semibold mt-6"
+                @click="confirmCheckout">Confirm
                 Check-Out</button>
         </Modal>
     </div>
@@ -184,6 +185,15 @@ const checkOut = async (record) => {
     checkOutItem.value = record
     checkoutOpen.value = true
     await getTotal()
+}
+
+const confirmCheckout = async () => {
+    const fd = new FormData()
+    fd.append('payment_method', paymentMethod.value)
+    fd.append('parking_record_id', checkOutItem.value.id)
+    const { data } = await api.post('manager/confirm-checkout')
+    console.log(data
+    )
 }
 
 onMounted(async () => {

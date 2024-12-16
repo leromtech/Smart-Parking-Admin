@@ -1,5 +1,5 @@
 <template>
-    <div class="modal-overlay fixed inset-0 flex items-center justify-center bg-black bg-opacity-50" v-if="modelValue"
+    <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" v-if="modelValue"
         @click="close">
         <div @click.stop v-bind="$attrs">
             <slot />
@@ -38,9 +38,3 @@ export default {
     inheritAttrs: false
 };
 </script>
-
-<style scoped>
-.modal-overlay {
-    /* Overlay styles, if needed */
-}
-</style>

@@ -46,8 +46,10 @@
 import { onMounted, ref, watch } from 'vue';
 import api from '../../../boot/api';
 import useAuth from '../../../scripts/auth';
+import useParking from '../../../scripts/parking';
 
 const { logout } = useAuth()
+const { selected_vehicle } = useParking()
 
 const user = ref(null)
 
@@ -56,9 +58,13 @@ const selected = ref(null)
 const vehicleQrCode = ref(null)
 
 watch(selected, async (newValue) => {
-  const { data } = await api.get(`vehicle/qr-code?vehicle_id=${newValue}`, {
+  selected_vehicle.value = newValue
+  const { data } = await api.get(`vehicle/qr-code?vehicle_id=${newValue}&user_id=${user.value.id}`, {
   })
   vehicleQrCode.value = data.qr_code
+  selected_vehicle.value = user.value.vehicle.find((item) => {
+    return item.id === selected_vehicle.value
+  })
 })
 
 const getUser = async () => {

@@ -1,5 +1,6 @@
 <template>
     <div class="w-full h-dvh flex p-8 pt-16 justify-center items-center flex-col bg-[#0B0B0B]">
+        <p class="text-white mb-8 font-semibold text-lg">{{ selected_vehicle?.registration_no }}</p>
         <div class="relative video-container">
             <div class="corner top-left"></div>
             <div class="corner top-right"></div>
@@ -7,8 +8,6 @@
             <div class="corner bottom-right"></div>
             <video id="video" class="video-feed" autoplay></video>
         </div>
-        <p class="text-white mt-4">QR Code Data: {{ qrCodeData }}</p>
-        <button @click="simulateQrScan">Simulate</button>
     </div>
 </template>
 
@@ -18,46 +17,34 @@ import { onMounted, ref } from 'vue';
 import { BrowserQRCodeReader } from '@zxing/browser';
 import useParking from '../../../scripts/parking';
 import router from '../../../routes/router';
+import useAuth from '../../../scripts/auth';
 
-const { initParking } = useParking()
+const { initParkingCustomer, selected_vehicle } = useParking()
 
-const qrCodeData = ref(null);
+const { user } = useAuth()
+
+const form = ref({
+    vehicle_registration_no: null,
+})
+
 const parkingZoneId = ref(null)
 
-const getParkingZone = async (id) => {
-    const { data } = await api.get('parking-zone', {
-        params: {
-            id: parkingZoneId
-        }
-    })
-}
-
-const getQrCode = async () => {
-    const { data } = await api.get('parking-zone/qr-code', {
-        params: {
-            parking_zone_id: 1
-        }
-    })
-    console.log(data)
-}
-
-const simulateQrScan = async () => {
-    const { data } = await api.get('customer/scan-qr', { params: { parking_zone_id: "eyJpdiI6Im1WS1BTMXBiSHU2elBCM2tYUXUyRWc9PSIsInZhbHVlIjoiS3NIRTM4NWcwcVNYTDhnS1RnQmNpQT09IiwibWFjIjoiYjg2OTIwYjM1NzQ1YTM3YzdmODRjYzZjOWYzMzA0MTZlNTBhNTBiNDliNGE3NTc4ZTdiYTlkZGQzNThhNjAzNCIsInRhZyI6IiJ9" } })
-    console.log(data)
-    initParking(data.id)
-    router.push('/park')
+const onScanQr = async (qrCodeData) => {
+    console.log(qrCodeData)
+    initParking(parkingZoneId.value, qrCodeData.value.user.id)
 }
 
 onMounted(() => {
+    if (!selected_vehicle.value) {
+        router.back()
+    }
+
     const codeReader = new BrowserQRCodeReader();
     codeReader.decodeOnceFromVideoDevice(undefined, 'video')
         .then(result => {
-            qrCodeData.value = result.text;
-            getParkingZone(result)
+            onScanQr(JSON.parse(result.text))
         })
         .catch(err => console.error(err));
-
-    getQrCode()
 });
 </script>
 

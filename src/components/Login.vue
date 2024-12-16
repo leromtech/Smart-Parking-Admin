@@ -2,7 +2,7 @@
     <div class="w-full h-full flex fixed top-0 left-0 bg-[rgb(0,0,0,0.2)] z-40 items-center justify-center" v-if="open"
         @click="open = false">
         <div class="fixed flex top-0 left-0 bottom-0 right-0 items-center justify-center">
-            <div class="bg-white lg:w-[25%] p-8 text-black rounded-md" @click.stop>
+            <div class="bg-white lg:w-[25%] w-[90%] p-8 text-black rounded-md" @click.stop>
                 <p class="text-[24px] font-semibold">
                     LOGIN
                 </p>

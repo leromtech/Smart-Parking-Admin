@@ -66,22 +66,20 @@
             </div>
         </Modal>
 
-        <Modal v-model="openBookingInfo">
-            <div
-                class="w-[90%] h-[70%] flex flex-col bg-[#1a1919e8] border border-stone-700 rounded-lg p-6 text-white font-medium">
-                <p>Booking Information</p>
-                <p class="mt-4">Booking Time</p>
-                <p class="font-normal text-sm">{{ getDateTime() }}</p>
-                <p class="mt-4">Select Your Vehicle</p>
-                <div :class="['w-full flex flex-row items-center gap-4 my-2 p-2 rounded-lg', bookingVehicle == vehicle.registration_no ? 'bg-[#FF9500]' : 'bg-[#1d1d1d]']"
-                    v-for="vehicle in user.vehicle">
-                    <input :id='vehicle.registration_no' type="radio" :value="vehicle.registration_no"
-                        v-model="bookingVehicle">
-                    <label :for="vehicle.registration_no" class="w-full">{{ vehicle.registration_no }}</label>
-                </div>
-
-                <button class="w-full p-2 rounded-lg bg-[#7F00FF] mt-auto">Confirm Booking</button>
+        <Modal v-model="openBookingInfo"
+            class="flex flex-col bg-[#1a1919e8] border border-stone-700 rounded-lg p-6 text-white font-medium w-[90%]">
+            <p>Booking Information</p>
+            <p class="mt-4">Booking Time</p>
+            <p class="font-normal text-sm">{{ getDateTime() }}</p>
+            <p class="mt-4">Select Your Vehicle</p>
+            <div :class="['w-full flex flex-row items-center gap-4 my-2 p-2 rounded-lg', bookingVehicle == vehicle.registration_no ? 'bg-[#FF9500]' : 'bg-[#1d1d1d]']"
+                v-for="vehicle in user.vehicle">
+                <input :id='vehicle.registration_no' type="radio" :value="vehicle.registration_no"
+                    v-model="bookingVehicle">
+                <label :for="vehicle.registration_no" class="w-full">{{ vehicle.registration_no }}</label>
             </div>
+
+            <button class="w-full p-2 rounded-lg bg-[#7F00FF] mt-auto">Confirm Booking</button>
         </Modal>
     </div>
 </template>
@@ -334,11 +332,10 @@ onMounted(() => {
     getUserPositionTick();
     getParkingZones()
 
-    Echo.channel('parking-zones').listen('ParkingAvailabilityUpdated', (data) => {
+    window.Echo.channel('parking-zones').listen('ParkingAvailabilityUpdated', (data) => {
         const { parking_zone_id, real_time_availability, allowed_vehicle_types } = data;
 
         const zoneIndex = parkingZones.value.findIndex(zone => zone.id === parseInt(parking_zone_id));
-        console.log(zoneIndex)
         if (zoneIndex !== -1) {
             parkingZones.value[zoneIndex].availability.real_time_availability = real_time_availability;
             parkingZones.value[zoneIndex].availability.allowed_vehicle_types = allowed_vehicle_types;

@@ -43,19 +43,12 @@ const getQrCode = async () => {
     })
 }
 
-const scan = async () => {
+const initiateParking = async () => {
     const { data } = await api.get('manager/check-in', {
         params: {
             parking_zone_id: parking_zones_managed.id
         }
     })
-    console.log(data)
-    initParking(data.id)
-    router.push('/park')
-}
-
-const simulateQrScan = async () => {
-    const { data } = await api.get('customer/scan-qr', { params: { parking_zone_id: "eyJpdiI6Im1WS1BTMXBiSHU2elBCM2tYUXUyRWc9PSIsInZhbHVlIjoiS3NIRTM4NWcwcVNYTDhnS1RnQmNpQT09IiwibWFjIjoiYjg2OTIwYjM1NzQ1YTM3YzdmODRjYzZjOWYzMzA0MTZlNTBhNTBiNDliNGE3NTc4ZTdiYTlkZGQzNThhNjAzNCIsInRhZyI6IiJ9" } })
     console.log(data)
     initParking(data.id)
     router.push('/park')

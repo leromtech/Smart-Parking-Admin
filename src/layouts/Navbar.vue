@@ -26,7 +26,7 @@
             us</a>
         </li>
         <li v-if="user">
-          <router-link to="/auth"
+          <router-link :to="dashboardRoute"
             class="bg-blue-600 inline-flex items-center justify-center w-full h-12 px-6 font-medium tracking-wide text-white transition duration-200 rounded shadow-md bg-deep-purple-accent-400 hover:bg-deep-purple-accent-700 focus:shadow-outline focus:outline-none">
             Dashboard
           </router-link>
@@ -103,7 +103,7 @@
                     us</a>
                 </li>
                 <li v-if="user">
-                  <router-link :to="user.roles[0] == 'customer' ? '/app' : '/auth'"
+                  <router-link :to="dashboardRoute"
                     class="bg-blue-600 inline-flex items-center justify-center w-full h-12 px-6 font-medium tracking-wide text-white transition duration-200 rounded shadow-md bg-deep-purple-accent-400 hover:bg-deep-purple-accent-700 focus:shadow-outline focus:outline-none">
                     Dashboard
                   </router-link>
@@ -115,7 +115,12 @@
                     Login
                   </button>
                 </li>
-                <li>
+                <li v-if="user">
+                  <button
+                    class="flex bg-neutral-100 hover:bg-neutral-200 p-4 font-medium text-black border-b w-full items-center justify-center"
+                    @click="logout">Logout</button>
+                </li>
+                <li v-else>
                   <button @click="registerDialog = true"
                     class="bg-gray-100 inline-flex items-center justify-center w-full h-12 px-6 font-medium tracking-wide text-black transition duration-200 rounded shadow-md bg-deep-purple-accent-400 hover:bg-deep-purple-accent-700 focus:shadow-outline focus:outline-none"
                     aria-label="Sign up" title="Sign up">
@@ -132,7 +137,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import useAuth from '../scripts/auth';
 
 const { loggedIn, user, logout } = useAuth()
@@ -144,4 +149,25 @@ watch(user, (newVal) => {
 const loginDialog = defineModel('loginDialog', false)
 const registerDialog = defineModel('registerDialog', false)
 const isMenuOpen = ref(false);
+
+const dashboardRoute = computed(() => {
+  if (!user.value?.roles) return '/';
+
+  switch (user.value.roles[0].name) {
+    case 'customer':
+      return '/customer';
+    case 'superadmin':
+      return '/admin';
+    case 'owner':
+      return '/parking-zone';
+    case 'manager':
+      return '/manager';
+    default:
+      return '/';
+  }
+});
+
+onMounted(() => {
+
+})
 </script>

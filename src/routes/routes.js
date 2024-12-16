@@ -1,9 +1,9 @@
 const routes = [
     { name: 'Welcome', path: '/', meta: { requiresAuth: false }, component: () => import('../pages/Welcome.vue') },
-    { name: 'RootScan', path: '/root-scan', meta: { requiresAuth: false }, component: () => import('../pages/scan.vue') },
+    { name: 'Contact Us', path: '/contact-us', meta: { requiresAuth: false }, component: () => import('../pages/contact-us.vue') },
     { 
-        name: 'AuthLayout', 
-        path: '/auth', 
+        name: 'SuperAdminLayout', 
+        path: '/admin', 
         meta: { requiresAuth: true, roles: ['superadmin', 'owner'] },
         component: () => import('../layouts/AuthLayout.vue'),
         children: [
@@ -13,6 +13,15 @@ const routes = [
             { name: 'Vehicle Types', path: 'vehicle-types', component: () => import('../pages/Auth/VehicleTypes/index.vue') },
             { name: 'Admin Wallet', path: 'wallet', component: () => import('../pages/Auth/Wallet/index.vue') },
             { name: 'Parking Zone', path: 'parking-zone', component: () => import('../pages/Auth/ParkingZone/index.vue') }
+        ]
+    },
+    { 
+        name: 'ParkingZoneOwnerLayout', 
+        path: '/parking-zone', 
+        meta: { requiresAuth: true, roles: ['owner'] },
+        component: () => import('../layouts/AuthLayout.vue'),
+        children: [
+            { name: 'Parking Zone', path: '', component: () => import('../pages/Auth/ParkingZone/index.vue') }
         ]
     },
     {

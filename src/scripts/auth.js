@@ -39,9 +39,25 @@ const login = async (fd) => {
         localStorage.setItem('auth_token', data.token)
         user.value = data.user
         roles.value = user.value.roles.map((item) => item.name)
-        let route = data.user.roles[0].name == 'customer' ? '/customer' : '/auth'
-        route = data.user.roles[0].name == 'manager' ? '/manager' : route
-        router.push(route)
+        let route;
+        switch (user.value.roles[0].name) {
+            case 'customer':
+                route = '/customer';
+                break
+            case 'superadmin':
+                route = '/admin';
+                break
+            case 'owner':
+                route = '/parking-zone';
+                break
+            case 'manager':
+                route = '/manager';
+                break
+            default:
+                route = '/';
+                break
+          }
+          router.push(route)
     }else{
         return data.message
     }
