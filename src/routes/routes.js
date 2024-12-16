@@ -33,7 +33,7 @@ const routes = [
           { name: 'Home', path: '', component: () => import('../pages/Customer/Home/index.vue') },
           { name: 'Parking', path: 'parking', component: () => import('../pages/Customer/Parking/index.vue') },
           { name: 'Wallet', path: 'wallet', component: () => import('../pages/Customer/Wallet/index.vue') },
-          { name: 'Profile', path: 'profile', component: () => import('../pages/Customer/Profile/index.vue') },
+          { name: 'Customer Profile', path: 'profile', component: () => import('../pages/Customer/Profile/index.vue') },
           { name: 'Park', path: 'park', component: () => import('../pages/Customer/Parking/create.vue') },
         ]
     },
@@ -59,7 +59,7 @@ const routes = [
             { name: 'Check-in', path: 'scan/check-in', component: () => import('../pages/Manager/Scan/checkIn.vue') },
             { name: 'Check-out', path: 'scan/check-out', component: () => import('../pages/Manager/Scan/checkOut.vue') },
             { name: 'Entry', path: 'entry', component: () => import('../pages/Manager/Entry/index.vue') },
-            { name: 'Profile', path: 'profile', component: () => import('../pages/Manager/Profile/index.vue') },
+            { name: 'Manager Profile', path: 'profile', component: () => import('../pages/Manager/Profile/index.vue') },
         ]
     }
       
