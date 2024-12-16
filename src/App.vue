@@ -1,7 +1,9 @@
 <template>
   <div>
-    <div id="notification-card"
-      :class="['fixed w-[300px] h-[60px] flex items-center top-0 justify-center bg-green-400 text-white rounded-sm font-semibold bottom-0 transition-all duration-300', _message !== '' ? 'translate-y-4' : '-translate-y-full']">
+    <div id="notification-card" :class="[
+      'fixed w-[300px] h-[60px] flex items-center justify-center bg-green-400 text-white rounded-sm font-semibold transition-all duration-300 left-1/2 -translate-x-1/2',
+      _message !== '' ? 'top-4' : '-top-full'
+    ]">
       {{ _message }}
     </div>
     <router-view />
@@ -18,5 +20,4 @@ const { _message, _type, notify } = useNotification()
 onMounted(() => {
   notifyCard.value = document.querySelector('#notification-card')
 })
-
 </script>
