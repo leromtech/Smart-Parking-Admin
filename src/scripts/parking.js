@@ -1,9 +1,9 @@
 import { ref } from "vue";
 import useAuth from './auth'
 import api from "../boot/api";
+import router from "../routes/router";
 
 const {user} = useAuth()
-const selected_vehicle = ref(null)
 const form = ref({
     user_id: null,
     parking_zone_id: null,
@@ -12,15 +12,13 @@ const form = ref({
     vehicle_registration_no: null
 })
 
-const initParkingCustomer = async (parkingZoneId, vehicle_registration_no, vehicle_type) => {
-    const fd = new FormData()
-    fd.append('parking_zone_id', parkingZoneId)
-    fd.append('vehicle_registration_no', vehicle_registration_no)
-    fd.append('vehicle_type', vehicle_type)
-
-    const {data} = await api.post('parking/initiate', fd)
-
-    return data
+const initParkingCustomer = async (parkingZoneId) => {
+    form.value.parking_zone_id = parkingZoneId
+    if(user.value){
+        form.value.user_id = user.value.id
+        form.value.phone = user.value.phone
+    }
+    router.push('/park')
 }
 
 const initParkingManager = async (user_id, vehicle_registration_no, vehicle_type) => {
@@ -29,16 +27,15 @@ const initParkingManager = async (user_id, vehicle_registration_no, vehicle_type
     fd.append('vehicle_registration_no', vehicle_registration_no)
     fd.append('vehicle_type', vehicle_type)
     fd.append('parking_zone_id', user.value.parking_zone_managed.id)
-    console.log(fd)
 
-    const {data} = await api.post('manager/initiate')
+    const {data} = api.post('manager/initiate')
+    console.log(fd)
 }
 
 export default function useParking(){
     return{
         initParkingCustomer,
         initParkingManager,
-        selected_vehicle,
         form
     }
 }
