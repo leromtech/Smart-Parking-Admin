@@ -8,7 +8,7 @@
             <div class="corner bottom-right"></div>
             <video id="video" class="video-feed" autoplay></video>
         </div>
-        <p>{{ success }}</p>
+        <p class="text-white mb-8 font-semibold text-lg">{{ success }}</p>
     </div>
 </template>
 
