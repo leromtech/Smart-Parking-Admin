@@ -18,8 +18,11 @@ import { onMounted, ref } from 'vue';
 import { BrowserQRCodeReader } from '@zxing/browser';
 import useParking from '../../../scripts/parking';
 import router from '../../../routes/router';
+import useAuth from '../../../scripts/auth';
 
 const { initParking } = useParking()
+
+const { user } = useAuth()
 
 const qrCodeData = ref(null);
 const parkingZoneId = ref(null)
@@ -38,7 +41,17 @@ const getQrCode = async () => {
             parking_zone_id: 1
         }
     })
+}
+
+const scan = async () => {
+    const { data } = await api.get('manager/check-in', {
+        params: {
+            parking_zone_id: parking_zones_managed.id
+        }
+    })
     console.log(data)
+    initParking(data.id)
+    router.push('/park')
 }
 
 const simulateQrScan = async () => {
@@ -52,7 +65,7 @@ onMounted(() => {
     const codeReader = new BrowserQRCodeReader();
     codeReader.decodeOnceFromVideoDevice(undefined, 'video')
         .then(result => {
-            qrCodeData.value = result.text;
+            qrCodeData.value = JSON.parse(result.text);
             getParkingZone(result)
         })
         .catch(err => console.error(err));
