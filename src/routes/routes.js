@@ -59,6 +59,7 @@ const routes = [
             { name: 'Check-in', path: 'scan/check-in', component: () => import('../pages/Manager/Scan/checkIn.vue') },
             { name: 'Check-out', path: 'scan/check-out', component: () => import('../pages/Manager/Scan/checkOut.vue') },
             { name: 'Entry', path: 'entry', component: () => import('../pages/Manager/Entry/index.vue') },
+            { name: 'Profile', path: 'profile', component: () => import('../pages/Manager/Profile/index.vue') },
         ]
     }
       
