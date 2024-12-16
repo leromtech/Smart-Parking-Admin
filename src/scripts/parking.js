@@ -4,6 +4,8 @@ import api from "../boot/api";
 import router from "../routes/router";
 
 const {user} = useAuth()
+
+const selected_vehicle = ref(null)
 const form = ref({
     user_id: null,
     parking_zone_id: null,
@@ -36,6 +38,7 @@ export default function useParking(){
     return{
         initParkingCustomer,
         initParkingManager,
+        selected_vehicle,
         form
     }
 }
