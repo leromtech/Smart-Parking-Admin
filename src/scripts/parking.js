@@ -14,9 +14,10 @@ const form = ref({
     vehicle_registration_no: null
 })
 
-const initParkingCustomer = async (parkingZoneId) => {
+const initParkingCustomer = (parkingZoneId) => {
     form.value.parking_zone_id = parkingZoneId
     if(user.value){
+        form.value.vehicle_registration_no = selected_vehicle.registration_no
         form.value.user_id = user.value.id
         form.value.phone = user.value.phone
     }

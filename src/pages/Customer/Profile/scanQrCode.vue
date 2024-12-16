@@ -8,7 +8,6 @@
             <video id="video" class="video-feed" autoplay></video>
         </div>
         <p class="text-white mt-4">QR Code Data: {{ qrCodeData }}</p>
-        <button @click="simulateQrScan">Simulate</button>
     </div>
 </template>
 
@@ -19,17 +18,17 @@ import { BrowserQRCodeReader } from '@zxing/browser';
 import useParking from '../../../scripts/parking';
 import router from '../../../routes/router';
 
-const { initParkingCustomer, form } = useParking()
+const { initParkingCustomer, form, selected_vehicle } = useParking()
 
 const qrCodeData = ref(null);
 const parkingZoneId = ref(null)
-
 
 onMounted(() => {
     const codeReader = new BrowserQRCodeReader();
     codeReader.decodeOnceFromVideoDevice(undefined, 'video')
         .then(result => {
-            initParkingCustomer(result.text)
+            qrCodeData.value = result.text
+            initParkingCustomer(result)
         })
         .catch(err => console.error(err));
 
