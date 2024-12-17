@@ -43,7 +43,8 @@ const getQrCode = async () => {
 }
 
 const initiateParking = async () => {
-    initParkingManager(qrCodeData.value.user_id, qrCodeData.value.vehicle_id)
+    const res = await initParkingManager(qrCodeData.value.user_id, qrCodeData.value.vehicle_id)
+    qrCodeData.value = res
 }
 
 onMounted(() => {
