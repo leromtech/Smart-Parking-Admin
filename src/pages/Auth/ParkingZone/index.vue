@@ -35,11 +35,43 @@
             </div>
         </div>
 
-        <!-- RATES -->
+        <!-- BOOKING RATES -->
+        <div class="border flex flex-col">
+            <div class="flex flex-row justify-between">
+                <p class="font-semibold">BOOKING RATES</p>
+                <button class="border bg-blue-400 hover:bg-blue-500 text-white rounded-md px-2 py-1"
+                    @click="createBookingRate">ADD</button>
+            </div>
+            <div class="border m-2 bg-stone-200" v-if="bookingRates.length > 0">
+                <div class="b-2 p-1 bg-white px-8">
+                    <div class="justify-between flex font-normal text-stone-500">
+                        <p>FROM</p>
+                        <p>TO</p>
+                        <p>RATE AMOUNT</p>
+                    </div>
+                </div>
+                <div v-for="rate, rateIndex in bookingRates" :key="rate.id" class="p-2 border m-2 bg-white">
+
+                    <div class="p-1 justify-between flex gap-4">
+                        <p class="w-full text-center border py-2">{{ rate.from }}</p>
+                        <p class="w-full text-center border py-2">{{ rate.to }}</p>
+                        <p class="w-full text-center border py-2">{{ rate.rate_amount }}</p>
+                        <font-awesome-icon :icon="['far', 'trash-can']"
+                            class="text-red-700 w-5 h-5 mt-2 hover:text-red-500"
+                            @click="() => deleteBookingRate(rate.id)" />
+                    </div>
+                </div>
+            </div>
+            <div class="border m-2 bg-stone-200 pl-4" v-else>
+                NO ITEMS
+            </div>
+        </div>
+
+        <!--PARKING RATES -->
         <div class="border flex flex-col">
             <div class="flex flex-col p-2">
                 <div class="flex flex-row justify-between">
-                    <p class="font-semibold">RATES</p>
+                    <p class="font-semibold">PARKING RATES</p>
                     <button class="border bg-blue-400 hover:bg-blue-500 text-white rounded-md px-2 py-1"
                         @click="createRate">ADD</button>
                 </div>
@@ -185,6 +217,36 @@
             </div>
         </Modal>
 
+        <Modal v-model="open_booking_rate_add">
+            <div class="bg-white p-6 flex gap-4 flex-col">
+                <p>ADD BOOKING RATE</p>
+                <div class="flex flex-col">
+                    <label for="from">From</label>
+                    <div class="flex flex-row gap-2">
+                        <input type="time" v-model="booking_rate_form.from" class="p-2 border w-full">
+                    </div>
+                </div>
+                <div class="flex flex-col">
+                    <label for="to">To</label>
+                    <div class="flex flex-row gap-2">
+                        <input type="time" v-model="booking_rate_form.to" class="p-2 border w-full">
+                    </div>
+                </div>
+                <div class="flex flex-col">
+                    <label for="rate-amount">Rate Amount</label>
+                    <div class="flex flex-row gap-2 items-center relative">
+                        <p
+                            class="border border-slate-300 absolute bg-slate-50 h-full flex items-center justify-center px-2">
+                            ₹
+                        </p>
+                        <input type="text" id="rate-amount" class="p-2 border pl-8"
+                            v-model="booking_rate_form.rate_amount">
+                    </div>
+                </div>
+                <button class="p-2 w-full bg-blue-600 text-white rounded-md" @click="submitBookingRate">SUBMIT</button>
+            </div>
+        </Modal>
+
     </div>
 </template>
 
@@ -214,6 +276,7 @@ const open_delete_interval = ref(false)
 const open_create_manager = ref(false)
 const open_delete_manager = ref(false)
 const open_delete_capacity = ref(false)
+const open_booking_rate_add = ref(false)
 
 const qr_code = ref(null)
 
@@ -227,6 +290,9 @@ const rateToDelete = ref(null)
 const intervalToDelete = ref(null)
 const managerToDelete = ref(null)
 const capacityToDelete = ref(null)
+
+const bookingRates = ref([])
+const bookingRateForm = ref()
 
 const editing_name = ref(false)
 
@@ -447,11 +513,49 @@ const confirmDeleteCapacity = async () => {
     await getParkingZone()
 }
 
+const booking_rate_form = ref({
+    id: null,
+    from: '',
+    to: '',
+    rate_amount: 0,
+})
+
+const getBookingRates = async () => {
+    const { data } = await api.get(`booking-rates`)
+    bookingRates.value = data
+}
+
+const createBookingRate = () => {
+    open_booking_rate_add.value = true
+}
+
+const submitBookingRate = async () => {
+    const fd = new FormData()
+    if (booking_rate_form.value.id !== null) {
+        fd.append('_METHOD', 'PATCH')
+    }
+    fd.append('from', booking_rate_form.value.from)
+    fd.append('to', booking_rate_form.value.to)
+    fd.append('rate_amount', booking_rate_form.value.rate_amount)
+    const { data } = await api.post('booking-rates', fd)
+    notify({ type: data.success, message: data.message })
+    await getBookingRates()
+}
+
+const deleteBookingRate = async (id) => {
+    const fd = new FormData()
+    fd.append('_method', 'DELETE')
+    const { data } = await api.post(`booking-rates/${id}`, fd)
+    notify({ type: data.success, message: data.message })
+    await getBookingRates()
+}
+
 onMounted(async () => {
     await getParkingZone()
     await getRates()
     await getIntervalSettings()
     await getVehicleTypes()
     await getQrCode()
+    await getBookingRates()
 })
 </script>

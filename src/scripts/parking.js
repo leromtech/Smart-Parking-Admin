@@ -2,8 +2,10 @@ import { ref } from "vue";
 import useAuth from './auth'
 import api from "../boot/api";
 import router from "../routes/router";
+import useNotification from "./notification";
 
 const {user} = useAuth()
+const {notify} = useNotification()
 
 const selected_vehicle = ref(null)
 const form = ref({
@@ -31,8 +33,9 @@ const initParkingManager = async (user_id, vehicle_registration_no, vehicle_type
     fd.append('vehicle_type', vehicle_type)
     fd.append('parking_zone_id', user.value.parking_zone_managed.id)
 
-    const {data} = api.post('manager/initiate')
-    console.log(fd)
+    const {data} = api.post('parking/initiate')
+
+    notify({type: data.success, message: data.message})
 }
 
 export default function useParking(){

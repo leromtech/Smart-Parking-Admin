@@ -74,12 +74,11 @@
             <p class="mt-4">Select Your Vehicle</p>
             <div :class="['w-full flex flex-row items-center gap-4 my-2 p-2 rounded-lg', bookingVehicle == vehicle.registration_no ? 'bg-[#FF9500]' : 'bg-[#1d1d1d]']"
                 v-for="vehicle in user.vehicle">
-                <input :id='vehicle.registration_no' type="radio" :value="vehicle.registration_no"
-                    v-model="bookingVehicle">
+                <input :id='vehicle.registration_no' type="radio" :value="vehicle.id" v-model="bookingVehicle">
                 <label :for="vehicle.registration_no" class="w-full">{{ vehicle.registration_no }}</label>
             </div>
 
-            <button class="w-full p-2 rounded-lg bg-[#7F00FF] mt-auto">Confirm Booking</button>
+            <button class="w-full p-2 rounded-lg bg-[#7F00FF] mt-auto" @click="initiateBooking">Confirm Booking</button>
         </Modal>
     </div>
 </template>
@@ -92,7 +91,9 @@ import useMap from '../../../scripts/map';
 import { Circle, GoogleMap, Marker } from 'vue3-google-map';
 import api from '../../../boot/api';
 import useAuth from '../../../scripts/auth';
+import useNotification from '../../../scripts/notification';
 
+const { notify } = useNotification()
 const { user } = useAuth()
 
 const modalOpen = ref(false)
@@ -324,6 +325,16 @@ const getDateTime = () => {
     const year = date.getFullYear();
 
     return `${time}, ${day}, ${dayNumber} ${month}, ${year}`;
+}
+
+const initiateBooking = async () => {
+    const fd = new FormData()
+    fd.append('user_id', user.value.id)
+    fd.append('vehicle_id', bookingVehicle.value)
+    fd.append('parking_zone_id', selected.value.id)
+    const { data } = await api.post('bookings/initiate', fd)
+
+    notify({ type: data.success, message: data.message })
 }
 
 

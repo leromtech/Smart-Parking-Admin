@@ -8,7 +8,6 @@
             <video id="video" class="video-feed" autoplay></video>
         </div>
         <p class="text-white mt-4">QR Code Data: {{ qrCodeData }}</p>
-        <button @click="simulateQrScan">Simulate</button>
     </div>
 </template>
 
@@ -44,7 +43,7 @@ const getQrCode = async () => {
 }
 
 const initiateParking = async () => {
-    const { data } = await api.get('manager/check-in', {
+    const { data } = await api.post('manager/check-in', {
         params: {
             parking_zone_id: parking_zones_managed.id
         }
