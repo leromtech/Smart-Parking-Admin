@@ -44,7 +44,6 @@ const getQrCode = async () => {
 
 const initiateParking = async () => {
     initParkingManager(qrCodeData.value.user_id, qrCodeData.value.vehicle_id)
-    router.push('/park')
 }
 
 onMounted(() => {
