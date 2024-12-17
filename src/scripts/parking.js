@@ -31,7 +31,7 @@ const initParkingManager = async (user_id, vehicle_registration_no ) => {
     fd.append('user_id', user_id)
     fd.append('vehicle_registration_no', vehicle_registration_no)
     fd.append('parking_zone_id', user.value.parking_zone_managed[0].id)
-
+    return user.value.parking_zone_managed[0].id
     const {data} = await api.post('parking/initiate')
 
     notify({type: data.success, message: data.message})
