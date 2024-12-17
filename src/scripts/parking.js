@@ -26,11 +26,10 @@ const initParkingCustomer = (parkingZoneId) => {
     router.push('/customer/park')
 }
 
-const initParkingManager = async (user_id, vehicle_registration_no, vehicle_type) => {
+const initParkingManager = async (user_id, vehicle_registration_no ) => {
     const fd = new FormData()
     fd.append('user_id', user_id)
     fd.append('vehicle_registration_no', vehicle_registration_no)
-    fd.append('vehicle_type', vehicle_type)
     fd.append('parking_zone_id', user.value.parking_zone_managed.id)
 
     const {data} = api.post('parking/initiate')

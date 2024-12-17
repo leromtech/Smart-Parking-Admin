@@ -19,7 +19,7 @@ import useParking from '../../../scripts/parking';
 import router from '../../../routes/router';
 import useAuth from '../../../scripts/auth';
 
-const { initParking } = useParking()
+const { initParkingManager } = useParking()
 
 const { user } = useAuth()
 
@@ -43,13 +43,7 @@ const getQrCode = async () => {
 }
 
 const initiateParking = async () => {
-    const { data } = await api.post('manager/check-in', {
-        params: {
-            parking_zone_id: parking_zones_managed.id
-        }
-    })
-    console.log(data)
-    initParking(data.id)
+    initParkingManager(qrCodeData.value.user_id, qrCodeData.value.vehicle_id)
     router.push('/park')
 }
 
@@ -58,7 +52,7 @@ onMounted(() => {
     codeReader.decodeOnceFromVideoDevice(undefined, 'video')
         .then(result => {
             qrCodeData.value = JSON.parse(result.text);
-            getParkingZone(result)
+            initiateParking()
         })
         .catch(err => console.error(err));
 
