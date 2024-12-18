@@ -500,4 +500,6 @@ import Register from '../components/Register.vue';
 
 const loginDialogOpen = ref(false)
 const registerDialogOpen = ref(false)
+
+
 </script>

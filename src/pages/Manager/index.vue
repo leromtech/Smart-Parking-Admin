@@ -104,10 +104,11 @@ const filters = [
 
 
 const initiatePaymentUPI = async () => {
-    console.log(checkOutItem.value.id)
+    console.log(checkOutItem.value)
     try {
         const fd = new FormData()
         fd.append('parking_record_id', checkOutItem.value.id)
+        fd.append('parking_zone_id', checkOutItem.value.parking_zone_id)
         // Create order
         const { data } = await api.post('checkout', fd);
         console.log(data)
