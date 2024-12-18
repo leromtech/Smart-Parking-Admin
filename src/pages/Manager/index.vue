@@ -23,11 +23,23 @@
                     <p>{{ _data.vehicle_type.name }}</p>
                     <div class="flex flex-row items-center justify-between">
                         <p>{{ _data.start_time }}</p>
-                        <p class="text-blue-500">{{ formatTime(_data.elapsedTime) }}</p>
+                        <p class="text-blue-500">
+                            <!-- Show end time for completed records, elapsed time for others -->
+                            <template v-if="selected === 'Completed'">
+                                {{ _data.end_time }}
+                            </template>
+                            <template v-else>
+                                {{ formatTime(_data.elapsedTime) }}
+                            </template>
+                        </p>
                     </div>
                     <div class="flex flex-row gap-2 mt-2">
                         <button class="w-full p-1 border rounded-lg">Details</button>
-                        <button class="w-full p-1 border rounded-lg" @click="() => checkOut(_data)">Check Out</button>
+                        <!-- Only show checkout button for non-completed records -->
+                        <button v-if="selected !== 'Completed'" class="w-full p-1 border rounded-lg"
+                            @click="() => checkOut(_data)">
+                            Check Out
+                        </button>
                     </div>
                 </div>
             </div>
@@ -102,55 +114,103 @@ const filters = [
     'Booking', 'In Parking', 'Completed'
 ]
 
+const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+        // Remove any existing Razorpay scripts first
+        const existingScript = document.getElementById('razorpay-script');
+        if (existingScript) {
+            existingScript.remove();
+        }
+
+        const script = document.createElement('script');
+        script.id = 'razorpay-script';
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+
+        // Don't set async to ensure sequential loading
+        script.onload = () => {
+            // Wait a brief moment to ensure complete initialization
+            setTimeout(() => resolve(true), 100);
+        };
+
+        document.head.appendChild(script);
+    });
+};
+
 
 const initiatePaymentUPI = async () => {
-    console.log(checkOutItem.value)
     try {
-        const fd = new FormData()
-        fd.append('parking_record_id', checkOutItem.value.id)
-        fd.append('parking_zone_id', checkOutItem.value.parking_zone_id)
-        // Create order
+        // Ensure script is loaded
+        await loadRazorpayScript();
+
+        // Wait for Razorpay to be available
+        let attempts = 0;
+        while (!window.Razorpay && attempts < 10) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+        }
+
+        if (!window.Razorpay) {
+            throw new Error('Razorpay failed to initialize');
+        }
+
+        const fd = new FormData();
+        fd.append('parking_record_id', checkOutItem.value.id);
+        fd.append('parking_zone_id', checkOutItem.value.parking_zone_id);
+
         const { data } = await api.post('checkout', fd);
-        console.log(data)
-        const orderId = data.order.id
+        console.log('Checkout response:', data);
+
+        if (!data.key || !data.amount || !data.order_id) {
+            throw new Error('Invalid checkout response');
+        }
 
         const options = {
             key: data.key,
             amount: data.amount * 100,
             currency: "INR",
             name: "Your Company Name",
-            description: `Parking Payment - ${plan.coins} coins`,
+            description: `Parking Payment - ${data.amount}`,
             order_id: data.order_id,
             handler: async function (response) {
-                const { data } = await api.post('payments/parking/verify-payment', {
-                    razorpay_payment_id: response.razorpay_payment_id,
-                    razorpay_order_id: orderId,
-                    razorpay_signature: response.razorpay_signature
-                });
+                try {
+                    const { data: verifyData } = await api.post('payments/parking/verify-payment', {
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_order_id: data.order_id,
+                        razorpay_signature: response.razorpay_signature
+                    });
 
-                console.log(data)
-
-                if (data.success) {
-                    await getWalletBalance();
-                    alert('Payment successful!');
+                    if (verifyData.success) {
+                        filter.value = 'In Parking'
+                        alert('Payment successful!');
+                    }
+                } catch (error) {
+                    console.error('Verification failed:', error);
+                    alert('Payment verification failed');
                 }
             },
             prefill: {
-                name: user.value.name,
-                email: user.value.email,
+                name: user.value?.name || '',
+                email: user.value?.email || '',
             },
             theme: {
                 color: "#9333EA"
+            },
+            modal: {
+                ondismiss: function () {
+                    console.log('Payment modal closed');
+                }
             }
         };
 
-        const rzp = new window.Razorpay(options);
+        console.log('Creating Razorpay instance with options:', options);
+        const rzp = new Razorpay(options);  // Remove window.
         rzp.open();
+
     } catch (error) {
-        console.error('Payment failed:', error);
-        alert('Payment failed. Please try again.');
+        console.error('Payment initialization failed:', error);
+        alert(`Payment failed: ${error.message}`);
     }
-}
+};
 
 const filter = async (val) => {
     console.log(val)
@@ -169,13 +229,29 @@ const filter = async (val) => {
             filters = { completed: true }
     }
     const response = await api.get(url, { params: { 'filters': filters } })
+
+    // Handle data mapping differently for completed records
     data.value = response.data.data.map((item) => {
-        const startTime = new Date(item.start_time)
-        const elapsedTime = Math.floor((Date.now() - startTime) / 1000)
-        return { ...item, elapsedTime }
+        if (val === 'Completed') {
+            // Don't calculate elapsed time for completed records
+            return item;
+        } else {
+            // Calculate elapsed time for non-completed records
+            const startTime = new Date(item.start_time)
+            const elapsedTime = Math.floor((Date.now() - startTime) / 1000)
+            return { ...item, elapsedTime }
+        }
     })
 
-    beginInterval()
+    // Only start interval for non-completed records
+    if (val !== 'Completed') {
+        beginInterval()
+    } else {
+        // Clear interval for completed records
+        if (timer) {
+            clearInterval(timer)
+        }
+    }
 }
 
 const selected = ref('Booking')
@@ -247,10 +323,13 @@ const confirmCheckout = async () => {
 }
 
 onMounted(async () => {
-    const { data } = await api.get('bookings')
-    data.value = data.data
-})
-
+    try {
+        const { data } = await api.get('bookings');
+        data.value = data.data;
+    } catch (error) {
+        console.error('Failed to fetch bookings:', error);
+    }
+});
 onUnmounted(() => {
     clearInterval(timer)
 })
