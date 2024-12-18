@@ -78,7 +78,7 @@
                 </div>
             </div>
             <button class="p-2 w-full rounded-2xl bg-blue-700 text-white text-lg font-semibold mt-6"
-                @click="confirmCheckout">Confirm
+                @click="initiatePaymentUPI">Confirm
                 Check-Out</button>
         </Modal>
     </div>
@@ -101,6 +101,55 @@ const checkoutOpen = ref(false)
 const filters = [
     'Booking', 'In Parking', 'Completed'
 ]
+
+
+const initiatePaymentUPI = async () => {
+    console.log(checkOutItem.value.id)
+    try {
+        const fd = new FormData()
+        fd.append('parking_record_id', checkOutItem.value.id)
+        // Create order
+        const { data } = await api.post('checkout', fd);
+        console.log(data)
+        const orderId = data.order.id
+
+        const options = {
+            key: data.key,
+            amount: data.amount * 100,
+            currency: "INR",
+            name: "Your Company Name",
+            description: `Parking Payment - ${plan.coins} coins`,
+            order_id: data.order_id,
+            handler: async function (response) {
+                const { data } = await api.post('payments/parking/verify-payment', {
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_order_id: orderId,
+                    razorpay_signature: response.razorpay_signature
+                });
+
+                console.log(data)
+
+                if (data.success) {
+                    await getWalletBalance();
+                    alert('Payment successful!');
+                }
+            },
+            prefill: {
+                name: user.value.name,
+                email: user.value.email,
+            },
+            theme: {
+                color: "#9333EA"
+            }
+        };
+
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+    } catch (error) {
+        console.error('Payment failed:', error);
+        alert('Payment failed. Please try again.');
+    }
+}
 
 const filter = async (val) => {
     console.log(val)
