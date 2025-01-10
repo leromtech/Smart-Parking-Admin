@@ -19,9 +19,10 @@ const routes = [
         name: 'ParkingZoneOwnerLayout', 
         path: '/parking-zone', 
         meta: { requiresAuth: true, roles: ['owner'] },
-        component: () => import('../layouts/AuthLayout.vue'),
+        component: () => import('../layouts/ParkingZoneAdminLayout.vue'),
         children: [
-            { name: 'Parking Zone', path: '', component: () => import('../pages/Auth/ParkingZone/index.vue') }
+            { name: 'Parking Zone', path: '', component: () => import('../pages/ParkingZoneOwner/index.vue') },
+            { name: 'Parking Zone Capacity', path: 'capacity', component: () => import('../pages/ParkingZoneOwner/capacity/index.vue') }
         ]
     },
     {

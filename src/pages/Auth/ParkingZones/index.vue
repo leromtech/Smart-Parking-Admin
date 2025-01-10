@@ -73,15 +73,15 @@
         </div>
     </div>
 
-    <Modal v-model:open="openCreate">
+    <Modal v-model="openCreate">
         <create class="bg-white p-8" @created="fetchParkingZones" />
     </Modal>
 
-    <Modal v-model:open="openEdit">
+    <Modal v-model="openEdit">
         <edit class="bg-white p-8" @updated="onUpdated" :item="editItem" />
     </Modal>
 
-    <Modal v-model:open="showDelete">
+    <Modal v-model="showDelete">
         <div class="bg-white p-6">
             <p>DELETE</p>
             <p>Are you sure you want to delete the parking zone?</p>
