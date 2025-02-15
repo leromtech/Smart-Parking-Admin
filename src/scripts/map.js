@@ -1,4 +1,4 @@
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 
 const map_api_key = ref()
 const center = ref({
@@ -14,7 +14,7 @@ const googleMapInit = () => {
     })
 }
 
-export default function useMap(){
+export default function useMap() {
     return {
         map_api_key,
         center,

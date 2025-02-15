@@ -1,208 +1,99 @@
 <template>
-    <div class="flex flex-col w-full h-full">
-        <div class="flex md:flex-row flex-col gap-4 mt-4">
-            <div class="flex flex-col">
-                <label for="search">Search</label>
-                <input type="search" name="search" v-model="filters.search" @update:model-value="fetchUsers"
-                    class="p-2 border-2 bg-neutral-100" placeholder="Search">
+    <Panel class="flex flex-col">
+        <div class="flex flex-row items-center gap-2 justify-between">
+            <div class="flex flex-row gap-2">
+                <InputText placeholder="Search" v-model="filter.search" />
+                <Select v-model="filter.role" :options="roles" placeholder="Select a Role" class="w-full md:w-56" />
             </div>
-            <div class="flex flex-col md:w-[20%] w-full">
-                <label for="filterByRole">Filter by Role</label>
-                <select class="w-full h-full px-2 md:py-0 py-2" name="filterByRole" v-model="filters.role"
-                    @update:model-value="fetchUsers">
-                    <option value="" disabled hidden>Select by Role</option>
-                    <option v-for="role in role_options" :key="Object.keys(role)[0]" :value="Object.values(role)[0]">
-                        {{ Object.keys(role)[0] }}
-                    </option>
-                </select>
-            </div>
-            <button class="p-2 shadow-md self-end ml-auto rounded-md border hover:bg-neutral-100"
-                @click="openCreate = true">Create</button>
+            <Button icon="pi pi-plus" rounded @click="createOpen = true"></Button>
         </div>
-        <div class="w-full h-[600px] overflow-y-scroll mt-6 text-black">
-            <d-table :columns="columns" :rows="rows" :pagination="pagination">
-                <template #actions="{ row }">
-                    <td align="right" class="py-4">
-                        <div class="flex flex-row items-center justify-end pr-2 gap-2">
-                            <button @click="() => _edit(row)" class="rounded-full hover:bg-slate-100">
-                                <font-awesome-icon :icon="['fas', 'pen-to-square']"
-                                    class="w-5 h-5 hover:text-neutral-700" />
-                            </button>
-                            <button @click="() => deleteItem(row.id)" class="rounded-full hover:bg-slate-100">
-                                <font-awesome-icon :icon="['far', 'trash-can']"
-                                    class="text-red-700 w-5 h-5 hover:text-red-500 " />
-                            </button>
-                        </div>
-                    </td>
+        <DataTable :value="users" tableStyle="min-width: 50rem" paginator :rows="pagination.per_page" :lazy="true"
+            class="mt-6" :totalRecords="pagination.total" :rowsPerPageOptions="[5, 10, 15, 30]">
+            <Column field="name" header="Name"></Column>
+            <Column field="email" header="Email"></Column>
+            <Column field="phone" header="Phone"></Column>
+            <Column field="roles" header="Role">
+                <template #body="slotProps">
+                    <div class="flex flex-col">
+                        <span>{{ slotProps.data.roles[0].name.toUpperCase() }}</span>
+                        <span v-if="slotProps.data.parking_zone_managed.length > 0" class="font-semibold">
+                            {{ slotProps.data.parking_zone_managed[0].name }}</span>
+                        <span v-if="slotProps.data.parking_zone_owned" class="font-semibold">
+                            {{ slotProps.data.parking_zone_owned.name }}
+                        </span>
+                    </div>
                 </template>
-            </d-table>
-        </div>
-        <div class="flex flex-row items-center justify-between pt-4 border-t">
-            <div>
-                {{ items_num !== 0 ? items_num : 0 }} of {{ total !== 0 ? total : 0 }}
-            </div>
+            </Column>
+            <Column>
+                <template #body="slotProps">
+                    <div class="flex flex-row gap-2">
+                        <Button icon="pi pi-trash" rounded outlined severity="danger"
+                            @click="() => { deleteItem = slotProps.data.id; deleteOpen = true }"></Button>
+                        <Button icon="pi pi-pen-to-square" rounded severity="warn" outlined
+                            @click="edit(slotProps.data)"></Button>
+                    </div>
+                </template>
+            </Column>
+        </DataTable>
 
-            <div align="center" class="flex flex-row">
-                <div class="border w-8 h-8 flex items-center justify-center">
-                    <font-awesome-icon :icon="['fas', 'chevron-left']" @click="prevPage"
-                        :class="{ 'text-gray-400 cursor-not-allowed': pagination.page === 1 }" />
+        <Dialog v-model:visible="createOpen">
+            <template #header>
+                <span class="font-semibold">Add a User</span>
+            </template>
+            <Create />
+        </Dialog>
+
+        <Dialog v-model:visible="editOpen">
+            <template #header>
+                <span class="font-semibold">Edit {{ }}</span>
+            </template>
+            <create />
+        </Dialog>
+
+        <Dialog v-model:visible="deleteOpen">
+            <template #header>
+                <span class="font-semibold">Confirm delete?</span>
+            </template>
+            <div class="flex flex-col">
+                <span>Do you really want to delete the user ?</span>
+                <div class="w-full flex flex-row mt-2">
+                    <Button icon="pi pi-trash" label="DELETE" outlined severity="danger" class="w-[40%]"
+                        @click="confirmDelete"></Button>
                 </div>
-
-                <div class="border w-8 h-8 flex items-center justify-center">
-                    <font-awesome-icon :icon="['fas', 'chevron-right']" @click="nextPage"
-                        :class="{ 'text-gray-400 cursor-not-allowed': pagination.page >= totalPages }" />
-                </div>
-
             </div>
-            <div>
-                <select class="p-2 " v-model="pagination.per_page">
-                    <option :value="po" v-for="po in perPageOptions" :key="po">{{ po }}</option>
-                </select>
-            </div>
-        </div>
-    </div>
-
-    <Modal v-model:open="openCreate">
-        <create class="bg-white p-8" @created="fetchUsers" />
-    </Modal>
-
-    <Modal v-model:open="openEdit">
-        <edit class="bg-white p-8" @updated="() => { fetchUsers(); openEdit = false }" :item="editItem" />
-    </Modal>
-
-    <Modal v-model:open="openDetails">
-        <userdetails :user="detailsItem" />
-    </Modal>
-
-    <Modal v-model:open="showDelete">
-        <div class="bg-white p-6">
-            <p>DELETE</p>
-            <p>Are you sure you want to delete the user?</p>
-            <div class="w-full flex items-center justify-end mt-4">
-                <button @click="confirmDelte" class="bg-red-500 text-white p-2 px-4">Confirm</button>
-            </div>
-        </div>
-    </Modal>
+        </Dialog>
+    </Panel>
 </template>
 
-
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue';
-import create from './create.vue';
-import edit from './edit.vue';
-import userdetails from './details.vue';
-import Modal from '../../../components/Modal.vue';
+import { ref } from 'vue';
+import useUsers from '../../../scripts/admin/users';
+import Create from './create.vue';
 import api from '../../../boot/api';
-import useNotification from '../../../scripts/notification';
 
-const { notify } = useNotification()
+const { users, pagination, filter, deleteItem, editItem, getUsers } = useUsers()
 
-const columns = [
-    { name: 'name', label: 'NAME', field: 'name' },
-    { name: 'email', label: 'EMAIL', field: (row) => row.email },
-    { name: 'phone', label: 'EMAIL', field: (row) => row.phone },
-    { name: 'role', label: 'EMAIL', field: (row) => row.roles[0].name },
-]
+const deleteOpen = ref()
+const editOpen = ref()
+const createOpen = ref()
 
-const openEdit = ref(false)
-const openCreate = ref(false)
-const openDetails = ref(false)
-const detailsItem = ref()
-const showDelete = ref(false)
-const deleteId = ref([])
-const editItem = ref()
-
-const selected = ref([])
-
-const _edit = (item) => {
+const edit = (item) => {
     editItem.value = item
-    openEdit.value = true
+    editOpen.value = true
 }
 
-const _details = (item) => {
-    detailsItem.value = item
-    openDetails.value = true
-}
-
-const rows = ref([])
-
-const role_options = ref([
-    { 'All': '' },
-    { 'Owner': 'owner' },
-    { 'Manager': 'manager' },
-    { 'Customer': 'customer' }
-])
-
-const total = ref(0)
-const items_num = ref(0)
-
-const perPageOptions = [
-    5, 10, 15, 30, 50
-]
-
-const pagination = ref({
-    per_page: 15,
-    page: 1
-})
-
-const filters = ref({
-    search: '',
-    role: ''
-})
-
-watch(filters, async (newVal) => {
-    await fetchUsers()
-}, { deep: true })
-
-watch(pagination, async (newVal) => {
-    await fetchUsers()
-}, { deep: true })
-
-const fetchUsers = async () => {
-    const res = await api.get('users', { params: { filters: filters.value, pagination: pagination.value } })
-    total.value = res.data.total
-    items_num.value = res.data.data.length
-    rows.value = res.data.data
-}
-
-const totalPages = computed(() => Math.ceil(total.value / pagination.value.per_page));
-
-const nextPage = () => {
-    if (pagination.value.page < totalPages.value) {
-        pagination.value.page++;
-    }
-}
-
-const prevPage = () => {
-    if (pagination.value.page > 1) {
-        pagination.value.page--;
-    }
-}
-
-const deleteUser = async (id) => {
-    deleteId.value = id
-    showDelete.value = true
-}
-
-const confirmDelte = async () => {
+const confirmDelete = async () => {
     const fd = new FormData()
     fd.append('_method', 'DELETE')
-    const { data } = await api.post(`/users/${deleteId.value}`, fd)
-    notify({ type: 'success', message: data.message })
-    fetchUsers()
+    const { data } = api.post(`users/${deleteItem.value}`, fd)
+    await getUsers()
 }
 
-const selectAll = async () => {
-    if (selected.value.length <= 0) {
-        rows.value.forEach((item) => {
-            selected.value.push(item.id)
-        })
-    } else {
-        selected.value = []
-    }
-}
-
-onMounted(async () => {
-    await fetchUsers()
-})
+const roles = [
+    '',
+    'customer',
+    'superadmin',
+    'owner',
+    'manager',
+]
 </script>

@@ -1,8 +1,5 @@
 <template>
     <div>
-        <p class="text-xl font-semibold">
-            EDIT USER
-        </p>
         <form class="w-full h-full" @click.stop @submit.prevent="submit">
             <div class="flex flex-col w-full gap-2 mt-8">
                 <label for="name" class="font-semibold">NAME</label>

@@ -6,14 +6,15 @@
         <form @submit.prevent="submit" class="flex flex-col">
             <div class="flex flex-row gap-4">
                 <div class="w-full h-full">
-                    <dInput label="REGISTRATION No." v-model="form.registration_no" />
+                    <div class="flex flex-col w-full gap-2 mt-8">
+                        <label>Registration no</label>
+                        <InputText v-model="form.registration_no" />
+                    </div>
 
                     <div class="flex flex-col w-full gap-2 mt-8">
                         <label for="type" class="font-semibold">TYPE</label>
-                        <select class="p-2 py-4" v-model="form.vehicle_type">
-                            <option v-for="vehicle_type in vehicleTypes" :key="vehicle_type.id"
-                                :value="vehicle_type.value">{{ vehicle_type.label }}</option>
-                        </select>
+                        <Select v-model="form.vehicle_type" :options="vehicleTypes" placeholder="Select a Vehicle Type"
+                            optionLabel="name" optionValue="id" class="w-full md:w-56" />
                     </div>
 
                     <div class="relative flex flex-col w-full gap-2 mt-8">
@@ -28,7 +29,7 @@
                 </div>
             </div>
             <div class="flex flex-row items-center justify-end w-full mt-4">
-                <button class="p-3 bg-blue-500 text-white rounded-sm hover:bg-blue-600">SUBMIT</button>
+                <Button @click="submit">Submit</Button>
             </div>
         </form>
     </div>
@@ -40,6 +41,11 @@ import { ColorPicker } from 'vue3-colorpicker';
 import dSelect from '../../../components/d-select.vue';
 import dInput from '../../../components/d-input.vue';
 import api from '../../../boot/api';
+import { Select } from 'primevue';
+import useVehicles from '../../../scripts/admin/vehicles';
+
+const { vehicleTypes, editItem } = useVehicles()
+
 const message = ref()
 
 const props = defineProps(['vehicleTypes'])
@@ -101,5 +107,14 @@ const submit = async () => {
         reset()
     }
 }
+
+onMounted(() => {
+    if (editItem.value) {
+        form.value.registration_no = editItem.value.registration_no
+        form.value.vehicle_type = editItem.value.vehicle_type.id
+        form.value.user_id = editItem.value.user_id
+    }
+    console.log(form.value)
+})
 
 </script>
