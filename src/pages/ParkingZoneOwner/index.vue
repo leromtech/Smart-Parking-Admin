@@ -4,7 +4,7 @@
             {{ user.parking_zone_owned.name }}
         </p>
 
-        <div class="grid grid-cols-4 items-center justify-evenly gap-4">
+        <div class="grid grid-cols-4  items-center justify-evenly gap-4">
             <div class="flex flex-row items-center h-[60px] bg-white w-full rounded-md shadow-md gap-4">
                 <div class="bg-blue-500 flex items-center justify-center h-[90%] w-[50px] mx-1 rounded-md">
                     <font-awesome-icon :icon="['fas', 'p']" class="text-white h-6 w-6"></font-awesome-icon>

@@ -1,77 +1,77 @@
 <template>
-    <div @click.stop>
-        <p class="text-xl font-semibold">
-            CREATE PARKING ZONE
-        </p>
-        <form @submit.prevent="submit" class="flex flex-col">
-            <div class="flex flex-row gap-4">
-                <div class="w-full h-full">
-                    <div class="flex flex-col w-full gap-2 mt-8">
-                        <label for="name" class="font-semibold">NAME</label>
-                        <input type="text" name="name" required class="p-3 border-2 w-[400px] rounded-md bg-neutral-100"
-                            v-model="form.name">
-                    </div>
-                    <div class="flex flex-col w-full gap-2 mt-8">
-                        <label for="address" class="font-semibold">Address</label>
-                        <input type="address" name="address" required
-                            class="p-3 border-2 w-[400px] rounded-md bg-neutral-100" v-model="form.address">
-                    </div>
-                    <div class="flex flex-col w-full gap-2 mt-8">
-                        <label for="phone" class="font-semibold">Description</label>
-                        <input type="text" name="description" required
-                            class="p-3 border-2 w-[400px] rounded-md bg-neutral-100" v-model="form.description">
-                    </div>
-                    <div class="relative flex flex-col w-full gap-2 mt-8">
-                        <label for="owner" class="font-semibold">Owner</label>
-                        <dSelect :options="users" class="w-full" v-model:search="search" options-label="name"
-                            options-value="id" v-model="form.owner_id" />
-                    </div>
+    <form @submit.prevent="submit" class="flex flex-col">
+        <div class="flex flex-row gap-4">
+            <div class="w-full h-full">
+                <div class="flex flex-col w-full gap-2">
+                    <label for="name" class="font-semibold">Name</label>
+                    <InputText type="text" name="name" required class="p-3 border-2 w-[400px] rounded-md bg-neutral-100"
+                        v-model="form.name" />
+                </div>
+                <div class="flex flex-col w-full gap-2 mt-8">
+                    <label for="address" class="font-semibold">Address</label>
+                    <InputText type="address" name="address" required
+                        class="p-3 border-2 w-[400px] rounded-md bg-neutral-100" v-model="form.address" />
+                </div>
+                <div class="flex flex-col w-full gap-2 mt-8">
+                    <label for="phone" class="font-semibold">Description</label>
+                    <InputText type="text" name="description" required
+                        class="p-3 border-2 w-[400px] rounded-md bg-neutral-100" v-model="form.description" />
+                </div>
+                <div class="relative flex flex-col w-full gap-2 mt-8">
+                    <label for="owner" class="font-semibold">Owner</label>
+                    <dSelect :options="users" class="w-full text-black" v-model:search="search" options-label="name"
+                        options-value="id" v-model="form.owner_id" />
+                </div>
 
-                    <div class="flex flex-row items-center justify-between mt-4">
-                        <div class="flex flex-col gap-2">
-                            <label for="latitude" class="font-semibold">Latitude</label>
-                            <input type="text" disabled v-model="form.latitude"
-                                class="p-3 border-2 w-[150px] rounded-md bg-neutral-100">
-                        </div>
-                        <div class="flex flex-col gap-2">
-                            <label for="longitude" class="font-semibold">Longitude</label>
-                            <input type="text" disabled v-model="form.longitude"
-                                class="p-3 border-2 w-[150px] rounded-md bg-neutral-100">
-                        </div>
+                <div class="flex flex-row items-center justify-between mt-4">
+                    <div class="flex flex-col gap-2">
+                        <label for="latitude" class="font-semibold">Latitude</label>
+                        <InputText type="text" disabled v-model="form.latitude"
+                            class="p-3 border-2 w-[150px] rounded-md bg-neutral-100" />
                     </div>
-
-                    <div class="w-full flex items-center justify-center text-red-600 font-normal">
-                        {{ message }}
+                    <div class="flex flex-col gap-2">
+                        <label for="longitude" class="font-semibold">Longitude</label>
+                        <InputText type="text" disabled v-model="form.longitude"
+                            class="p-3 border-2 w-[150px] rounded-md bg-neutral-100" />
                     </div>
                 </div>
-                <div class="w-full h-full">
-                    <template v-if="map_api_key.length > 0">
-                        <GoogleMap :api-key="map_api_key" :center="{ lat: center.lat, lng: center.lng }"
-                            :zoom="map.zoom" class="w-[500px] h-[500px]" @click="setPosition">
-                            <Marker
-                                :options="{ position: { lat: form.latitude, lng: form.longitude }, title: form.name }" />
-                        </GoogleMap>
-                    </template>
+
+                <div class="w-full flex items-center justify-center text-red-600 font-normal">
+                    {{ message }}
                 </div>
             </div>
-            <div class="flex flex-row items-center justify-end w-full mt-4">
-                <button class="p-3 bg-blue-500 text-white rounded-sm hover:bg-blue-600">SUBMIT</button>
+            <div class="w-full h-full">
+                <template v-if="map_api_key.length > 0">
+                    <GoogleMap :api-key="map_api_key" :center="{ lat: center.lat, lng: center.lng }" :zoom="map.zoom"
+                        class="w-[500px] h-[500px]" @click="setPosition">
+                        <Marker
+                            :options="{ position: { lat: form.latitude, lng: form.longitude }, title: form.name }" />
+                    </GoogleMap>
+                </template>
             </div>
-        </form>
-    </div>
+        </div>
+        <div class="flex flex-row items-center justify-end w-full mt-4">
+            <button class="p-3 bg-blue-500 text-white rounded-sm hover:bg-blue-600">SUBMIT</button>
+        </div>
+    </form>
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 import dSelect from '../../../components/d-select.vue';
 import api from '../../../boot/api';
 import { GoogleMap, Marker } from 'vue3-google-map';
 import useMap from '../../../scripts/map';
+import { faF } from '@fortawesome/free-solid-svg-icons';
+import useAdmin from '../../../scripts/admin';
 const message = ref()
 const map = ref({
     center: { lat: '', lng: '' },
     zoom: 12
 })
+
+const { parking_zone_edit } = useAdmin()
+
 
 const { map_api_key, center } = useMap()
 
@@ -83,6 +83,7 @@ const search = ref('')
 const users = ref([])
 
 const form = ref({
+    id: null,
     name: '',
     address: '',
     description: '',
@@ -92,6 +93,7 @@ const form = ref({
 })
 
 const reset = () => {
+    form.value.id = ''
     form.value.name = ''
     form.value.address = ''
     form.value.description = ''
@@ -126,6 +128,10 @@ const fetchUsers = async () => {
 const submit = async () => {
     try {
         const fd = new FormData()
+        if (form.value.id !== null) {
+            fd.append('id', form.value.id)
+            fd.append('_method', 'PATCH')
+        }
         fd.append('name', form.value.name)
         fd.append('address', form.value.address)
         fd.append('description', form.value.description)
@@ -141,5 +147,32 @@ const submit = async () => {
         reset()
     }
 }
+
+onMounted(() => {
+    if (parking_zone_edit.value) {
+        form.value = {
+            id: parking_zone_edit.value.id || '',
+            name: parking_zone_edit.value.name || '',
+            address: parking_zone_edit.value.address || '',
+            description: parking_zone_edit.value.description || '',
+            owner_id: parking_zone_edit.value.owner_id || '',
+            latitude: parking_zone_edit.value.latitude || '',
+            longitude: parking_zone_edit.value.longitude || '',
+        };
+        // Optionally, set the map center based on the provided latitude and longitude
+        map.value.center = {
+            lat: parseFloat(parking_zone_edit.value.latitude) || center.lat,
+            lng: parseFloat(parking_zone_edit.value.longitude) || center.lng,
+        };
+
+        users.value = [parking_zone_edit.value.owner]
+    }
+});
+
+onUnmounted(() => {
+    if (parking_zone_edit.value) {
+        parking_zone_edit.value = null
+    }
+})
 
 </script>

@@ -77,7 +77,7 @@
 import { ref, computed, onMounted, triggerRef } from 'vue';
 import api from '../../../boot/api';
 import useAuth from '../../../scripts/auth';
-import Drawer from '../../../components/Drawer.vue';
+import Drawer from '../../../components/dDrawer.vue';
 import Modal from '../../../components/Modal.vue';
 
 const { user } = useAuth()

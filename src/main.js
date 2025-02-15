@@ -1,26 +1,30 @@
 import { createApp } from 'vue'
+import 'primeicons/primeicons.css'
 import './style.css'
+import ToastService from 'primevue/toastservice';
 import App from './App.vue'
 import router from './routes/router'
-import useMap from './scripts/map'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { far } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import dTable from './components/d-table.vue'
 import clickOutside from './directives/clickOutside'
-library.add(fas)
-library.add(far)
-
-const {googleMapInit} = useMap()
-googleMapInit()
 import api from './boot/api'
 import Modal from './components/Modal.vue'
 
+library.add(fas)
+library.add(far)
+
+const { googleMapInit } = useMap()
+googleMapInit()
 const app = createApp(App)
 
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
+import PrimeVue from 'primevue/config'
+import Material from '@primevue/themes/aura'
+import useMap from './scripts/map';
 
 window.Pusher = Pusher;
 
@@ -40,4 +44,10 @@ app.component('d-table', dTable)
 app.component('font-awesome-icon', FontAwesomeIcon)
 app.config.globalProperties.$api = api;
 app.use(router)
+app.use(PrimeVue, {
+    theme: {
+        preset: Material
+    }
+})
+app.use(ToastService)
 app.mount('#app')

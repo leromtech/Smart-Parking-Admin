@@ -3,7 +3,7 @@
         <Menubar>
             <template #start>
                 <span>
-                    Parking Zone Owner Panel v.1.0
+                    Super Admin Panel v.1.0
                 </span>
             </template>
         </Menubar>
@@ -34,6 +34,7 @@
 </template>
 
 <script setup>
+import 'primeicons/primeicons.css'
 import { ref } from 'vue';
 import useAuth from '../scripts/auth';
 
@@ -41,40 +42,40 @@ const { logout } = useAuth()
 
 const menuItems = ref([
     {
-        label: 'Home',
-        items: [
-            {
-                label: 'Dashboard',
-                route: '/parking-zone',
-                icon: 'pi pi-home'
-            }
-        ]
+        label: 'Users',
+        route: '/admin/users',
+        icon: 'pi pi-warehouse'
     },
     {
-        label: 'Settings',
-        items: [
-            {
-                label: 'Capacity',
-                route: '/parking-zone/capacity',
-                icon: 'pi pi-warehouse'
-            },
-            {
-                label: 'Managers',
-                route: '/parking-zone/managers',
-                icon: 'pi pi-user'
-            },
-            {
-                label: 'Rates',
-                route: '/parking-zone/rates',
-                icon: 'pi pi-user'
-            },
-            {
-                label: 'Earnings Report',
-                route: '/parking-zone/earnings',
-                icon: 'pi pi-user'
-            }
-        ]
-    }
+        label: 'Parking Zones',
+        route: '/admin/parking-zones',
+        icon: 'pi pi-user'
+    },
+    {
+        label: 'Vehicles',
+        route: '/admin/vehicles',
+        icon: 'pi pi-user'
+    },
+    {
+        label: 'Vehicle Types',
+        route: '/admin/vehicle-types',
+        icon: 'pi pi-user'
+    },
+    {
+        label: 'Wallet',
+        route: '/admin/wallet',
+        icon: 'pi pi-user'
+    },
+    {
+        label: 'Bookings',
+        route: '/admin/bookings',
+        icon: 'pi pi-user'
+    },
+    {
+        label: 'Settlement',
+        route: '/admin/settlement',
+        icon: 'pi pi-user'
+    },
 
 ]) 
 </script>
