@@ -132,7 +132,6 @@ const getEarnings = async () => {
         const { data } = await api.get('earnings', { params: { parking_zone_id: 1, month } });
         payments.value = data.payments;
         status.value = data.status
-        console.log(data)
         loading.value = false
     } catch (error) {
         console.error('Error fetching earnings:', error);
@@ -155,6 +154,8 @@ watch(monthFilter, async (newVal) => {
 
 onMounted(async () => {
     await getParkingZonesData()
-    selectedParkingZone.value = parkingZones.value[0]
+    if(parkingZones.value.length > 0){
+        selectedParkingZone.value = parkingZones.value[0]
+    }
 })
 </script>

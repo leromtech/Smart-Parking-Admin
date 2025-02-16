@@ -21,13 +21,13 @@ const routes = [
         meta: { requiresAuth: true, roles: ['superadmin'] },
         component: () => import('../layouts/SuperAdminLayout.vue'),
         children: [
-            { name: 'Users', path: 'users', component: () => import('../pages/Auth/Users/index.vue') },
-            { name: 'Parking Zones', path: 'parking-zones', component: () => import('../pages/Auth/ParkingZones/index.vue') },
-            { name: 'Vehicles', path: 'vehicles', component: () => import('../pages/Auth/Vehicles/index.vue') },
-            { name: 'Vehicle Types', path: 'vehicle-types', component: () => import('../pages/Auth/VehicleTypes/index.vue') },
-            { name: 'Admin Wallet', path: 'wallet', component: () => import('../pages/Auth/Wallet/index.vue') },
-            { name: 'Admin Bookings', path: 'bookings', component: () => import('../pages/Auth/Bookings/index.vue') },
-            { name: 'Admin Settlement', path: 'settlement', component: () => import('../pages/Auth/Settlement/index.vue') },
+            { name: 'Users', path: 'users', component: () => import('../pages/SuperAdmin/Users/index.vue') },
+            { name: 'Parking Zones', path: 'parking-zones', component: () => import('../pages/SuperAdmin/ParkingZones/index.vue') },
+            { name: 'Vehicles', path: 'vehicles', component: () => import('../pages/SuperAdmin/Vehicles/index.vue') },
+            { name: 'Vehicle Types', path: 'vehicle-types', component: () => import('../pages/SuperAdmin/VehicleTypes/index.vue') },
+            { name: 'Admin Wallet', path: 'wallet', component: () => import('../pages/SuperAdmin/Wallet/index.vue') },
+            { name: 'Admin Bookings', path: 'bookings', component: () => import('../pages/SuperAdmin/Bookings/index.vue') },
+            { name: 'Admin Settlement', path: 'settlement', component: () => import('../pages/SuperAdmin/Settlement/index.vue') },
         ]
     },
     {

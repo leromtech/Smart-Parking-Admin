@@ -1,7 +1,7 @@
 <template>
     <div>
         <Panel>
-            <div class="w-full h-[400px] bg-white">
+            <div class="w-full h-[400px] bg-white" v-if="map_api_key != null">
                 <template v-if="map_api_key.length > 0">
                     <GoogleMap :api-key="map_api_key" :center="{ lat: center.lat, lng: center.lng }" :zoom="12"
                         class="w-full h-full">
@@ -10,6 +10,11 @@
 
                     </GoogleMap>
                 </template>
+            </div>
+            <div v-else class="w-full flex items-center justify-center">
+                <span class="text-red-600 border border-dashed border-red-600 p-2">
+                    NO MAP API KEY!
+                </span>
             </div>
             <DataTable :value="rows" tableStyle="min-width: 50rem" paginator :rows="pagination.per_page" :lazy="true"
                 class="mt-6" :totalRecords="pagination.total" :rowsPerPageOptions="[5, 10, 15, 30]">

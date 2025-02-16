@@ -19,8 +19,30 @@
                 </div>
                 <div class="relative flex flex-col w-full gap-2 mt-8">
                     <label for="owner" class="font-semibold">Owner</label>
-                    <dSelect :options="users" class="w-full text-black" v-model:search="search" options-label="name"
-                        options-value="id" v-model="form.owner_id" />
+                    <Select :options="users"  @update:modelValue="(e) => {form.owner_id = e.id}">
+                        <template #header="slotProps">
+                            <div class="flex items-center justify-center">
+                                <InputText v-model="search" class="w-full m-2" placeholder="Search User..."/>
+                            </div>
+                        </template>
+
+                        <template #value="slotProps">
+                            <div class="flex flex-row items-start justify-center gap-2" v-if="slotProps.value">
+                                <span>{{ slotProps.value.name }}</span>
+                                <span>( {{ slotProps.value.phone }} )</span>
+                            </div>
+                            <div v-else>
+                                Select the owner 
+                            </div>
+                        </template>
+
+                        <template #option="slotProps">
+                            <div class="flex flex-row items-start justify-center gap-2">
+                                <span>{{ slotProps.option.name }}</span>
+                                <span>( {{ slotProps.option.phone }} )</span>
+                            </div>
+                        </template>
+                    </Select>
                 </div>
 
                 <div class="flex flex-row items-center justify-between mt-4">

@@ -66,7 +66,7 @@ const reset = () => {
 const submit = async () => {
     try {
         const fd = new FormData()
-        if (form.value.id !== null) {
+        if (form.value.id !== null && form.value.id !== undefined) {
             fd.append('id', form.value.id)
             fd.append('_method', 'PATCH')
         }
