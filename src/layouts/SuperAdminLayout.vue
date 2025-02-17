@@ -6,6 +6,9 @@
                     Super Admin Panel v.1.0
                 </span>
             </template>
+            <template #end>
+                <Button :icon="darkModeIcon" severity="warn" outlined @click="toggleDarkMode()"></Button>
+            </template>
         </Menubar>
         <div class="flex flex-row h-full">
             <Menu :model="menuItems">
@@ -40,6 +43,13 @@ import useAuth from '../scripts/auth';
 
 const { logout } = useAuth()
 
+const darkModeIcon = ref('pi pi-sun')
+
+const toggleDarkMode = () => {
+    document.documentElement.classList.toggle('my-app-dark');
+    darkModeIcon.value = document.documentElement.classList.contains('my-app-dark') ? 'pi pi-sun' : 'pi pi-moon';
+}
+
 const menuItems = ref([
     {
         label: 'Users',
@@ -66,11 +76,11 @@ const menuItems = ref([
         route: '/admin/wallet',
         icon: 'pi pi-user'
     },
-    {
-        label: 'Bookings',
-        route: '/admin/bookings',
-        icon: 'pi pi-user'
-    },
+    // {
+    //     label: 'Bookings',
+    //     route: '/admin/bookings',
+    //     icon: 'pi pi-user'
+    // },
     {
         label: 'Settlement',
         route: '/admin/settlement',

@@ -46,7 +46,10 @@ app.config.globalProperties.$api = api;
 app.use(router)
 app.use(PrimeVue, {
     theme: {
-        preset: Material
+        preset: Material,
+        options: {
+            darkModeSelector: '.my-app-dark'
+        }
     }
 })
 app.use(ToastService)
