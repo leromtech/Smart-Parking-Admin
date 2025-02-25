@@ -16,13 +16,21 @@
             <GoogleMap :api-key="map_api_key" style="width: 100%; height: 100vh"
                 :center="userLocation.lat ? userLocation : defaultCenter" :zoom="15" :styles="customDarkStyle"
                 :fullscreen-control="false" :map-type-control="false" :zoom-control="false" :disable-default-ui="true"
-                @zoom_changed="updateZoom" ref="mapRef">
+                @zoom_changed="updateZoom" ref="mapRef" @ready="onMapReady">
                 <Marker v-for="parkingZone in parkingZones" :key="parkingZone.id"
                     :options="{ position: { lat: parseFloat(parkingZone.latitude), lng: parseFloat(parkingZone.longitude) }, label: { text: parkingZone.name, color: '#ffffff', className: 'mb-12' } }"
                     @click="() => openDetails(parkingZone)" />
                 <Circle
                     :options="{ center: userLocation, radius: circleRadius, strokeColor: '#4285f4', strokeWeight: 2, fillColor: '#4285f4' }"
                     v-if="userLocation.lat !== null && userLocation.lng !== null" />
+                <!-- Add Polyline for navigation route -->
+                <Polyline v-if="booking.length > 0 && navigationPath"
+                    :options="{
+                        path: navigationPath,
+                        strokeColor: '#FF0000',
+                        strokeOpacity: 0.8,
+                        strokeWeight: 4
+                    }" />
             </GoogleMap>
         </div>
         <!-- Draggable Drawer -->
@@ -58,10 +66,10 @@
                 </div>
             </div>
             <div class="mt-8 flex gap-2 justify-between text-white w-full px-2">
-                <button class="border border-[#7F00FF] bg-[#7F00FF] p-2  rounded-md font-normal w-full"
-                    @click="displayBookingInfo">Continue to
+                <button :class="['border border-[#7F00FF] p-2  rounded-md font-normal w-full', booking.length > 0 ? 'bg-[#8000ff86]' : 'bg-[#7F00FF]']"
+                    @click="displayBookingInfo" :disabled="booking.length > 0">Continue to
                     book</button>
-                <button class="border border-[#7F00FF] p-2  rounded-md font-normal w-full">Start
+                <button class="border border-[#7F00FF] p-2  rounded-md font-normal w-full" @click="calculateRoute">Start
                     navigation</button>
             </div>
         </Modal>
@@ -85,22 +93,34 @@
 
 
 <script setup>
+import { Loader } from '@googlemaps/js-api-loader';
 import Modal from '../../../components/Modal.vue';
 import { computed, onMounted, onUnmounted, reactive, ref, useTemplateRef, watch } from 'vue';
 import useMap from '../../../scripts/map';
-import { Circle, GoogleMap, Marker } from 'vue3-google-map';
+import { Circle, GoogleMap, Marker, Polyline } from 'vue3-google-map';
 import api from '../../../boot/api';
 import useAuth from '../../../scripts/auth';
 import useNotification from '../../../scripts/notification';
+import { useToast } from 'primevue';
+import useBooking from '../../../scripts/customer/booking';
+
+const {booking} = useBooking()
 
 const { notify } = useNotification()
 const { user } = useAuth()
+
+const navigationPath = ref(null)
+
+const directionsService = ref(null);
+const directionsRenderer = ref(null);
 
 const modalOpen = ref(false)
 const selected = ref(null)
 const openBookingInfo = ref(false)
 
 const bookingVehicle = ref()
+
+const toast = useToast()
 
 const searchQuery = ref('')
 const theme = ref('dark')
@@ -333,15 +353,76 @@ const initiateBooking = async () => {
     fd.append('vehicle_id', bookingVehicle.value)
     fd.append('parking_zone_id', selected.value.id)
     const { data } = await api.post('bookings/initiate', fd)
-
-    notify({ type: data.success, message: data.message })
+    toast.add({ 
+        severity: data.success ? 'success' : 'error', 
+        summary: data.success ? 'Success' : 'Error', 
+        detail: data.message, 
+        life: 2000 
+    });
+    if(data.success) {
+        openBookingInfo.value = false
+        await calculateRoute() // Calculate route after successful booking
+    }
 }
 
+const onMapReady = (map) => {
+    console.log("here")
+  directionsService.value = new google.maps.DirectionsService();
+  directionsRenderer.value = new google.maps.DirectionsRenderer({
+    map: map,
+    suppressMarkers: true,
+    polylineOptions: {
+      strokeColor: '#FF0000',
+      strokeOpacity: 0.8,
+      strokeWeight: 4
+    }
+  });
+};
 
-onMounted(() => {
+const calculateRoute = async () => {
+  if ( !userLocation.lat || !directionsService.value) return;
+
+  try {
+    const request = {
+      origin: { lat: userLocation.lat, lng: userLocation.lng },
+      destination: { 
+        lat: parseFloat(selected.value.latitude), 
+        lng: parseFloat(selected.value.longitude) 
+      },
+      travelMode: google.maps.TravelMode.DRIVING
+    };
+
+    const response = await new Promise((resolve, reject) => {
+      directionsService.value.route(request, (result, status) => {
+        if (status === 'OK') resolve(result);
+        else reject(status);
+      });
+    });
+
+    directionsRenderer.value.setDirections(response);
+    bookedParkingZone.value = selected.value;
+  } catch (error) {
+    console.error('Directions request failed:', error);
+    toast.add({
+      severity: 'error',
+      summary: 'Routing Error',
+      detail: 'Could not calculate route to parking zone',
+      life: 3000
+    });
+  }
+};
+watch(booking, async (newVal) => {
+    if (newVal.length > 0) {
+        await calculateRoute();
+    } else {
+        navigationPath.value = null; // Clear route when no booking exists
+    }
+}, { deep: true });
+
+onMounted(async () => {
     getUserLocation(); // Fetch initial location
     getUserPositionTick();
-    getParkingZones()
+    await getParkingZones()
 
     window.Echo.channel('parking-zones').listen('ParkingAvailabilityUpdated', (data) => {
         const { parking_zone_id, real_time_availability, allowed_vehicle_types } = data;
@@ -351,7 +432,6 @@ onMounted(() => {
             parkingZones.value[zoneIndex].availability.real_time_availability = real_time_availability;
             parkingZones.value[zoneIndex].availability.allowed_vehicle_types = allowed_vehicle_types;
         }
-        console.log(parkingZones.value[zoneIndex])
     });
 });
 
