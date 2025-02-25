@@ -27,9 +27,24 @@
                             {{ slotProps.data.id }}
                         </template>
                     </Column>
-                    <Column header="bd">
+                    <Column header="Receipt No.">
                         <template #body="slotProps">
-                            {{ slotProps.data.id }}
+                            {{ slotProps.data.receipt_no ?? "--NA--" }}
+                        </template>
+                    </Column>
+                    <Column header="Created At">
+                        <template #body="slotProps">
+                            {{ slotProps.data.created_at ?? "--NA--" }}
+                        </template>
+                    </Column>
+                    <Column header="Status">
+                        <template #body="slotProps">
+                            {{ slotProps.data.status ?? "--NA--" }}
+                        </template>
+                    </Column>
+                    <Column header="Amount">
+                        <template #body="slotProps">
+                            {{ slotProps.data.amount ?? "--NA--" }}
                         </template>
                     </Column>
                     <template #empty>
@@ -73,6 +88,7 @@ const getEarnings = async () => {
         payments.value = data.payments;
         status.value = data.status
         loading.value = false
+        console.log(payments.value)
     } catch (error) {
         console.error('Error fetching earnings:', error);
     }

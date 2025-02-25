@@ -78,7 +78,7 @@
                     <template #footer>
                         <div class="flex justify-between p-2 font-bold">
                             <span>Total: </span>
-                            <span class="text-end">{{ totals }}</span>
+                            <span class="text-end">₹ {{ totals[k] }}</span>
                         </div>
                     </template>
 

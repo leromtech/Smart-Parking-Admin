@@ -56,6 +56,11 @@ const menuItems = ref([
         label: 'Settings',
         items: [
             {
+                label: 'Account',
+                route: '/parking-zone/account',
+                icon: 'pi pi-warehouse'
+            },
+            {
                 label: 'Capacity',
                 route: '/parking-zone/capacity',
                 icon: 'pi pi-warehouse'

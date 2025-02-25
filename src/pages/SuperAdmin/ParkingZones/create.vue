@@ -66,8 +66,8 @@
                 <template v-if="map_api_key.length > 0">
                     <GoogleMap :api-key="map_api_key" :center="{ lat: center.lat, lng: center.lng }" :zoom="map.zoom"
                         class="w-[500px] h-[500px]" @click="setPosition">
-                        <Marker
-                            :options="{ position: { lat: form.latitude, lng: form.longitude }, title: form.name }" />
+                        <Marker v-if="form.latitude"
+                                :options="{ position: { lat: parseFloat(form.latitude), lng: parseFloat(form.longitude) }, label: { text: form.name, className: 'mb-[160%] font-normal' }, title: form.name }" />
                     </GoogleMap>
                 </template>
             </div>
@@ -110,8 +110,8 @@ const form = ref({
     address: '',
     description: '',
     owner_id: '',
-    latitude: '',
-    longitude: ''
+    latitude: 0,
+    longitude: 0
 })
 
 const reset = () => {
@@ -120,8 +120,8 @@ const reset = () => {
     form.value.address = ''
     form.value.description = ''
     form.value.owner_id = ''
-    form.value.latitude = ''
-    form.value.longitude = ''
+    form.value.latitude = 0
+    form.value.longitude = 0
 }
 
 watch(search, async (newVal) => {

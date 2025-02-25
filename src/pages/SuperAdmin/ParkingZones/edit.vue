@@ -45,11 +45,12 @@
                     </div>
                 </div>
                 <div class="w-full h-full">
+                    {{ form.latitude }}
                     <template v-if="map_api_key.length > 0">
                         <GoogleMap :api-key="map_api_key"
                             :center="{ lat: parseFloat(form.latitude), lng: parseFloat(form.longitude) }" :zoom="16"
                             class="w-[500px] h-[500px]" @click="setPosition">
-                            <Marker
+                            <Marker v-if="form.latitude"
                                 :options="{ position: { lat: parseFloat(form.latitude), lng: parseFloat(form.longitude) }, label: { text: form.name, className: 'mb-[160%] font-normal' }, title: form.name }" />
                         </GoogleMap>
                     </template>
@@ -96,8 +97,8 @@ const form = ref({
     address: '',
     description: '',
     owner_id: '',
-    latitude: '',
-    longitude: ''
+    latitude: 0,
+    longitude: 0
 })
 
 const reset = () => {
@@ -105,8 +106,8 @@ const reset = () => {
     form.value.address = ''
     form.value.description = ''
     form.value.owner_id = ''
-    form.value.latitude = ''
-    form.value.longitude = ''
+    form.value.latitude = 0
+    form.value.longitude = 0
 }
 
 watch(search, async (newVal) => {
@@ -118,6 +119,7 @@ watch(search, async (newVal) => {
 })
 
 const setPosition = (e) => {
+    console.log(e)
     form.value.latitude = e.latLng.lat()
     form.value.longitude = e.latLng.lng()
 }

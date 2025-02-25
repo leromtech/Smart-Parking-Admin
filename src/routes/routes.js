@@ -37,6 +37,7 @@ const routes = [
         component: () => import('../layouts/ParkingZoneAdminLayout.vue'),
         children: [
             { name: 'Parking Zone', path: '', component: () => import('../pages/ParkingZoneOwner/index.vue') },
+            { name: 'Parking Zone Account', path: 'account', component: () => import('../pages/ParkingZoneOwner/account/index.vue') },
             { name: 'Parking Zone Capacity', path: 'capacity', component: () => import('../pages/ParkingZoneOwner/capacity/index.vue') },
             { name: 'Parking Zone Managers', path: 'managers', component: () => import('../pages/ParkingZoneOwner/managers/index.vue') },
             { name: 'Parking Zone Rates', path: 'rates', component: () => import('../pages/ParkingZoneOwner/rates/index.vue') },
