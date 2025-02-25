@@ -25,6 +25,7 @@ import Pusher from 'pusher-js';
 import PrimeVue from 'primevue/config'
 import Material from '@primevue/themes/aura'
 import useMap from './scripts/map';
+import Tooltip from 'primevue/tooltip';
 
 window.Pusher = Pusher;
 
@@ -37,6 +38,9 @@ window.Echo = new Echo({
     forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
     enabledTransports: ['ws', 'wss'],
 });
+
+
+app.directive('tooltip', Tooltip);
 
 app.directive('click-outside', clickOutside);
 app.component('Modal', Modal)
