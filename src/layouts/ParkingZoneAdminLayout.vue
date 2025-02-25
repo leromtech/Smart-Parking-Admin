@@ -2,8 +2,8 @@
     <div class="card flex flex-col min-h-screen h-screen">
         <Menubar>
             <template #start>
-                <span>
-                    Parking Zone Owner Panel v.1.0
+                <span v-if="parking_zone">
+                    {{ parking_zone?.name }} <br> <b>Admin Panel</b>
                 </span>
             </template>
         </Menubar>
@@ -36,7 +36,9 @@
 <script setup>
 import { ref } from 'vue';
 import useAuth from '../scripts/auth';
+import { useParkingZone } from '../scripts/parkingZone';
 
+const {parking_zone} = useParkingZone()
 const { logout } = useAuth()
 
 const menuItems = ref([

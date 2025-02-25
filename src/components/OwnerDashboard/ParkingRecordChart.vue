@@ -31,12 +31,15 @@ const options = ref({
 })
 
 onMounted(() => {
-    props.data.forEach(element => {
-        element.forEach(item => {
-            options.value.series[0].data.push(Object.values(item)[0])
-            options.value.xaxis.categories.push(Object.keys(item)[0])
-        })
+    props.data.forEach(item => {
+        // Extract key and value from the object
+        const month = Object.keys(item)[0] // e.g., "Jan 2025"
+        const value = Object.values(item)[0] // e.g., 0
+
+        options.value.series[0].data.push(value)
+        options.value.xaxis.categories.push(month)
     })
+
     options.value.title.text = props.title
     chart.value = new ApexCharts(document.querySelector("#chart1"), options.value)
     chart.value.render()

@@ -78,7 +78,7 @@
                     <template #footer>
                         <div class="flex justify-between p-2 font-bold">
                             <span>Total: </span>
-                            <span class="text-end">{{ v.total_earnings.toLocaleString('en-IN') }}</span>
+                            <span class="text-end">{{ totals }}</span>
                         </div>
                     </template>
 
@@ -115,8 +115,7 @@ const payments = ref({})
 
 const status = ref('')
 
-const totalBookingEarnings = ref(0)
-const totalParkingEarnings = ref(0)
+const totals = ref(null)
 
 const selectedParkingZone = ref(null)
 
@@ -131,6 +130,7 @@ const getEarnings = async () => {
         const month = monthFilter.value.toLocaleDateString('en-GB', { month: 'numeric', year: 'numeric' }).replace('/', '-');
         const { data } = await api.get('earnings', { params: { parking_zone_id: 1, month } });
         payments.value = data.payments;
+        totals.value = data.totals
         status.value = data.status
         loading.value = false
     } catch (error) {

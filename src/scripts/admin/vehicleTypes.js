@@ -34,8 +34,8 @@ watch(filter, async () => {
 }, { deep: true })
 
 export default function useVehicleTypes() {
-    onMounted(() => {
-        getVehicleTypes()
+    onMounted(async () => {
+        await getVehicleTypes()
     })
 
     return {

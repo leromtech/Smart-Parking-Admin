@@ -4,9 +4,9 @@ import useAuth from "./auth";
 
 const { user } = useAuth()
 
-const parking_zone = ref({})
-const rates = ref({})
-const intervals = ref([])
+const parking_zone = ref(null)
+const rates = ref(null)
+const intervals = ref(null)
 
 const pagination = ref({
     per_page: 5,
@@ -75,10 +75,8 @@ const newRateForm = ref({
 
 export function useParkingZone() {
     if (user.value && user.value.parking_zone_owned) {
-        onMounted(async () => {
-            await getParkingZone(user.value.parking_zone_owned.id)
-            await getIntevalSettings()
-        })
+        getParkingZone(user.value.parking_zone_owned.id)
+        getIntevalSettings()
 
         return {
             newRateForm,

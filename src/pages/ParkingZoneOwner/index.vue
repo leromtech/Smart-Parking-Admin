@@ -11,7 +11,7 @@
                 </div>
                 <div class="flex flex-col items-start justify-between">
                     <span>Parking Space</span>
-                    <span>100</span>
+                    <span>{{ parking_zone?.capacity_total }}</span>
                 </div>
             </div>
 
@@ -21,7 +21,7 @@
                 </div>
                 <div class="flex flex-col items-start justify-between">
                     <span>Reserved Space</span>
-                    <span>50</span>
+                    <span>{{ parking_zone?.reserved_space }}</span>
                 </div>
             </div>
 
@@ -31,7 +31,8 @@
                 </div>
                 <div class="flex flex-col items-start justify-between">
                     <span>Currently Occupied</span>
-                    <span>50</span>
+                    <span>{{ (availabiltiy?.real_time_availability - parking_zone?.capacity_total) ?? "Loading..."
+                        }}</span>
                 </div>
             </div>
 
@@ -41,60 +42,79 @@
                 </div>
                 <div class="flex flex-col items-start justify-between">
                     <span>Managers</span>
-                    <div class="flex flex-row items-center justify-between gap-8">
-                        <span class="flex flex-row items-center gap-2">50 <Tooltip>
-                                <template #content>
-                                    <span class="p-[0.30rem] bg-green-500 rounded-full border"></span>
-                                </template>
-
-                                <template #tooltip>
-                                    Active
-                                </template>
-                            </Tooltip></span>
-
-                        <span class="flex flex-row items-center gap-2">50 <Tooltip>
-                                <template #content>
-                                    <span class="p-[0.30rem] bg-neutral-400 rounded-full border"></span>
-                                </template>
-
-                                <template #tooltip>
-                                    Inactive
-                                </template>
-                            </Tooltip></span>
-                    </div>
+                    <span>{{ parking_zone?.managers?.length }}</span>
                 </div>
             </div>
         </div>
 
-        <div class="flex flex-row items-center bg-white p-2 rounded-md shadow-md mt-2">
-            <ParkingRecordChart title="Parking Record (this month)" :data="dataP" class="w-[68%]" />
+        <div class="flex flex-row gap-4 w-full">
+            <IftaLabel>
+                <DatePicker v-model="monthFilter" showIcon fluid iconDisplay="input" view="year" dateFormat="yy" />
+                <label for="date">Year</label>
+            </IftaLabel>
+        </div>
+
+        <div class="flex flex-row items-center bg-white p-2 rounded-md shadow-md mt-2" v-if="parkingRecords">
+            <ParkingRecordChart :title="`Parking Record ${yearFilter.getFullYear()}`" :data="parkingRecords" class="w-[68%]" v-if="parkingRecords"/>
             <div class="h-full border-l-2"></div>
-            <TotalVehicleMonthChart title="Vehicle Types Parked" :data="dataD" class="w-[28%]" />
+            <!-- <TotalVehicleMonthChart title="Vehicle Types Parked" :data="vehicleRecords" class="w-[28%]" /> -->
         </div>
     </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import useAuth from '../../scripts/auth';
 import ParkingRecordChart from '../../components/OwnerDashboard/ParkingRecordChart.vue';
 import TotalVehicleMonthChart from '../../components/OwnerDashboard/TotalVehicleMonthChart.vue';
 import Tooltip from '../../components/tooltip.vue';
+import { useParkingZone } from '../../scripts/parkingZone';
+import api from '../../boot/api';
 
 const { user } = useAuth()
 const chart = ref(null)
+const { parking_zone } = useParkingZone()
+const availabiltiy = ref(null)
+const yearFilter = ref(new Date())
 
-const dataD = [
-    { 'Two Wheeler': 26 },
-    { 'Four Wheeler': 12 },
-]
+const parkingRecords = ref(null)
+const vehicleRecords = ref(null)
 
-const dataP = [
-    [
-        { 'Aug 2025': 100 },
-        { 'Sept 2025': 78 },
-        { 'Oct 2025': 56 },
-        { 'Nov 2025': 76 },
-    ]
-]
+const hasRun = ref(false); // Track if it’s already executed
+
+const webSocketTest = async () => {
+
+    window.Echo.channel('parking-zones').listen('ParkingAvailabilityUpdated', (data) => {
+        availabiltiy.value = data
+    });
+    await api.get('availability/' + parking_zone.value?.id);
+}
+
+const getEarnings = async () => {
+    try {
+
+        const year = yearFilter.value.toLocaleDateString('en-GB', { year: 'numeric' }).replace('/', '-');
+        const { data } = await api.get('analytics/parking-zone', { params: { parking_zone_id: parking_zone.value.id, year } });
+        console.log(data)
+        parkingRecords.value = data.monthly_parking_records.map((item) => {
+            return { [item.month]: item.count }
+        });
+        vehicleRecords.value = data.unique_vehicle_by_type
+    } catch (error) {
+        console.error('Error fetching earnings:', error);
+    }
+};
+
+watch(
+    parking_zone,
+    async (newVal) => {
+        if (newVal && !hasRun.value) {
+            console.log("ran");
+            hasRun.value = true; // Prevent future runs
+            await webSocketTest();
+            await getEarnings()
+        }
+    },
+    { immediate: true }
+);
 </script>

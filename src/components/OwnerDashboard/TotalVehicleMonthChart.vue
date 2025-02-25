@@ -32,7 +32,6 @@ onMounted(() => {
     })
     options.value.title.text = props.title
     chart.value = new ApexCharts(document.querySelector('#chart2'), options.value)
-    console.log(chart.value)
     chart.value.render()
 })
 </script>
