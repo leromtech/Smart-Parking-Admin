@@ -23,6 +23,7 @@ export default function useAdmin() {
     })
 
     return {
+        getParkingZones,
         parking_zones,
         parking_zone_delete,
         parking_zone_edit,

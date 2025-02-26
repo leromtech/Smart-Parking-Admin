@@ -83,7 +83,7 @@ import { onMounted, ref, watch } from 'vue';
 import api from '../../../boot/api';
 
 const { map_api_key, center } = useMap()
-const { parking_zones, parking_zone_delete, parking_zone_edit } = useAdmin()
+const { parking_zones, parking_zone_delete, parking_zone_edit, getParkingZones } = useAdmin()
 
 const createOpen = ref(false)
 const editOpen = ref(false)
@@ -103,7 +103,7 @@ const confirmDelete = async () => {
     const fd = new FormData()
     fd.append('_method', 'DELETE')
     const { data } = api.post(`parking-zones/${parking_zone_delete.value}`, fd)
-    console.log(data)
+    await getParkingZones()
 }
 
 const rows = ref()
