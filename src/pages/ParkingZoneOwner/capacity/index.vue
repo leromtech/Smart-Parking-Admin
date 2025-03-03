@@ -3,18 +3,17 @@
         <Panel header="CAPACITY" class="w-[50%]">
             <div class="flex flex-col gap-6">
                 <div class="flex flex-col gap-2">
-                    <label for="username">Capacity</label>
-                    <InputNumber id="username" v-model="parking_zone.capacity_total" aria-describedby="username-help" />
-                    <Message size="small" severity="secondary" variant="simple">Enter the total capacity
-                    </Message>
+                    <label for="capacity_total">Capacity</label>
+                    <InputNumber id="capacity_total" v-model="capacity_total" aria-describedby="capacity-help" @blur="validateCapacity" />
+                    <Message size="small" severity="secondary" variant="simple">Enter the total capacity</Message>
                 </div>
                 <div class="flex flex-col gap-2">
-                    <label for="username">Reserved</label>
-                    <InputNumber id="username" v-model="parking_zone.reserved_space" aria-describedby="username-help" />
-                    <Message size="small" severity="secondary" variant="simple">Enter the capacity reserved for booking
-                    </Message>
+                    <label for="reserved_space">Reserved</label>
+                    <InputNumber id="reserved_space" v-model="reserved_space" aria-describedby="reserved-help" @blur="validateReserved" />
+                    <Message size="small" severity="secondary" variant="simple">Enter the capacity reserved for booking</Message>
                 </div>
-                <Button @click="submit">Save</Button>
+                <Button @click="submit" :disabled="error">Save</Button>
+                <Message v-if="error" size="small" severity="error" variant="simple">{{ error }}</Message>
             </div>
         </Panel>
     </div>
@@ -38,9 +37,6 @@ const reserved_space = ref(0);
 const error = ref('');
 const error_timer = ref(null);
 
-// Form validity computed based on input values
-const isFormValid = ref(true);
-
 const validateCapacity = () => {
     if (capacity_total.value < 0) {
         error.value = 'Total capacity cannot be negative';
@@ -63,12 +59,13 @@ const validateReserved = () => {
 };
 
 const submit = async () => {
-    const data = await updateParkingZone({
-        capacity_total: capacity_total.value,
-        reserved_space: reserved_space.value
-    })
-    console.log(data)
-    toast.add({ severity: data.success ? 'success' : 'error', summary: data.success ? 'Success' : 'Error', detail: data.message })
+    if (!error.value) {
+        const data = await updateParkingZone({
+            capacity_total: capacity_total.value,
+            reserved_space: reserved_space.value
+        })
+        toast.add({ severity: data.success ? 'success' : 'error', summary: data.success ? 'Success' : 'Error', detail: data.message })
+    }
 }
 
 watch(parking_zone, () => {

@@ -2,7 +2,29 @@
     <Panel>
         <template #header>
             <div class="flex flex-row items-center justify-between w-full">
-                <span>Wallet</span>
+                <div class="flex flex-row gap-10 items-center">
+                    <span class="font-semibold">Wallet</span>
+                    <div class="flex flex-row font-semibold items-center gap-3">
+                        <div class="flex flex-row gap-2 items-center">
+                            <InputGroup>
+                                <InputGroupAddon class="cursor-pointer">
+                                    <span>Coins</span>
+                                </InputGroupAddon>
+                                <InputNumber v-model="coinsForm.coins" id="small" :disabled="!editing" />
+                            </InputGroup>
+                            <span>=</span>
+                            <InputGroup>
+                                <InputNumber v-model="coinsForm.money" currency="INE" id="small" :disabled="!editing" />
+                                <InputGroupAddon>
+                                    <span>₹</span>
+                                </InputGroupAddon>
+                            </InputGroup>
+                        </div>
+                        <Button icon="pi pi-pen-to-square" rounded outlined severity="warn" v-if="!editing"
+                            @click="editing = true"></Button>
+                        <Button icon="pi pi-check" rounded outlined v-else @click="saveCoinsToMoneyRate"></Button>
+                    </div>
+                </div>
                 <div>
                     <Button icon="pi pi-plus" rounded @click="openCreate = true"></Button>
                 </div>
@@ -65,10 +87,31 @@ import { computed, onMounted, ref } from 'vue';
 import useNotification from '../../../scripts/notification';
 import create from './create.vue';
 import useRechargeAmounts from '../../../scripts/admin/wallet';
+import { InputNumber, useToast } from 'primevue';
+import api from '../../../boot/api';
+
+const toast = useToast()
 
 const { editItem, deleteItem, walletRechargeAmounts, form, confirmDelete } = useRechargeAmounts()
 
 const { notify } = useNotification()
+
+const editing = ref(false)
+
+const coinsForm = ref({
+    coins: 1,
+    money: 1
+})
+
+const saveCoinsToMoneyRate = async () => {
+    const fd = new FormData()
+    fd.append('key', 'coins_money_value')
+    fd.append('value', `${coinsForm.value.coins}:${coinsForm.value.money}`)
+    const { data } = await api.post('settings', fd)
+    editing.value = false
+
+    toast.add({ severity: data.success ? 'success' : 'error', summary: data.success ? 'Success' : 'Error', detail: data.message, life: 3000 })
+}
 
 const openCreate = ref(false)
 const openDelete = ref(false)
@@ -84,3 +127,9 @@ const edit = (item) => {
     form.value = { ...item, active: item.active ? true : false }
 }
 </script>
+
+<style>
+#small input {
+    width: 50px;
+}
+</style>

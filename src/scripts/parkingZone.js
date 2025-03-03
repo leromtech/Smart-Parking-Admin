@@ -14,6 +14,11 @@ const pagination = ref({
     total_records: 0
 })
 
+const refresh = async () => {
+    await getParkingZone(parking_zone.value.id)
+    await getRates()
+}
+
 const getParkingZone = async (id) => {
     const { data } = await api.get(`parking-zones/${id}`)
     parking_zone.value = data
@@ -83,6 +88,7 @@ export function useParkingZone() {
             parking_zone,
             rates,
             intervals,
+            refresh,
             getParkingZone,
             updateParkingZone,
             addManager,

@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col m-4">
+    <div class="flex flex-col m-4 md:w-[400px]">
         <div class="flex flex-col mt-4">
             <label>Name</label>
             <InputText v-model="form.name" />
@@ -44,7 +44,7 @@ const submit = async () => {
     }
     const { data } = await api.post(url, fd)
     if (data.success) {
-        toast.add({ severity: 'success', summary: 'Success', detail: 'Recharge amount added successfully' })
+        toast.add({ severity: 'success', summary: 'Success', detail: 'Recharge amount added successfully', life: 3000 })
     }
 
     getWalletRechargeAmounts()

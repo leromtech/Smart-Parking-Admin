@@ -113,7 +113,7 @@ const pagination = ref({
     total: 0
 })
 
-watch(parking_zones, async () => {
+watch(parking_zones, () => {
     rows.value = parking_zones.value.data
     console.log(rows.value)
 })

@@ -28,6 +28,7 @@ const routes = [
             { name: 'Admin Wallet', path: 'wallet', component: () => import('../pages/SuperAdmin/Wallet/index.vue') },
             { name: 'Admin Bookings', path: 'bookings', component: () => import('../pages/SuperAdmin/Bookings/index.vue') },
             { name: 'Admin Settlement', path: 'settlement', component: () => import('../pages/SuperAdmin/Settlement/index.vue') },
+            { name: 'Admin Booking Intervals', path: 'booking-intervals', component: () => import('../pages/SuperAdmin/Bookings/index.vue') },
         ]
     },
     {

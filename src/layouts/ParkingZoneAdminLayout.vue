@@ -3,7 +3,7 @@
         <Menubar>
             <template #start>
                 <span v-if="parking_zone">
-                    {{ parking_zone?.name }} <br> <b>Admin Panel</b>
+                    {{ parking_zone?.name }} <br> <b>Owner Admin Panel</b>
                 </span>
             </template>
         </Menubar>
@@ -38,7 +38,7 @@ import { ref } from 'vue';
 import useAuth from '../scripts/auth';
 import { useParkingZone } from '../scripts/parkingZone';
 
-const {parking_zone} = useParkingZone()
+const { parking_zone } = useParkingZone()
 const { logout } = useAuth()
 
 const menuItems = ref([

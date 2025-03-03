@@ -76,11 +76,11 @@ const menuItems = ref([
         route: '/admin/wallet',
         icon: 'pi pi-user'
     },
-    // {
-    //     label: 'Bookings',
-    //     route: '/admin/bookings',
-    //     icon: 'pi pi-user'
-    // },
+    {
+        label: 'Booking Intervals',
+        route: '/admin/booking-intervals',
+        icon: 'pi pi-user'
+    },
     {
         label: 'Settlement',
         route: '/admin/settlement',
