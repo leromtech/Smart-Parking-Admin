@@ -82,6 +82,11 @@ const menuItems = ref([
         icon: 'pi pi-user'
     },
     {
+        label: 'Interval Settings',
+        route: '/admin/settings-intervals',
+        icon: 'pi pi-user'
+    },
+    {
         label: 'Settlement',
         route: '/admin/settlement',
         icon: 'pi pi-user'

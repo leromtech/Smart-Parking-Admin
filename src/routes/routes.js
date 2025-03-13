@@ -1,20 +1,4 @@
 const routes = [
-    { name: 'Welcome', path: '/', meta: { requiresAuth: false }, component: () => import('../pages/Welcome.vue') },
-    { name: 'Contact Us', path: '/contact-us', meta: { requiresAuth: false }, component: () => import('../pages/contact-us.vue') },
-    // {
-    //     name: 'SuperAdminLayout',
-    //     path: '/admin',
-    //     meta: { requiresAuth: true, roles: ['superadmin', 'owner'] },
-    //     component: () => import('../layouts/AuthLayout.vue'),
-    //     children: [
-    //         { name: 'Users', path: 'users', component: () => import('../pages/Auth/Users/index.vue') },
-    //         { name: 'Parking Zones', path: 'parking-zones', component: () => import('../pages/Auth/ParkingZones/index.vue') },
-    //         { name: 'Vehicles', path: 'vehicles', component: () => import('../pages/Auth/Vehicles/index.vue') },
-    //         { name: 'Vehicle Types', path: 'vehicle-types', component: () => import('../pages/Auth/VehicleTypes/index.vue') },
-    //         { name: 'Admin Wallet', path: 'wallet', component: () => import('../pages/Auth/Wallet/index.vue') },
-    //         { name: 'Parking Zone', path: 'parking-zone', component: () => import('../pages/Auth/ParkingZone/index.vue') }
-    //     ]
-    // },
     {
         name: 'AdminLayout',
         path: '/admin',
@@ -27,6 +11,7 @@ const routes = [
             { name: 'Vehicle Types', path: 'vehicle-types', component: () => import('../pages/SuperAdmin/VehicleTypes/index.vue') },
             { name: 'Admin Wallet', path: 'wallet', component: () => import('../pages/SuperAdmin/Wallet/index.vue') },
             { name: 'Admin Bookings', path: 'bookings', component: () => import('../pages/SuperAdmin/Bookings/index.vue') },
+            { name: 'Admin Intervals', path: 'settings-intervals', component: () => import('../pages/SuperAdmin/Intervals/index.vue') },
             { name: 'Admin Settlement', path: 'settlement', component: () => import('../pages/SuperAdmin/Settlement/index.vue') },
             { name: 'Admin Booking Intervals', path: 'booking-intervals', component: () => import('../pages/SuperAdmin/Bookings/index.vue') },
         ]
@@ -47,8 +32,8 @@ const routes = [
     },
     {
         name: 'CustomerLayout',
-        path: '/customer',
-        meta: { requiresAuth: true, roles: ['customer'] },
+        path: '/',
+        meta: { requiresAuth: false, roles: ['customer'] },
         component: () => import('../layouts/CustomerLayout.vue'),
         children: [
             { name: 'Home', path: '', component: () => import('../pages/Customer/Home/index.vue') },
@@ -83,7 +68,6 @@ const routes = [
             { name: 'Manager Profile', path: 'profile', component: () => import('../pages/Manager/Profile/index.vue') },
         ]
     }
-
 ];
 
 export default routes;

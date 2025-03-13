@@ -24,13 +24,12 @@
                     :options="{ center: userLocation, radius: circleRadius, strokeColor: '#4285f4', strokeWeight: 2, fillColor: '#4285f4' }"
                     v-if="userLocation.lat !== null && userLocation.lng !== null" />
                 <!-- Add Polyline for navigation route -->
-                <Polyline v-if="booking.length > 0 && navigationPath"
-                    :options="{
-                        path: navigationPath,
-                        strokeColor: '#FF0000',
-                        strokeOpacity: 0.8,
-                        strokeWeight: 4
-                    }" />
+                <Polyline v-if="booking.length > 0 && navigationPath" :options="{
+                    path: navigationPath,
+                    strokeColor: '#FF0000',
+                    strokeOpacity: 0.8,
+                    strokeWeight: 4
+                }" />
             </GoogleMap>
         </div>
         <!-- Draggable Drawer -->
@@ -66,7 +65,8 @@
                 </div>
             </div>
             <div class="mt-8 flex gap-2 justify-between text-white w-full px-2">
-                <button :class="['border border-[#7F00FF] p-2  rounded-md font-normal w-full', booking.length > 0 ? 'bg-[#8000ff86]' : 'bg-[#7F00FF]']"
+                <button
+                    :class="['border border-[#7F00FF] p-2  rounded-md font-normal w-full', booking.length > 0 ? 'bg-[#8000ff86]' : 'bg-[#7F00FF]']"
                     @click="displayBookingInfo" :disabled="booking.length > 0">Continue to
                     book</button>
                 <button class="border border-[#7F00FF] p-2  rounded-md font-normal w-full" @click="calculateRoute">Start
@@ -104,7 +104,7 @@ import useNotification from '../../../scripts/notification';
 import { useToast } from 'primevue';
 import useBooking from '../../../scripts/customer/booking';
 
-const {booking} = useBooking()
+const { booking } = useBooking()
 
 const { notify } = useNotification()
 const { user } = useAuth()
@@ -303,7 +303,7 @@ const getUserPositionTick = () => {
 };
 
 const getParkingZones = async () => {
-    const { data } = await api.get('parking-zones');
+    const { data } = await api.get('get-parking-zones');
     const { parking_zones, availabilities } = data;
 
     const availabilityMap = availabilities.reduce((map, availability) => {
@@ -353,13 +353,13 @@ const initiateBooking = async () => {
     fd.append('vehicle_id', bookingVehicle.value)
     fd.append('parking_zone_id', selected.value.id)
     const { data } = await api.post('bookings/initiate', fd)
-    toast.add({ 
-        severity: data.success ? 'success' : 'error', 
-        summary: data.success ? 'Success' : 'Error', 
-        detail: data.message, 
-        life: 2000 
+    toast.add({
+        severity: data.success ? 'success' : 'error',
+        summary: data.success ? 'Success' : 'Error',
+        detail: data.message,
+        life: 2000
     });
-    if(data.success) {
+    if (data.success) {
         openBookingInfo.value = false
         await calculateRoute() // Calculate route after successful booking
     }
@@ -367,49 +367,49 @@ const initiateBooking = async () => {
 
 const onMapReady = (map) => {
     console.log("here")
-  directionsService.value = new google.maps.DirectionsService();
-  directionsRenderer.value = new google.maps.DirectionsRenderer({
-    map: map,
-    suppressMarkers: true,
-    polylineOptions: {
-      strokeColor: '#FF0000',
-      strokeOpacity: 0.8,
-      strokeWeight: 4
-    }
-  });
+    directionsService.value = new google.maps.DirectionsService();
+    directionsRenderer.value = new google.maps.DirectionsRenderer({
+        map: map,
+        suppressMarkers: true,
+        polylineOptions: {
+            strokeColor: '#FF0000',
+            strokeOpacity: 0.8,
+            strokeWeight: 4
+        }
+    });
 };
 
 const calculateRoute = async () => {
-  if ( !userLocation.lat || !directionsService.value) return;
+    if (!userLocation.lat || !directionsService.value) return;
 
-  try {
-    const request = {
-      origin: { lat: userLocation.lat, lng: userLocation.lng },
-      destination: { 
-        lat: parseFloat(selected.value.latitude), 
-        lng: parseFloat(selected.value.longitude) 
-      },
-      travelMode: google.maps.TravelMode.DRIVING
-    };
+    try {
+        const request = {
+            origin: { lat: userLocation.lat, lng: userLocation.lng },
+            destination: {
+                lat: parseFloat(selected.value.latitude),
+                lng: parseFloat(selected.value.longitude)
+            },
+            travelMode: google.maps.TravelMode.DRIVING
+        };
 
-    const response = await new Promise((resolve, reject) => {
-      directionsService.value.route(request, (result, status) => {
-        if (status === 'OK') resolve(result);
-        else reject(status);
-      });
-    });
+        const response = await new Promise((resolve, reject) => {
+            directionsService.value.route(request, (result, status) => {
+                if (status === 'OK') resolve(result);
+                else reject(status);
+            });
+        });
 
-    directionsRenderer.value.setDirections(response);
-    bookedParkingZone.value = selected.value;
-  } catch (error) {
-    console.error('Directions request failed:', error);
-    toast.add({
-      severity: 'error',
-      summary: 'Routing Error',
-      detail: 'Could not calculate route to parking zone',
-      life: 3000
-    });
-  }
+        directionsRenderer.value.setDirections(response);
+        bookedParkingZone.value = selected.value;
+    } catch (error) {
+        console.error('Directions request failed:', error);
+        toast.add({
+            severity: 'error',
+            summary: 'Routing Error',
+            detail: 'Could not calculate route to parking zone',
+            life: 3000
+        });
+    }
 };
 watch(booking, async (newVal) => {
     if (newVal.length > 0) {

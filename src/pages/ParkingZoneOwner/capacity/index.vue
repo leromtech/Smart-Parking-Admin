@@ -3,14 +3,24 @@
         <Panel header="CAPACITY" class="w-[50%]">
             <div class="flex flex-col gap-6">
                 <div class="flex flex-col gap-2">
-                    <label for="capacity_total">Capacity</label>
-                    <InputNumber id="capacity_total" v-model="capacity_total" aria-describedby="capacity-help" @blur="validateCapacity" />
+                    <label for="capacity_total">Total Capacity</label>
+                    <InputNumber id="capacity_total" v-model="capacity_total" aria-describedby="capacity-help"
+                        @blur="validateCapacity" />
                     <Message size="small" severity="secondary" variant="simple">Enter the total capacity</Message>
                 </div>
                 <div class="flex flex-col gap-2">
-                    <label for="reserved_space">Reserved</label>
-                    <InputNumber id="reserved_space" v-model="reserved_space" aria-describedby="reserved-help" @blur="validateReserved" />
-                    <Message size="small" severity="secondary" variant="simple">Enter the capacity reserved for booking</Message>
+                    <label for="reserved_space">Declared for App</label>
+                    <InputNumber id="reserved_space" v-model="reserved_space" aria-describedby="reserved-help"
+                        @blur="validateReserved" />
+                    <Message size="small" severity="secondary" variant="simple">Enter the capacity reserved for App
+                    </Message>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <label for="reserved_space">Reserved for Booking</label>
+                    <InputNumber id="reserved_space" v-model="reserved_space" aria-describedby="reserved-help"
+                        @blur="validateReserved" />
+                    <Message size="small" severity="secondary" variant="simple">Enter the capacity reserved for booking
+                    </Message>
                 </div>
                 <Button @click="submit" :disabled="error">Save</Button>
                 <Message v-if="error" size="small" severity="error" variant="simple">{{ error }}</Message>
