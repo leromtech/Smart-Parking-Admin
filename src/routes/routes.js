@@ -37,10 +37,10 @@ const routes = [
         component: () => import('../layouts/CustomerLayout.vue'),
         children: [
             { name: 'Home', path: '', component: () => import('../pages/Customer/Home/index.vue') },
-            { name: 'Parking', path: 'parking', component: () => import('../pages/Customer/Parking/index.vue') },
-            { name: 'Wallet', path: 'wallet', component: () => import('../pages/Customer/Wallet/index.vue') },
-            { name: 'Customer Profile', path: 'profile', component: () => import('../pages/Customer/Profile/index.vue') },
-            { name: 'Park', path: 'park', component: () => import('../pages/Customer/Parking/create.vue') },
+            { name: 'Parking', path: 'customer/parking', component: () => import('../pages/Customer/Parking/index.vue') },
+            { name: 'Wallet', path: 'customer/wallet', component: () => import('../pages/Customer/Wallet/index.vue') },
+            { name: 'Customer Profile', path: 'customer/profile', component: () => import('../pages/Customer/Profile/index.vue') },
+            { name: 'Park', path: 'customer/park', component: () => import('../pages/Customer/Parking/create.vue') },
         ]
     },
     {

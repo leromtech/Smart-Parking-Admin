@@ -7,11 +7,13 @@
     <div
       class="absolute bottom-0 bg-[#1D1D1D] rounded-full w-[90%] mb-[5%] py-4 flex flex-row items-center justify-evenly z-40">
       <router-link :to="option.link" v-for="option in menuOptions" :key="option.name"
-        class="text-white w-full h-full text-center">
+        class="text-white w-full h-full text-center" v-if="user">
         {{ option.name }}
       </router-link>
-      <div class="text-white w-full h-full text-center cursor-pointer" @click="loginDialogVisible = true">Login</div>
-      <div class="text-white w-full h-full text-center cursor-pointer" @click="registerDialogVisible = true">Register
+      <div class="text-white w-full h-full text-center cursor-pointer" @click="loginDialogVisible = true" v-if="!user">
+        Login</div>
+      <div class="text-white w-full h-full text-center cursor-pointer" @click="registerDialogVisible = true"
+        v-if="!user">Register
       </div>
     </div>
   </div>
@@ -97,10 +99,12 @@ const registerFd = computed(() => {
 
 const loginCb = (data) => {
   loginError.value = data.message
+  loginDialogVisible.value = !data.success
 }
 
 const registerCb = (data) => {
   registerError.value = data.message
+  registerDialogVisible.value = !data.success
 }
 
 const registrationForm = ref({
@@ -112,20 +116,8 @@ const registrationForm = ref({
 
 const menuOptions = ref([
   { name: 'Home', link: '/' },
+  { name: 'Parking', link: '/customer/parking' },
+  { name: 'Wallet', link: '/customer/wallet' },
+  { name: 'Profile', link: '/customer/profile' },
 ])
-
-watch(user, (newVal) => {
-  if (newVal) {
-    menuOptions.value = [
-      { name: 'Home', link: '/' },
-      { name: 'Parking', link: '/customer/parking' },
-      { name: 'Wallet', link: '/customer/wallet' },
-      { name: 'Profile', link: '/customer/profile' },
-    ]
-  } else {
-    menuOptions.value = [
-      { name: 'Home', link: '/' },
-    ]
-  }
-})
 </script>

@@ -34,6 +34,7 @@ const fetchUser = async () => {
 }
 
 const login = async (fd, cb = null) => {
+    console.log('login')
     const { data } = await api.post('login', fd);
     if (data.success) {
         localStorage.setItem('auth_token', data.token)
@@ -42,7 +43,7 @@ const login = async (fd, cb = null) => {
         let route;
         switch (user.value.roles[0].name) {
             case 'customer':
-                route = '/customer';
+                route = '/';
                 break
             case 'superadmin':
                 route = '/admin';

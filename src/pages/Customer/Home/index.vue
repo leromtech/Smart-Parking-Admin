@@ -2,9 +2,14 @@
     <div class="h-full w-full flex flex-col relative overflow-hidden">
         <div class="h-[30%] w-full flex bg-gradient-to-b from-black absolute top-0 z-10 pointer-events-none"></div>
         <div class="flex flex-col h-[20%] w-full p-4 z-20 relative">
-            <div class="font-extrabold text-xl text-white flex flex-col w-full">
-                <p>Find Your</p>
-                <p>Parking Space</p>
+            <div class="flex flex-row items-center justify-between">
+                <div class="font-extrabold text-xl text-white flex flex-col w-full">
+                    <p>Find Your</p>
+                    <p>Parking Space</p>
+                </div>
+                <router-link to="customer/profile/scan-qr">
+                    <font-awesome-icon :icon="['fas', 'qrcode']" class="text-[#F0E573] w-6 h-6" />
+                </router-link>
             </div>
             <div class="w-full items-center justify-center flex mt-2 relative">
                 <input type="text" class="p-2 rounded-full z-10 w-full bg-transparent border text-white"
@@ -80,13 +85,20 @@
             <p class="mt-4">Booking Time</p>
             <p class="font-normal text-sm">{{ getDateTime() }}</p>
             <p class="mt-4">Select Your Vehicle</p>
+            <div v-if="user.vehicle.length === 0" class="text-[#FF9500] flex flex-col gap-2 my-2">
+                <p>No Vehicles found</p>
+                <router-link to="customer/profile/add-vehicle"
+                    class="text-[#FF9500] border border-[#694097] rounded-md p-2">Add Vehicle</router-link>
+            </div>
             <div :class="['w-full flex flex-row items-center gap-4 my-2 p-2 rounded-lg', bookingVehicle == vehicle.registration_no ? 'bg-[#FF9500]' : 'bg-[#1d1d1d]']"
                 v-for="vehicle in user.vehicle">
                 <input :id='vehicle.registration_no' type="radio" :value="vehicle.id" v-model="bookingVehicle">
                 <label :for="vehicle.registration_no" class="w-full">{{ vehicle.registration_no }}</label>
             </div>
 
-            <button class="w-full p-2 rounded-lg bg-[#7F00FF] mt-auto" @click="initiateBooking">Confirm Booking</button>
+            <button
+                :class="['w-full p-2 rounded-lg bg-[#7F00FF] mt-auto', user.vehicle.length === 0 ? 'cursor-not-allowed' : 'cursor-pointer']"
+                @click="initiateBooking" :disabled="user.vehicle.length === 0">Confirm Booking</button>
         </Modal>
     </div>
 </template>
@@ -304,19 +316,8 @@ const getUserPositionTick = () => {
 
 const getParkingZones = async () => {
     const { data } = await api.get('get-parking-zones');
-    const { parking_zones, availabilities } = data;
-
-    const availabilityMap = availabilities.reduce((map, availability) => {
-        map[availability.parking_zone_id] = availability;
-        return map;
-    }, {});
-
-    parkingZones.value = parking_zones.data.map(zone => {
-        return {
-            ...zone,
-            availability: availabilityMap[zone.id] || null
-        };
-    });
+    const { parking_zones } = data;
+    parkingZones.value = parking_zones.data
 };
 
 const openDetails = (item) => {

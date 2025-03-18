@@ -14,8 +14,8 @@ const generateChartName = () => {
     return `chart${charts.value}`
 }
 
-export function useChart(){
-    return{
+export function useChart() {
+    return {
         addChart,
         removeChart,
         generateChartName
