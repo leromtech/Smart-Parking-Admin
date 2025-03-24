@@ -29,12 +29,12 @@
                     :options="{ center: userLocation, radius: circleRadius, strokeColor: '#4285f4', strokeWeight: 2, fillColor: '#4285f4' }"
                     v-if="userLocation.lat !== null && userLocation.lng !== null" />
                 <!-- Add Polyline for navigation route -->
-                <Polyline v-if="booking.length > 0 && navigationPath" :options="{
+                <!-- <Polyline v-if="booking.length > 0 && navigationPath" :options="{
                     path: navigationPath,
                     strokeColor: '#FF0000',
                     strokeOpacity: 0.8,
                     strokeWeight: 4
-                }" />
+                }" /> -->
             </GoogleMap>
         </div>
         <!-- Draggable Drawer -->

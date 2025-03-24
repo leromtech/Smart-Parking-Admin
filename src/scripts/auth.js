@@ -7,7 +7,7 @@ import { data } from "autoprefixer";
 const user = ref(null)
 const roles = ref(null)
 const parking_zone_id = ref(null)
-
+const loading = ref(false)
 const loggedIn = () => {
     const token = localStorage.getItem('auth_token')
     if (!token) {
@@ -34,8 +34,9 @@ const fetchUser = async () => {
 }
 
 const login = async (fd, cb = null) => {
-    console.log('login')
+    loading.value = true
     const { data } = await api.post('login', fd);
+    loading.value = false
     if (data.success) {
         localStorage.setItem('auth_token', data.token)
         user.value = data.user
@@ -79,7 +80,9 @@ const logout = async () => {
 }
 
 const register = async (fd, cb = null) => {
+    loading.value = true
     const { data } = await api.post('register', fd)
+    loading.value = false
     cb && cb(data)
     return data
 }
@@ -89,6 +92,7 @@ export default function useAuth() {
         user,
         roles,
         parking_zone_id,
+        loading,
         login,
         logout,
         loggedIn,

@@ -30,11 +30,12 @@
         </InputGroupAddon>
         <InputMask v-model="loginForm.phone" mask="9999999999" placeholder="Phone" />
       </InputGroup>
-      <InputText v-model="loginForm.password" placeholder="Password" />
+      <InputText v-model="loginForm.password" placeholder="Password" type="password" />
       <span class="text-red-500">{{ loginError }}</span>
       <div class="flex flex-row gap-4">
         <p>Not Registered?</p>
-        <span class="cursor-pointer text-violet-500">Register</span>
+        <span class="cursor-pointer text-violet-500"
+          @click="{ loginDialogVisible = false; registerDialogVisible = true }">Register</span>
       </div>
     </div>
   </Dialog>
@@ -57,10 +58,17 @@
       <span class="text-red-500">{{ registerError }}</span>
       <div class="flex flex-row gap-4">
         <p>Already Registered?</p>
-        <span class="cursor-pointer text-violet-500">Login</span>
+        <span class="cursor-pointer text-violet-500"
+          @click="{ loginDialogVisible = true; registerDialogVisible = false }">Login</span>
       </div>
     </div>
   </Dialog>
+
+  <div class="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50"
+    v-if="loading">
+    <ProgressSpinner style="width: 50px; height: 50px" strokeWidth="8" fill="transparent" animationDuration=".5s"
+      aria-label="Custom ProgressSpinner" class="z-50" />
+  </div>
 </template>
 
 <script setup>
@@ -68,7 +76,7 @@ import { computed, ref, watch } from 'vue';
 import useAuth from '../scripts/auth';
 import { InputMask, InputNumber } from 'primevue';
 
-const { user, login, register } = useAuth()
+const { user, login, register, loading } = useAuth()
 
 const loginDialogVisible = ref(false)
 const registerDialogVisible = ref(false)
