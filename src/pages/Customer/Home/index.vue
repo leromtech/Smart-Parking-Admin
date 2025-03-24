@@ -56,6 +56,7 @@
                 </div>
             </div>
         </div>
+
         <Modal v-model="modalOpen" class="flex flex-col bg-black p-6 rounded-lg border">
             <img src="" alt="unavailable" class="min-w-full min-h-[300px] rounded-lg bg-stone-950 my-2 border">
             <div class="flex flex-col w-full h-[40%] text-white px-2 mt-2 gap-2">
@@ -115,11 +116,13 @@ import useAuth from '../../../scripts/auth';
 import useNotification from '../../../scripts/notification';
 import { useToast } from 'primevue';
 import useBooking from '../../../scripts/customer/booking';
+import useLoginDialog from '../../../scripts/customer/login';
 
 const { booking } = useBooking()
 
 const { notify } = useNotification()
 const { user } = useAuth()
+const {loginDialogOpen1} = useLoginDialog()
 
 const navigationPath = ref(null)
 
@@ -326,6 +329,11 @@ const openDetails = (item) => {
 }
 
 const displayBookingInfo = () => {
+    if(!user.value){
+        loginDialogOpen1.value = true
+        modalOpen.value = false
+        return
+    }
     modalOpen.value = false
     openBookingInfo.value = true
 }
@@ -367,7 +375,6 @@ const initiateBooking = async () => {
 }
 
 const onMapReady = (map) => {
-    console.log("here")
     directionsService.value = new google.maps.DirectionsService();
     directionsRenderer.value = new google.maps.DirectionsRenderer({
         map: map,
@@ -412,13 +419,14 @@ const calculateRoute = async () => {
         });
     }
 };
-watch(booking, async (newVal) => {
-    if (newVal.length > 0) {
-        await calculateRoute();
-    } else {
-        navigationPath.value = null; // Clear route when no booking exists
-    }
-}, { deep: true });
+
+// watch(booking, async (newVal) => {
+//     if (newVal.length > 0) {
+//         await calculateRoute();
+//     } else {
+//         navigationPath.value = null; // Clear route when no booking exists
+//     }
+// }, { deep: true });
 
 onMounted(async () => {
     getUserLocation(); // Fetch initial location

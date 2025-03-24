@@ -10,7 +10,7 @@
         class="text-white w-full h-full text-center" v-if="user">
         {{ option.name }}
       </router-link>
-      <div class="text-white w-full h-full text-center cursor-pointer" @click="loginDialogVisible = true" v-if="!user">
+      <div class="text-white w-full h-full text-center cursor-pointer" @click="loginDialogOpen = true" v-if="!user">
         Login</div>
       <div class="text-white w-full h-full text-center cursor-pointer" @click="registerDialogVisible = true"
         v-if="!user">Register
@@ -18,7 +18,8 @@
     </div>
   </div>
 
-  <Dialog v-model:visible="loginDialogVisible" header="Login" :style="{ width: '90%' }" modal="true"
+  <!-- Login -->
+  <Dialog v-model:visible="loginDialogOpen" header="Login" :style="{ width: '90%' }" modal="true"
     style="background-color: #111a; color: white;">
     <template #footer>
       <Button label="Login" @click="() => login(loginFd, loginCb)" />
@@ -35,11 +36,12 @@
       <div class="flex flex-row gap-4">
         <p>Not Registered?</p>
         <span class="cursor-pointer text-violet-500"
-          @click="{ loginDialogVisible = false; registerDialogVisible = true }">Register</span>
+          @click="{ loginDialogOpen = false; registerDialogVisible = true }">Register</span>
       </div>
     </div>
   </Dialog>
 
+  <!-- Registratiosn -->
   <Dialog v-model:visible="registerDialogVisible" header="Register" :style="{ width: '90%' }" modal="true"
     style="background-color: #111a; color: white;">
     <template #footer>
@@ -59,7 +61,7 @@
       <div class="flex flex-row gap-4">
         <p>Already Registered?</p>
         <span class="cursor-pointer text-violet-500"
-          @click="{ loginDialogVisible = true; registerDialogVisible = false }">Login</span>
+          @click="{ loginDialogOpen = true; registerDialogVisible = false }">Login</span>
       </div>
     </div>
   </Dialog>
@@ -75,12 +77,14 @@
 import { computed, ref, watch } from 'vue';
 import useAuth from '../scripts/auth';
 import { InputMask, InputNumber } from 'primevue';
+import useloginDialogOpenog from '../scripts/customer/login';
+import useLoginDialog from '../scripts/customer/login';
 
 const { user, login, register, loading } = useAuth()
+const loginDialogOpen = ref(false)
 
-const loginDialogVisible = ref(false)
 const registerDialogVisible = ref(false)
-
+const {loginDialogOpen1} = useLoginDialog()
 const loginError = ref('')
 const registerError = ref('')
 
@@ -107,7 +111,7 @@ const registerFd = computed(() => {
 
 const loginCb = (data) => {
   loginError.value = data.message
-  loginDialogVisible.value = !data.success
+  loginDialogOpen.value = !data.success
 }
 
 const registerCb = (data) => {
@@ -128,4 +132,8 @@ const menuOptions = ref([
   { name: 'Wallet', link: '/customer/wallet' },
   { name: 'Profile', link: '/customer/profile' },
 ])
+
+watch(loginDialogOpen1, (newVal) => {
+  loginDialogOpen.value = newVal
+})
 </script>
