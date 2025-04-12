@@ -81,33 +81,27 @@ onMounted(async () => {
 
 const initiatePayment = async (plan) => {
   try {
-    // Create order
-    const { data } = await api.post('wallet', {
-      amount: plan.amount
+    const paymentData = await api.post('payments', {
+      amount: plan.amount,
+      payment_type: 'wallet',
     });
-
-    const orderId = data.order.id
-
+    
     const options = {
-      key: data.key,
+      key: paymentData.data.key,
       amount: plan.amount * 100,
       currency: "INR",
       name: "Your Company Name",
       description: `Wallet Recharge - ${plan.coins} coins`,
-      order_id: data.order_id,
-      handler: async function (response) {
-        const { data } = await api.post('payments/wallet/verify-payment', {
-          razorpay_payment_id: response.razorpay_payment_id,
-          razorpay_order_id: orderId,
-          razorpay_signature: response.razorpay_signature
-        });
-
-        console.log(data)
-
-        if (data.success) {
-          await getWalletBalance();
-          alert('Payment successful!');
-        }
+      order_id: paymentData.data.order_id,
+      handler: async (response) => {
+        const formData = new FormData();
+        formData.append('razorpay_payment_id', response.razorpay_payment_id);
+        formData.append('status', 'initiated');
+        formData.append('_method', 'PATCH');
+        
+        // Fixed the syntax error and variable shadowing issue
+        const result = await api.post(`payments/${paymentData.data.payment.id}`, formData);
+        console.log(result);
       },
       prefill: {
         name: user.value.name,
@@ -117,12 +111,11 @@ const initiatePayment = async (plan) => {
         color: "#9333EA"
       }
     };
-
+    
     const rzp = new window.Razorpay(options);
     rzp.open();
   } catch (error) {
     console.error('Payment failed:', error);
-    alert('Payment failed. Please try again.');
   }
 };
 

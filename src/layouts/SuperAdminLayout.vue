@@ -77,7 +77,7 @@ const menuItems = ref([
         icon: 'pi pi-user'
     },
     {
-        label: 'Booking Intervals',
+        label: 'Bookings',
         route: '/admin/booking-intervals',
         icon: 'pi pi-user'
     },

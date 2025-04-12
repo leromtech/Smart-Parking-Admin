@@ -21,8 +21,8 @@
                     </Select>
 
                     <IftaLabel>
-                        <DatePicker v-model="monthFilter" showIcon fluid iconDisplay="input" view="month"
-                            dateFormat="MM yy" />
+                        <DatePicker v-model="monthFilter" showIcon fluid iconDisplay="input" view="month" class="w-full md:w-40"
+                            dateFormat="MM yy"/>
                         <label for="date">Month</label>
                     </IftaLabel>
                 </div>
@@ -39,7 +39,7 @@
         <div class="flex flex-row items-center justify-end">
             <Button @click="settle">Settle</Button>
         </div>
-        <div class="flex flex-row gap-2">
+        <div class="flex flex-col gap-2">
             <Panel :header="k.toUpperCase()" v-for="[k, v] in Object.entries(payments)" :key="k">
                 <DataTable :value="v" scrollable scrollHeight="400px" tableStyle="min-width: 50rem" :loading="loading"
                     lazy>
