@@ -13,6 +13,7 @@ const routes = [
             { name: 'Admin Bookings', path: 'bookings', component: () => import('../pages/SuperAdmin/Bookings/index.vue') },
             { name: 'Admin Settlement', path: 'settlement', component: () => import('../pages/SuperAdmin/Settlement/index.vue') },
             { name: 'Admin Booking Intervals', path: 'booking-intervals', component: () => import('../pages/SuperAdmin/Bookings/index.vue') },
+            { name: 'Admin Comission Rate', path: 'commission-rate', component: () => import('../pages/SuperAdmin/Comission/index.vue') },
         ]
     },
     {

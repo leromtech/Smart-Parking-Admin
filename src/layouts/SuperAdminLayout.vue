@@ -62,6 +62,11 @@ const menuItems = ref([
         icon: 'pi pi-user'
     },
     {
+        label: 'Comission Rate',
+        route: '/admin/commission-rate',
+        icon: 'pi pi-user'
+    },
+    {
         label: 'Vehicles',
         route: '/admin/vehicles',
         icon: 'pi pi-user'
