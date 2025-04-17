@@ -12,10 +12,12 @@
             <Column field="name" header="Name"></Column>
             <Column field="email" header="Email"></Column>
             <Column field="phone" header="Phone"></Column>
-            <Column field="roles" header="Role">
+            <!-- Roles -->
+            <Column field="roles" header="Roles">
                 <template #body="slotProps">
                     <div class="flex flex-col">
-                        <span>{{ slotProps.data.roles[0].name.toUpperCase() }}</span>
+                        <span>{{ slotProps.data.roles.length > 0 ? slotProps.data.roles[0].name.toUpperCase() : 'N/A'
+                        }}</span>
                         <span v-if="slotProps.data.parking_zone_managed.length > 0" class="font-semibold">
                             {{ slotProps.data.parking_zone_managed[0].name }}</span>
                         <span v-if="slotProps.data.parking_zone_owned" class="font-semibold">
@@ -24,6 +26,7 @@
                     </div>
                 </template>
             </Column>
+            <!-- Column Actions -->
             <Column>
                 <template #body="slotProps">
                     <div class="flex flex-row gap-2">

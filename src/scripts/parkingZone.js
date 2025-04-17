@@ -78,6 +78,17 @@ const newRateForm = ref({
     interval: ''
 })
 
+const addFreeParkingUser = async (id) => {
+    const fd = new FormData()
+    fd.append('user_id', id)
+    fd.append('parking_zone_id', parking_zone.value.id)
+    const { data } = await api.post('free-parking-users', fd)
+
+    await refresh()
+
+    return data
+}
+
 export function useParkingZone() {
     if (user.value && user.value.parking_zone_owned) {
         getParkingZone(user.value.parking_zone_owned.id)
@@ -94,8 +105,8 @@ export function useParkingZone() {
             addManager,
             removeManager,
             getRates,
-            pagination
+            pagination,
+            addFreeParkingUser
         }
     }
-
 } 

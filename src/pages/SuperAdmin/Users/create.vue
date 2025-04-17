@@ -16,15 +16,18 @@
                 <InputText type="tel" name="phone" maxlength="10" required
                     class="p-3 border-2 w-[400px] rounded-md bg-neutral-100" v-model="form.phone" />
             </div>
-            <div class="flex flex-col w-[400px] gap-2 mt-8">
-                <label for="password" class="font-semibold">PASSWORD</label>
-                <div class="relative">
-                    <InputText :type="showPassword ? 'text' : 'password'" name="password" required
-                        class="p-3 border-2 w-[400px] rounded-md bg-neutral-100" v-model="form.password" />
-                    <font-awesome-icon :icon="[showPassword ? 'fas' : 'far', 'eye']"
-                        class="absolute right-0 top-[35%] mr-2" @click="showPassword = !showPassword" />
-                </div>
+            <div class="flex flex-col w-full gap-2 mt-8">
+                <label for="role" class="font-semibold">ROLE</label>
+                <Select v-model="form.role" placeholder="Select a role" :options="roleOptions" optionValue="value"
+                    optionLabel="label"></Select>
             </div>
+
+            <div v-if="form.role === 'owner' || form.role === 'manager'" class="
+                flex flex-col w-full gap-2 mt-8">
+                <label for="role-managed">Pakring Zone<span class="text-red-500">*</span></label>
+                <Select :options="parkingZones" optionValue="value" optionLabel="label"></Select>
+            </div>
+
             <div class="w-full flex items-center justify-center text-red-600 font-normal">
                 {{ message }}
             </div>
@@ -39,13 +42,12 @@
 import { onMounted, ref } from 'vue';
 import api from '../../../boot/api';
 import useUsers from '../../../scripts/admin/users';
-const showPassword = ref(false)
+import { Select, useToast } from 'primevue';
 const message = ref()
-
-
 const { getUsers, editItem } = useUsers()
 
 const emit = defineEmits('created');
+const toast = useToast()
 
 const form = ref({
     name: '',
@@ -53,7 +55,18 @@ const form = ref({
     phone: '',
     password: '',
     role: '',
+    parkingZone: ''
 })
+
+
+const parkingZones = ref([])
+
+const roleOptions = [
+    { label: 'Customer', value: 'customer' },
+    { label: 'Super Admin', value: 'superadmin' },
+    { label: 'Manager', value: 'manager' },
+    { label: 'Owner', value: 'owner' }
+]
 
 const reset = () => {
     form.value.name = ''
@@ -66,17 +79,17 @@ const reset = () => {
 const submit = async () => {
     try {
         const fd = new FormData()
-        if (form.value.id !== null && form.value.id !== undefined) {
-            fd.append('id', form.value.id)
+        if (form.value.id !== null || form.value.id !== undefined) {
             fd.append('_method', 'PATCH')
         }
         fd.append('name', form.value.name)
         fd.append('email', form.value.email)
         fd.append('phone', form.value.phone)
-        fd.append('password', form.value.password)
+        if (form.value.id == null || form.value.id == undefined) {
+            fd.append('password', form.value.password)
+        }
         fd.append('role', form.value.role)
-
-        await api.post('/users', fd)
+        await api.post(`/users/${form.value.id ?? ''}`, fd)
         reset()
         await getUsers()
     } catch (error) {
@@ -84,14 +97,33 @@ const submit = async () => {
     }
 }
 
-onMounted(() => {
+const getParkingZone = async () => {
+    try {
+        const { data } = await api.get('parking-zones', { params: { 'filters': { 'all': 1 } } })
+        parkingZones.value = data.parking_zones.map((item) => {
+            return { label: item.name, value: item.id }
+        })
+        console.log(parkingZones.value)
+    } catch (error) {
+        toast.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to load parking zones' + error,
+            life: 3000
+        })
+    }
+}
+
+onMounted(async () => {
     if (editItem.value) {
+        form.value.id = editItem.value.id
         form.value.name = editItem.value.name || ''
         form.value.email = editItem.value.email || ''
         form.value.phone = editItem.value.phone || ''
         form.value.password = editItem.value.password || ''
         form.value.role = editItem.value.role || ''
     }
+    await getParkingZone()
 })
 
 </script>

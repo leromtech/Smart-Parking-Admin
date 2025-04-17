@@ -11,7 +11,6 @@ const routes = [
             { name: 'Vehicle Types', path: 'vehicle-types', component: () => import('../pages/SuperAdmin/VehicleTypes/index.vue') },
             { name: 'Admin Wallet', path: 'wallet', component: () => import('../pages/SuperAdmin/Wallet/index.vue') },
             { name: 'Admin Bookings', path: 'bookings', component: () => import('../pages/SuperAdmin/Bookings/index.vue') },
-            { name: 'Admin Intervals', path: 'settings-intervals', component: () => import('../pages/SuperAdmin/Intervals/index.vue') },
             { name: 'Admin Settlement', path: 'settlement', component: () => import('../pages/SuperAdmin/Settlement/index.vue') },
             { name: 'Admin Booking Intervals', path: 'booking-intervals', component: () => import('../pages/SuperAdmin/Bookings/index.vue') },
         ]
@@ -28,6 +27,7 @@ const routes = [
             { name: 'Parking Zone Managers', path: 'managers', component: () => import('../pages/ParkingZoneOwner/managers/index.vue') },
             { name: 'Parking Zone Rates', path: 'rates', component: () => import('../pages/ParkingZoneOwner/rates/index.vue') },
             { name: 'Parking Zone Earnings', path: 'earnings', component: () => import('../pages/ParkingZoneOwner/earnings/index.vue') },
+            { name: 'parking Zone Free Parking List', path: 'free-parking-lists', component: () => import('../pages/ParkingZoneOwner/freeParkingList/index.vue') },
         ]
     },
     {

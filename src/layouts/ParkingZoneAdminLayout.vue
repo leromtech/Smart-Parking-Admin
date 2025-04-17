@@ -79,7 +79,12 @@ const menuItems = ref([
                 label: 'Earnings Report',
                 route: '/parking-zone/earnings',
                 icon: 'pi pi-user'
-            }
+            },
+            {
+                label: 'Free Parking Lists',
+                route: '/parking-zone/free-parking-lists',
+                icon: 'pi pi-user'
+            },
         ]
     }
 

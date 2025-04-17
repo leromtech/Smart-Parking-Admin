@@ -21,7 +21,7 @@
                 </div>
                 <div class="flex flex-col items-start justify-between">
                     <span>Reserved Space</span>
-                    <span>{{ parking_zone?.reserved_space }}</span>
+                    <span>{{ parking_zone?.declared_for_app }}</span>
                 </div>
             </div>
 
@@ -31,7 +31,7 @@
                 </div>
                 <div class="flex flex-col items-start justify-between">
                     <span>Currently Occupied</span>
-                    <span>{{ (availabiltiy?.real_time_availability - parking_zone?.capacity_total) ?? "Loading..."
+                    <span>{{ (availabiltiy) ?? "Loading..."
                         }}</span>
                 </div>
             </div>
@@ -55,7 +55,8 @@
         </div>
 
         <div class="flex flex-row items-center bg-white p-2 rounded-md shadow-md mt-2" v-if="parkingRecords">
-            <ParkingRecordChart :title="`Parking Record ${yearFilter.getFullYear()}`" :data="parkingRecords" class="w-[68%]" v-if="parkingRecords"/>
+            <ParkingRecordChart :title="`Parking Record ${yearFilter.getFullYear()}`" :data="parkingRecords"
+                class="w-[68%]" v-if="parkingRecords" />
             <div class="h-full border-l-2"></div>
             <!-- <TotalVehicleMonthChart title="Vehicle Types Parked" :data="vehicleRecords" class="w-[28%]" /> -->
         </div>
@@ -66,8 +67,6 @@
 import { onMounted, ref, watch } from 'vue';
 import useAuth from '../../scripts/auth';
 import ParkingRecordChart from '../../components/OwnerDashboard/ParkingRecordChart.vue';
-import TotalVehicleMonthChart from '../../components/OwnerDashboard/TotalVehicleMonthChart.vue';
-import Tooltip from '../../components/tooltip.vue';
 import { useParkingZone } from '../../scripts/parkingZone';
 import api from '../../boot/api';
 
@@ -82,17 +81,26 @@ const vehicleRecords = ref(null)
 
 const hasRun = ref(false); // Track if it’s already executed
 
-const webSocketTest = async () => {
+const setupRealTimeAvailability = async () => {
+    try {
+        Echo.channel('parking-zones')
+            .listen('ParkingAvailabilityUpdated', (e) => { // Add the dot prefix
+                console.log('Data received:', e);
+                availabiltiy.value = e.real_time_availability;
+            });
 
-    window.Echo.channel('parking-zones').listen('ParkingAvailabilityUpdated', (data) => {
-        availabiltiy.value = data
-    });
-    await api.get('availability/' + parking_zone.value?.id);
-}
+        // Then make the API call to trigger initial data
+        const { data } = await api.get(`availability/${parking_zone.value.id}`);
+        availabiltiy.value = data.currently_occupied_spaces
+
+    } catch (error) {
+        console.error('Error setting up real-time availability:', error);
+    }
+};
+
 
 const getEarnings = async () => {
     try {
-
         const year = yearFilter.value.toLocaleDateString('en-GB', { year: 'numeric' }).replace('/', '-');
         const { data } = await api.get('analytics/parking-zone', { params: { parking_zone_id: parking_zone.value.id, year } });
         console.log(data)
@@ -109,10 +117,9 @@ watch(
     parking_zone,
     async (newVal) => {
         if (newVal && !hasRun.value) {
-            console.log("ran");
             hasRun.value = true; // Prevent future runs
-            await webSocketTest();
             await getEarnings()
+            await setupRealTimeAvailability(parking_zone.value.id)
         }
     },
     { immediate: true }
