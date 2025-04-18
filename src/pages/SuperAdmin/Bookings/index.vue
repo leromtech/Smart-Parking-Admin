@@ -41,14 +41,13 @@
                 </div>
             </template>
             <div>
-                <InputNumber v-model="bookingRate" mode="currency" currency="INR" locale="en-IN"
-                    :min="0" :max="1000000" :showButtons="true" :buttonLayout="'horizontal'"
-                    :incrementButtonClass="'p-button-success'" :decrementButtonClass="'p-button-danger'"
-                    :style="{ width: '100%' }">
+                <InputNumber v-model="bookingRate" mode="currency" currency="INR" locale="en-IN" :min="0" :max="1000000"
+                    :showButtons="true" :buttonLayout="'horizontal'" :incrementButtonClass="'p-button-success'"
+                    :decrementButtonClass="'p-button-danger'" :style="{ width: '100%' }">
                     <template #prefix>
                         <i class="pi pi-rupee"></i>
                     </template>
-                    </InputNumber>
+                </InputNumber>
             </div>
         </Panel>
     </div>
@@ -59,7 +58,7 @@ import { onMounted, ref } from 'vue';
 import api from '../../../boot/api';
 import { useToast } from 'primevue';
 
-const bookingIntervals = ref([])
+const bookingIntervals = ref([]); // Correct initialization
 
 const toast = useToast()
 const bookingRate = ref(0)
@@ -75,7 +74,7 @@ const addPrefix = (index) => {
 };
 
 const add = () => {
-    bookingIntervals.value.push(0)
+    bookingIntervals.value.push(0); // Access the .value property to manipulate the array
 }
 
 const getBookingIntervals = async () => {
@@ -84,18 +83,19 @@ const getBookingIntervals = async () => {
             params: {
                 key: 'booking_reminder_intervals'
             }
-        })
-        bookingIntervals.value = data.value
-    }catch (error) {
-        console.error('Error fetching booking intervals:', error)
+        });
+        bookingIntervals.value = data.value.split(',').map(Number); // Convert string to array of numbers
+
+    } catch (error) {
+        console.error('Error fetching booking intervals:', error);
         toast.add({
             severity: 'error',
             summary: 'Error',
             detail: 'Failed to fetch booking intervals'
-        })
+        });
     }
-}
- 
+};
+
 const saveRate = async () => {
     const fd = new FormData()
     fd.append('key', 'booking_rate')
@@ -114,10 +114,9 @@ const saveRate = async () => {
 const save = async () => {
     const fd = new FormData()
     fd.append('key', 'booking_reminder_intervals')
-    fd.append('value', JSON.stringify(bookingIntervals.value))
+    fd.append('value', (bookingIntervals.value))
     const { data } = await api.post('settings', fd)
 
-    console.log(data)
 
     toast.add({
         severity: data.success ? 'success' : 'error',
@@ -133,10 +132,11 @@ const getbookingRate = async () => {
         }
     })
     bookingRate.value = data.value
+
 }
 
 onMounted(async () => {
-   await getBookingIntervals()
-   await getbookingRate()
+    await getBookingIntervals()
+    await getbookingRate()
 })
 </script>
