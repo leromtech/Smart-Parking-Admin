@@ -58,7 +58,7 @@ import { onMounted, ref } from 'vue';
 import api from '../../../boot/api';
 import { useToast } from 'primevue';
 
-const bookingIntervals = ref([]); // Correct initialization
+const bookingIntervals = ref([]);
 
 const toast = useToast()
 const bookingRate = ref(0)
@@ -84,7 +84,8 @@ const getBookingIntervals = async () => {
                 key: 'booking_reminder_intervals'
             }
         });
-        bookingIntervals.value = data.value.split(',').map(Number); // Convert string to array of numbers
+
+        bookingIntervals.value = JSON.parse(data.value); // Convert string to array of numbers
 
     } catch (error) {
         console.error('Error fetching booking intervals:', error);
@@ -114,7 +115,7 @@ const saveRate = async () => {
 const save = async () => {
     const fd = new FormData()
     fd.append('key', 'booking_reminder_intervals')
-    fd.append('value', (bookingIntervals.value))
+    fd.append('value', (JSON.stringify(bookingIntervals.value)))
     const { data } = await api.post('settings', fd)
 
 

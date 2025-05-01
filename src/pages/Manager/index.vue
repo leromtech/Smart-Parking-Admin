@@ -20,7 +20,7 @@
             <div class="flex w-full flex-col rounded-lg items-center gap-4 mt-4">
                 <div v-for="_data in data" class="w-full p-4 bg-[#242424] rounded-lg">
                     <p>{{ _data.vehicle.registration_no }}</p>
-                    <p>{{ _data.vehicle_type.name }}</p>
+                    <p>{{ _data.vehicle.vehicle_type.name }}</p>
                     <div class="flex flex-row items-center justify-between">
                         <p>{{ _data.start_time }}</p>
                         <p class="text-blue-500">
@@ -213,43 +213,50 @@ const initiatePaymentUPI = async () => {
 };
 
 const filter = async (val) => {
-    console.log(val)
-    let url
-    let filters
+    let url;
+    let filters;
+
     switch (val) {
         case 'Booking':
-            url = 'bookings'
-            break
+            url = 'bookings';
+            break;
         case 'In Parking':
-            url = 'parking-record'
-            filters = { in_parking: true }
-            break
+            url = 'parking-record';
+            filters = { in_parking: true };
+            break;
         case 'Completed':
-            url = 'parking-record'
-            filters = { completed: true }
+            url = 'parking-record';
+            filters = { completed: true };
+            break;
     }
-    const response = await api.get(url, { params: { 'filters': filters } })
 
-    // Handle data mapping differently for completed records
+    const response = await api.get(url, { params: { filters } });
+
+    // Handle data mapping differently based on the filter value
     data.value = response.data.data.map((item) => {
         if (val === 'Completed') {
             // Don't calculate elapsed time for completed records
             return item;
+        } else if (val === 'Booking') {
+            // Use booking_start_time for bookings
+            const startTime = new Date(item.booking_start_time);
+            const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+            return { ...item, elapsedTime };
         } else {
-            // Calculate elapsed time for non-completed records
-            const startTime = new Date(item.start_time)
-            const elapsedTime = Math.floor((Date.now() - startTime) / 1000)
-            return { ...item, elapsedTime }
+            // Use start_time for other cases
+            const startTime = new Date(item.start_time);
+            const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+            return { ...item, elapsedTime };
         }
-    })
+    });
 
     // Only start interval for non-completed records
     if (val !== 'Completed') {
-        beginInterval()
+        beginInterval();
     } else {
         // Clear interval for completed records
         if (timer) {
-            clearInterval(timer)
+            clearInterval(timer);
         }
     }
 }
@@ -324,8 +331,7 @@ const confirmCheckout = async () => {
 
 onMounted(async () => {
     try {
-        const { data } = await api.get('bookings');
-        data.value = data.data;
+        await filter('Booking')
     } catch (error) {
         console.error('Failed to fetch bookings:', error);
     }

@@ -81,6 +81,11 @@ const menuItems = ref([
                 icon: 'pi pi-user'
             },
             {
+                label: 'Closed Days',
+                route: '/parking-zone/closed-days',
+                icon: 'pi pi-user'
+            },
+            {
                 label: 'Free Parking Lists',
                 route: '/parking-zone/free-parking-lists',
                 icon: 'pi pi-user'

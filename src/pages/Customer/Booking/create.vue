@@ -30,6 +30,7 @@
 </template>
 
 <script setup>
+
 import useBooking from '../../../scripts/customer/booking';
 
 const props = defineProps(['item'])
