@@ -7,11 +7,11 @@
 
             <Select :options="policyIntervals" placeholder="Select a policy interval" fluid
                 v-model="selectedPolicyInterval" optionLabel="label" optionValue="value"></Select>
-            {{ selectedPolicyInterval }}
+
             <div class="flex flex-col gap-2">
-                <div class=" flex flex-row items-center gap-2">
+                <div class="flex flex-row items-center gap-2">
                     <Checkbox binary v-model="fixedRateToggle" :disabled="selectedPolicyInterval == 'hourly'"
-                        id="fixed-rate-toggle" />
+                        id="fixed-rate-toggle" @change="handleFixedRateToggle" />
                     <label for="fixed-rate-toggle">Fixed Rate</label>
                 </div>
                 <div v-if="fixedRateToggle" class="flex flex-row gap-4">
@@ -25,8 +25,9 @@
             </div>
 
             <div class="flex flex-row items-center gap-2">
-                <Checkbox binary v-model="timingToggle" :disabled="selectedPolicyInterval !== 'hourly'" />
-                <label for="">Timing</label>
+                <Checkbox binary v-model="timingToggle" :disabled="selectedPolicyInterval !== 'hourly'"
+                    @change="handleTimingToggle" />
+                <label for="timing-toggle">Timing</label>
             </div>
             <div v-if="timingToggle" class="flex flex-row gap-4">
                 <div>
@@ -55,13 +56,13 @@
 </template>
 
 <script setup>
+import { watch } from 'vue';
 import useVehicleTypes from '../../../scripts/admin/vehicleTypes';
 import { useToast } from 'primevue';
 import useCreateRate from '../../../scripts/parkingZoneOwner/rate';
 import { useParkingZone } from '../../../scripts/parkingZone';
 
 const { parking_zone } = useParkingZone()
-
 const toast = useToast()
 
 const {
@@ -73,8 +74,33 @@ const {
     submitRatePolicy
 } = useCreateRate(parking_zone.id, toast)
 
-
 const { vehicleTypes } = useVehicleTypes()
 
+// Handle toggle changes
+const handleFixedRateToggle = (value) => {
+    // If toggle is off, set fixedRate to null or 0
+    if (!value) {
+        ratePolicyForm.fixedRate = null;
+    } else if (ratePolicyForm.fixedRate === null) {
+        // If turning on and value is null, initialize with 0
+        ratePolicyForm.fixedRate = 0;
+    }
+}
 
+// Handle timing toggle
+const handleTimingToggle = (value) => {
+    if (!value) {
+        ratePolicyForm.from = null;
+        ratePolicyForm.to = null;
+    }
+}
+
+// Watch for policy interval changes
+watch(selectedPolicyInterval, (newVal) => {
+    // Reset related fields when interval changes
+    if (newVal === 'hourly') {
+        fixedRateToggle.value = false;
+        ratePolicyForm.fixedRate = null;
+    }
+});
 </script>

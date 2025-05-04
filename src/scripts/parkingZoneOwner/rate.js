@@ -111,7 +111,13 @@ const submitRatePolicy = async () => {
             fd.append('to', '')
         }
         fd.append('name', ratePolicyForm.value.name)
-        fd.append('fixed_rate', ratePolicyForm.value.fixedRate)
+        
+        if (fixedRateToggle.value && ratePolicyForm.value.fixedRate !== null) {
+            formData.append('fixed_rate', ratePolicyForm.value.fixedRate);
+        } else {
+            formData.append('fixed_rate', '0'); // Or whatever default value makes sense
+        }
+
         if (currentlyEditing.value) {
             fd.append('_method', 'PUT')
         }
