@@ -41,6 +41,7 @@ const reset = () => {
         rate_id: null,
         vehicle_type: null,
         parking_zone_id: null,
+        fixedRate: false,
         name: '',
         from: null,
         to: null,
@@ -111,11 +112,11 @@ const submitRatePolicy = async () => {
             fd.append('to', '')
         }
         fd.append('name', ratePolicyForm.value.name)
-        
+
         if (fixedRateToggle.value && ratePolicyForm.value.fixedRate !== null) {
-            formData.append('fixed_rate', ratePolicyForm.value.fixedRate);
+            fd.append('fixed_rate', ratePolicyForm.value.fixedRate);
         } else {
-            formData.append('fixed_rate', '0'); // Or whatever default value makes sense
+            fd.append('fixed_rate', '0'); // Default value
         }
 
         if (currentlyEditing.value) {
@@ -131,7 +132,6 @@ const submitRatePolicy = async () => {
         reset()
         this_refresh.value()
         this_toast.value.add({ severity: 'error', summary: 'Error', detail: error, life: 3000 })
-
     }
 }
 
