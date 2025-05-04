@@ -41,25 +41,24 @@ const login = async (fd, cb = null) => {
         localStorage.setItem('auth_token', data.token)
         user.value = data.user
         roles.value = user.value.roles.map((item) => item.name)
-        let route;
+        
         switch (user.value.roles[0].name) {
             case 'customer':
-                route = '/';
-                break
-            case 'superadmin':
-                route = '/admin';
-                break
-            case 'owner':
-                route = '/parking-zone';
-                break
             case 'manager':
-                route = '/manager';
-                break
+                // Redirect to external Flutter web app using window.location
+                window.location.href = import.meta.env.VITE_FRONTEND_URL;
+                return; // Exit early to prevent further execution
+            case 'superadmin':
+                router.push('/admin');
+                break;
+            case 'owner':
+                router.push('/parking-zone');
+                break;
             default:
-                route = '/';
-                break
+                router.push('/');
+                break;
         }
-        router.push(route)
+        
         cb && cb(data)
     } else {
         cb && cb(data)

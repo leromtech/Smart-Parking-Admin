@@ -49,7 +49,7 @@ router.beforeEach(async (to, from, next) => {
     if (!hasRequiredRole) {
       // Redirect customers to the CustomerLayout route if they don't have access to the current route
       if (userRoles.includes('customer')) {
-        return next('/customer'); // Redirect to CustomerLayout
+         // Redirect to CustomerLayout
       }
       return next('/'); // Redirect to a 'Not Authorized' page or fallback for other roles
     }
@@ -67,5 +67,37 @@ router.beforeEach(async (to, from, next) => {
   next();
 });
 
+const login = async (fd, cb = null) => {
+  loading.value = true
+  const { data } = await api.post('login', fd);
+  loading.value = false
+  if (data.success) {
+      localStorage.setItem('auth_token', data.token)
+      user.value = data.user
+      roles.value = user.value.roles.map((item) => item.name)
+      
+      switch (user.value.roles[0].name) {
+          case 'customer':
+          case 'manager':
+              // Redirect to external Flutter web app using window.location
+              window.location.href = import.meta.env.VITE_FRONTEND_URL;
+              return; // Exit early to prevent further execution
+          case 'superadmin':
+              router.push('/admin');
+              break;
+          case 'owner':
+              router.push('/parking-zone');
+              break;
+          default:
+              router.push('/');
+              break;
+      }
+      
+      cb && cb(data)
+  } else {
+      cb && cb(data)
+      return data.message
+  }
+}
 
 export default router;

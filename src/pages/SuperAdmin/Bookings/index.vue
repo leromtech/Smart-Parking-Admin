@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-row gap-4 w-full">
-        <Panel class="w-full">
+        <Panel class="w-full"> 
             <template #header>
                 <div class="flex flex-row items-center justify-between w-full">
                     <div>Booking Reminder Intervals</div>
