@@ -56,14 +56,14 @@
 
                 <!-- Intervals -->
 
-                <Fieldset legend="Intervals" toggleable v-if="rate.intervals?.length > 0">
+                <Fieldset legend="Intervals" toggleable v-if="rate.intervals?.length >= 0">
                     <div class="flex flex-row items-center justify-end mb-2">
-                        <Button icon="pi pi-plus" rounded @click="() => addInterval(rate.id, parking_zone.id)"
-                            v-if="!intervalForm.rate_id"></Button>
+                        <Button icon="pi pi-plus" rounded @click="() => addIntervalLocal(rate.id, parking_zone.id)"
+                            v-if="activeRateId !== rate.id"></Button>
                         <Button icon="pi pi-save" rounded @click="saveInterval" v-else></Button>
                     </div>
                     <template v-for="(interval, intervalIndex) in rate.intervals" :key="intervalIndex">
-                        <div class="flex flex-row gap-2 items-center justify-between">
+                        <div class="flex flex-row gap-2 items-center justify-between mb-2">
                             <InputGroup>
                                 <InputGroupAddon>
                                     <span>₹</span>
@@ -84,8 +84,8 @@
                             </div>
                         </div>
                     </template>
-                    <!-- New Interval Form  -->
-                    <div class="flex flex-row gap-2 items-center justify-between" v-if="intervalForm.rate_id">
+                    <!-- New Interval Form - only show for the actively edited rate -->
+                    <div class="flex flex-row gap-2 items-center justify-between" v-if="activeRateId === rate.id">
                         <InputGroup>
                             <InputGroupAddon>
                                 <span>₹</span>
@@ -121,18 +121,43 @@ import { useParkingZone } from '../../../scripts/parkingZone';
 import { Fieldset, InputNumber, useToast } from 'primevue';
 import useCreateRate from '../../../scripts/parkingZoneOwner/rate';
 
-const toast = useToast()
+const toast = useToast();
 
-const { parking_zone, refresh } = useParkingZone()
-const { editRatePolicy, deleteInterval, intervalForm, addInterval, saveInterval } = useCreateRate(parking_zone.value?.id, toast, refresh)
+const { parking_zone, refresh } = useParkingZone();
 
-const addingPolicy = ref(false)
+// Track which rate is currently being edited
+const activeRateId = ref(null);
+
+// Modified addInterval function that also tracks which rate is active
+const addIntervalLocal = (rateId, parkingZoneId) => {
+    // Set the active rate ID
+    activeRateId.value = rateId;
+    // Call the original addInterval function
+    addInterval(rateId, parkingZoneId);
+};
+
+// Get the rest of the functions from useCreateRate
+const {
+    editRatePolicy,
+    deleteInterval,
+    intervalForm,
+    addInterval,
+    saveInterval: originalSaveInterval
+} = useCreateRate(parking_zone.value?.id, toast, refresh);
+
+// Wrap the saveInterval function to reset activeRateId when done
+const saveInterval = async () => {
+    await originalSaveInterval();
+    activeRateId.value = null;
+};
+
+const addingPolicy = ref(false);
 
 const dailyIntervals = [
     'second',
     'minute',
     'hour'
-]
+];
 
 function formatTime12Hour(date) {
     let [hours, minutes] = date.split(':');

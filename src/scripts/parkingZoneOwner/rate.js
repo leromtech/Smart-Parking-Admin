@@ -144,10 +144,9 @@ const parseTimeToDate = (timeString) => {
     return date;
 };
 
-export default function useCreateRate(this_parking_zone_id, toast, refresh) {
+export default function useCreateRate(this_parking_zone_id, toast) {
     parking_zone_id.value = this_parking_zone_id
     this_toast.value = toast
-    this_refresh.value = refresh
     return {
         selectedPolicyInterval,
         policyIntervals,
