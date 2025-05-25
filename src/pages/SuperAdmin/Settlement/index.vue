@@ -21,8 +21,8 @@
                     </Select>
 
                     <IftaLabel>
-                        <DatePicker v-model="monthFilter" showIcon fluid iconDisplay="input" view="month" class="w-full md:w-40"
-                            dateFormat="MM yy"/>
+                        <DatePicker v-model="monthFilter" showIcon fluid iconDisplay="input" view="date"
+                            class="w-full md:w-40" dateFormat="MM yy dd" />
                         <label for="date">Month</label>
                     </IftaLabel>
                 </div>
@@ -127,7 +127,7 @@ const getParkingZonesData = async () => {
 const getEarnings = async () => {
     loading.value = true
     try {
-        const month = monthFilter.value.toLocaleDateString('en-GB', { month: 'numeric', year: 'numeric' }).replace('/', '-');
+        const month = monthFilter.value.toLocaleDateString('en-GB', { month: 'numeric', year: 'numeric', day: "numeric" }).replaceAll('/', '-');
         const { data } = await api.get('earnings', { params: { parking_zone_id: 1, month } });
         payments.value = data.payments;
         totals.value = data.totals
@@ -154,7 +154,7 @@ watch(monthFilter, async (newVal) => {
 
 onMounted(async () => {
     await getParkingZonesData()
-    if(parkingZones.value.length > 0){
+    if (parkingZones.value.length > 0) {
         selectedParkingZone.value = parkingZones.value[0]
     }
 })

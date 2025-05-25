@@ -4,8 +4,8 @@
             <div class="flex flex-row gap-8">
                 <div class="flex flex-row gap-4 w-full">
                     <IftaLabel>
-                        <DatePicker v-model="monthFilter" showIcon fluid iconDisplay="input" view="month"
-                            dateFormat="MM yy" />
+                        <DatePicker v-model="monthFilter" showIcon fluid iconDisplay="input" view="date"
+                            dateFormat="MM yy dd" />
                         <label for="date">Month</label>
                     </IftaLabel>
                 </div>
@@ -47,6 +47,12 @@
                             {{ slotProps.data.amount ?? "--NA--" }}
                         </template>
                     </Column>
+                    <template #footer>
+                        <div class="flex justify-between p-2 font-bold">
+                            <span>Total: </span>
+                            <span class="text-end">₹ {{ totals[index] }}</span>
+                        </div>
+                    </template>
                     <template #empty>
                         <div class="flex items-center justify-center w-full ">
                             NO RECORD FOUND
@@ -55,7 +61,6 @@
                 </DataTable>
             </Panel>
         </div>
-
     </div>
 </template>
 
@@ -65,10 +70,12 @@ import api from '../../../boot/api';
 import { useToast } from 'primevue';
 import { useParkingZone } from '../../../scripts/parkingZone';
 
-const {parking_zone} = useParkingZone()
+const { parking_zone } = useParkingZone()
 const filters = ref({
     search: ''
 })
+
+const totals = ref()
 
 const toast = useToast()
 
@@ -83,10 +90,11 @@ const status = ref('')
 const getEarnings = async () => {
     loading.value = true
     try {
-        const month = monthFilter.value.toLocaleDateString('en-GB', { month: 'numeric', year: 'numeric' }).replace('/', '-');
+        const month = monthFilter.value.toLocaleDateString('en-GB', { month: 'numeric', year: 'numeric', day: 'numeric' }).replaceAll('/', '-');
         const { data } = await api.get('earnings', { params: { parking_zone_id: parking_zone.value.id, month } });
         payments.value = data.payments;
         status.value = data.status
+        totals.value = data.totals
         loading.value = false
         console.log(payments.value)
     } catch (error) {
@@ -100,5 +108,5 @@ watch(monthFilter, async (newVal) => {
 
 watch(parking_zone, async () => {
     await getEarnings()
-}, {deep: true})
+}, { deep: true })
 </script>

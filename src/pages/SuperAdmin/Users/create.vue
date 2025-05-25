@@ -79,14 +79,16 @@ const reset = () => {
 const submit = async () => {
     try {
         const fd = new FormData()
-        if (form.value.id !== null || form.value.id !== undefined) {
+        if (form.value.id !== null && form.value.id !== undefined) {
             fd.append('_method', 'PATCH')
         }
+
         fd.append('name', form.value.name)
         fd.append('email', form.value.email)
         fd.append('phone', form.value.phone)
-        if (form.value.id == null || form.value.id == undefined) {
-            fd.append('password', form.value.password)
+
+        if (form.value.id == null && form.value.id == undefined) {
+            fd.append('password', 'password')
         }
         fd.append('role', form.value.role)
         await api.post(`/users/${form.value.id ?? ''}`, fd)
