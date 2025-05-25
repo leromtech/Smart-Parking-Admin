@@ -29,7 +29,7 @@
             </div>
             <div>
                 <InputText class="w-full" v-model="search" placeholder="Search User..." />
-                <DataTable :value="users" tableStyle="min-width: 50rem" class="mt-6">
+                <DataTable :value="users" class="mt-6 overflow-y-scroll h-[400px]">
                     <template #header>
                         <span>Search for users</span>
                     </template>
