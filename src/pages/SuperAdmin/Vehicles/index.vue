@@ -37,18 +37,18 @@
             </Column>
         </DataTable>
 
-        <Dialog v-model:visible="createOpen">
+        <Dialog v-model:visible="createOpen" class="md:w-[80%] w-full">
             <template #header>
                 <span class="font-semibold">Add a User</span>
             </template>
-            <Create />
+            <Create @created="handleCreated" />
         </Dialog>
 
         <Dialog v-model:visible="editOpen">
             <template #header>
-                <span class="font-semibold">Edit {{ }}</span>
+                <span class="font-semibold">Edit</span>
             </template>
-            <create />
+            <create @created="handleCreated" />
         </Dialog>
 
         <Dialog v-model:visible="deleteOpen">
@@ -71,6 +71,10 @@ import { ref } from 'vue';
 import Create from './create.vue';
 import api from '../../../boot/api';
 import useVehicles from '../../../scripts/admin/vehicles';
+import { faL } from '@fortawesome/free-solid-svg-icons';
+import { useToast } from 'primevue';
+
+const toast = useToast()
 
 const { vehicles, vehicleTypes, pagination, filter, deleteItem, editItem, getVehicles } = useVehicles()
 
@@ -83,11 +87,20 @@ const edit = (item) => {
     editOpen.value = true
 }
 
+const handleCreated = async () => {
+    createOpen.value = false
+    editOpen.value = false
+    await getVehicles()
+}
+
 const confirmDelete = async () => {
     const fd = new FormData()
     fd.append('_method', 'DELETE')
-    const { data } = api.post(`vehicles/${deleteItem.value}`, fd)
+    const { data } = await api.post(`vehicles/${deleteItem.value}`, fd)
+    deleteOpen.value = false
+    deleteItem.value = null
     await getVehicles()
+    toast.add({ closable: true, detail: data.message, life: 3000 })
 }
 
 
