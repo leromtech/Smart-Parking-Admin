@@ -179,6 +179,10 @@ watch(monthFilter, async (newVal) => {
     await getEarnings()
 })
 
+watch(filters, async (newVal) => {
+    await getEarnings()
+}, { deep: true })
+
 onMounted(async () => {
     await getParkingZonesData()
     if (parkingZones.value.length > 0) {
