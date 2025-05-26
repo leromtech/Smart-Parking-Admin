@@ -10,11 +10,13 @@
                                 <InputGroupAddon class="cursor-pointer">
                                     <span>Coins</span>
                                 </InputGroupAddon>
-                                <InputNumber v-model="coinsForm.coins" id="small" :disabled="!editing" />
+                                <InputNumber v-model="coinsForm.coins" id="small" :disabled="!editing" :min="1"
+                                    @blur="validateCoins" />
                             </InputGroup>
                             <span>=</span>
                             <InputGroup>
-                                <InputNumber v-model="coinsForm.money" currency="INE" id="small" :disabled="!editing" />
+                                <InputNumber v-model="coinsForm.money" currency="INR" id="small" :disabled="!editing"
+                                    :min="1" @blur="validateMoney" />
                                 <InputGroupAddon>
                                     <span>₹</span>
                                 </InputGroupAddon>
@@ -104,14 +106,74 @@ const coinsForm = ref({
     money: 1
 })
 
+// Helper function to ensure positive values
+const ensurePositiveValue = (value) => {
+    const numValue = Number(value)
+    return (numValue && numValue > 0) ? numValue : 1
+}
+
+// Validation functions for individual fields
+const validateCoins = () => {
+    coinsForm.value.coins = ensurePositiveValue(coinsForm.value.coins)
+}
+
+const validateMoney = () => {
+    coinsForm.value.money = ensurePositiveValue(coinsForm.value.money)
+}
+
+// Watch for changes in coinsMoneyValue and update coinsForm
+watch(coinsMoneyValue, (newValue) => {
+    console.log('coinsMoneyValue changed:', newValue) // Debug log
+
+    if (newValue && newValue.coins && newValue.money) {
+        coinsForm.value = {
+            coins: ensurePositiveValue(newValue.coins),
+            money: ensurePositiveValue(newValue.money)
+        }
+    }
+}, { immediate: true, deep: true })
+
+// Also watch coinsForm for any direct changes and validate
+watch(() => coinsForm.value.coins, (newValue) => {
+    if (newValue !== null && newValue !== undefined) {
+        const validValue = ensurePositiveValue(newValue)
+        if (validValue !== newValue) {
+            coinsForm.value.coins = validValue
+        }
+    }
+})
+
+watch(() => coinsForm.value.money, (newValue) => {
+    if (newValue !== null && newValue !== undefined) {
+        const validValue = ensurePositiveValue(newValue)
+        if (validValue !== newValue) {
+            coinsForm.value.money = validValue
+        }
+    }
+})
+
 const saveCoinsToMoneyRate = async () => {
+    // Validate before saving
+    validateCoins()
+    validateMoney()
+
     const fd = new FormData()
     fd.append('key', 'coins_money_value')
     fd.append('value', `${coinsForm.value.coins}:${coinsForm.value.money}`)
     const { data } = await api.post('settings', fd)
     editing.value = false
 
-    toast.add({ severity: data.success ? 'success' : 'error', summary: data.success ? 'Success' : 'Error', detail: data.success ? 'Coins to money rate updated successfully' : 'Failed to update coins to money rate', life: 3000 })
+    toast.add({
+        severity: data.success ? 'success' : 'error',
+        summary: data.success ? 'Success' : 'Error',
+        detail: data.success ? 'Coins to money rate updated successfully' : 'Failed to update coins to money rate',
+        life: 3000
+    })
+
+    // Refresh the data after saving
+    if (data.success) {
+        await getCoinsMoneyValue()
+    }
 }
 
 const openCreate = ref(false)
@@ -129,9 +191,19 @@ const edit = (item) => {
 }
 
 onMounted(async () => {
-    await getCoinsMoneyValue()
-    coinsForm.value.coins = coinsMoneyValue.value.coins
-    coinsForm.value.money = coinsMoneyValue.value.money
+    try {
+        await getCoinsMoneyValue()
+
+        // Set coinsForm values after data is loaded
+        if (coinsMoneyValue?.value) {
+            coinsForm.value = {
+                coins: ensurePositiveValue(coinsMoneyValue.value.coins),
+                money: ensurePositiveValue(coinsMoneyValue.value.money)
+            }
+        }
+    } catch (error) {
+        console.error('Error loading coins money value:', error)
+    }
 })
 </script>
 
