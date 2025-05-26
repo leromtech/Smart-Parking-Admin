@@ -160,7 +160,7 @@ const settle = async () => {
 
 watch(selectedParkingZone, async (newVal) => {
     await getEarnings()
-}, { immediate: true })
+})
 
 watch(monthFilter, async (newVal) => {
     if (!newVal[0]) {
@@ -172,7 +172,7 @@ watch(monthFilter, async (newVal) => {
 onMounted(async () => {
     await getParkingZonesData()
     if (parkingZones.value.length > 0) {
-        selectedParkingZone.value = parkingZones.value[0].id
+        selectedParkingZone.value = 1
     }
 })
 </script>
