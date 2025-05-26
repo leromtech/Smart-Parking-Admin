@@ -25,6 +25,10 @@
                             class="w-full md:w-40" dateFormat="MM yy dd" />
                         <label for="date">Date filter</label>
                     </IftaLabel>
+
+                    <Select v-model="filters.status">
+
+                    </Select>
                 </div>
                 <div class="flex flex-col items-end justify-end w-full">
                     <span class="font-semibold">
@@ -36,7 +40,7 @@
                 </div>
             </div>
         </Panel>
-        <div class="flex flex-row items-center justify-end">
+        <div class="flex flex-row items-center justify-between">
             <Button @click="settle">Settle</Button>
         </div>
         <div class="flex flex-col gap-2">
@@ -100,7 +104,8 @@ import api from '../../../boot/api';
 import { useToast } from 'primevue';
 
 const filters = ref({
-    search: ''
+    search: '',
+    status: ''
 })
 
 const toast = useToast()
@@ -137,7 +142,7 @@ const getEarnings = async () => {
             dateFilter.end = monthFilter.value[1].toLocaleDateString('en-GB', { month: 'numeric', year: 'numeric', day: 'numeric' }).replaceAll('/', '-');
         }
         dateFilter.start = monthFilter.value[0].toLocaleDateString('en-GB', { month: 'numeric', year: 'numeric', day: "numeric" }).replaceAll('/', '-');
-        const { data } = await api.get('earnings', { params: { parking_zone_id: 1, dateFilter } });
+        const { data } = await api.get('earnings', { params: { parking_zone_id: selectedParkingZone.value, dateFilter } });
         payments.value = data.payments;
         totals.value = data.totals
         status.value = data.status
