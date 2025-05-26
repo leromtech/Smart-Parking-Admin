@@ -145,7 +145,7 @@ const getEarnings = async () => {
             dateFilter.end = monthFilter.value[1].toLocaleDateString('en-GB', { month: 'numeric', year: 'numeric', day: 'numeric' }).replaceAll('/', '-');
         }
         dateFilter.start = monthFilter.value[0].toLocaleDateString('en-GB', { month: 'numeric', year: 'numeric', day: "numeric" }).replaceAll('/', '-');
-        const { data } = await api.get('earnings', { params: { parking_zone_id: selectedParkingZone.value, dateFilter } });
+        const { data } = await api.get('earnings', { params: { parking_zone_id: selectedParkingZone.value.id, dateFilter } });
         payments.value = data.payments;
         totals.value = data.totals
         status.value = data.status
@@ -175,7 +175,7 @@ watch(monthFilter, async (newVal) => {
 onMounted(async () => {
     await getParkingZonesData()
     if (parkingZones.value.length > 0) {
-        selectedParkingZone.value = 1
+        selectedParkingZone.value = parkingZones.value[0]
     }
 })
 </script>
