@@ -133,6 +133,9 @@ const getParkingZonesData = async () => {
 
 const getEarnings = async () => {
     loading.value = true
+    if (!selectedParkingZone.value) {
+        selectedParkingZone.value = 1
+    }
     try {
         let dateFilter = {
             start: null,
