@@ -8,21 +8,24 @@
                 </div>
             </div>
         </template>
-        <div class="flex flex-row items-center justify-between w-full">
-            <InputGroup>
-                <InputGroupAddon>
-                    <span>₹</span>
-                </InputGroupAddon>
-                <InputNumber v-model="commission" v-keyfilter.int />
-                <InputGroupAddon>
-                    <span>%</span>
-                </InputGroupAddon>
-            </InputGroup>
-        </div>
-        <div>
-            <span class="text-sm text-gray-500">Commission rate is the percentage of the total amount that will be
-                charged as a commission.</span>
-            <span class="text-sm text-red-500" v-if="commission < 0">Please enter a valid commission rate.</span>
+        <div class="grid grid-cols-2">
+            <div>
+                <div class="flex flex-row items-center justify-between">
+                    <InputGroup>
+                        <InputNumber v-model="commission" v-keyfilter.int />
+                        <InputGroupAddon>
+                            <span>%</span>
+                        </InputGroupAddon>
+                    </InputGroup>
+                </div>
+                <div>
+                    <span class="text-sm text-gray-500">Commission rate is the percentage of the total amount that will
+                        be
+                        charged as a commission.</span>
+                    <span class="text-sm text-red-500" v-if="commission < 0">Please enter a valid commission
+                        rate.</span>
+                </div>
+            </div>
         </div>
     </Panel>
 </template>
@@ -79,8 +82,8 @@ const submit = async () => {
 const getCommissionRate = async () => {
     try {
         const { data } = await api.get('settings', { params: { key: 'commission_rate' } });
-            commission.value = data.value * 100;
-            return;
+        commission.value = data.value * 100;
+        return;
     } catch (error) {
         commission.value = 0;
         toast.add({

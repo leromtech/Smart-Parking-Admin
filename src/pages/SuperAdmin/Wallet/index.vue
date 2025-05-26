@@ -44,18 +44,19 @@
                     </div>
                 </div>
             </template>
-            <div class="flex flex-row">
-                <div class="flex flex-col flex-1">
-                    <span>Cost</span>
+            <div class="grid grid-cols-3">
+                <div class="flex flex-col flex-1 items-center justify-center">
+                    <span class="font font-semibold">Cost</span>
                     {{ rechargeAmount.amount }}
                 </div>
-                <div class="flex flex-col flex-1">
-                    <span>Coins</span>
+                <div class="flex flex-col flex-1 items-center justify-center">
+                    <span class="font font-semibold">Coins</span>
                     {{ rechargeAmount.coins }}
                 </div>
-                <div class="flex flex-col flex-1">
-                    <span>Active</span>
-                    {{ rechargeAmount.active }}
+                <div class="flex flex-col flex-1 items-center justify-center">
+                    <span class="font font-semibold">Active</span>
+                    <i
+                        :class="[Boolean(rechargeAmount.active) ? 'pi pi-check text-green-600' : 'pi pi-times text-red-600']"></i>
                 </div>
             </div>
         </Panel>
@@ -83,7 +84,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import useNotification from '../../../scripts/notification';
 import create from './create.vue';
 import useRechargeAmounts from '../../../scripts/admin/wallet';
@@ -92,7 +93,7 @@ import api from '../../../boot/api';
 
 const toast = useToast()
 
-const { editItem, deleteItem, walletRechargeAmounts, form, confirmDelete } = useRechargeAmounts()
+const { editItem, deleteItem, walletRechargeAmounts, form, confirmDelete, coinsMoneyValue, getCoinsMoneyValue } = useRechargeAmounts()
 
 const { notify } = useNotification()
 
@@ -110,7 +111,7 @@ const saveCoinsToMoneyRate = async () => {
     const { data } = await api.post('settings', fd)
     editing.value = false
 
-    toast.add({ severity: data.success ? 'success' : 'error', summary: data.success ? 'Success' : 'Error', detail: data.message, life: 3000 })
+    toast.add({ severity: data.success ? 'success' : 'error', summary: data.success ? 'Success' : 'Error', detail: data.success ? 'Coins to money rate updated successfully' : 'Failed to update coins to money rate', life: 3000 })
 }
 
 const openCreate = ref(false)
@@ -126,6 +127,12 @@ const edit = (item) => {
     console.log(item)
     form.value = { ...item, active: item.active ? true : false }
 }
+
+onMounted(async () => {
+    await getCoinsMoneyValue()
+    coinsForm.value.coins = coinsMoneyValue.value.coins
+    coinsForm.value.money = coinsMoneyValue.value.money
+})
 </script>
 
 <style>

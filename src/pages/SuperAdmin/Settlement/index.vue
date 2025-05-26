@@ -21,9 +21,9 @@
                     </Select>
 
                     <IftaLabel>
-                        <DatePicker v-model="monthFilter" showIcon fluid iconDisplay="input" view="date"
+                        <DatePicker v-model="monthFilter" selectionMode="range" :manualInput="false"
                             class="w-full md:w-40" dateFormat="MM yy dd" />
-                        <label for="date">Month</label>
+                        <label for="date">Date filter</label>
                     </IftaLabel>
                 </div>
                 <div class="flex flex-col items-end justify-end w-full">
@@ -107,7 +107,9 @@ const toast = useToast()
 
 const loading = ref(false)
 
-const monthFilter = ref(new Date())
+const monthFilter = ref([
+    new Date(),
+])
 
 const parkingZones = ref([])
 
@@ -127,8 +129,15 @@ const getParkingZonesData = async () => {
 const getEarnings = async () => {
     loading.value = true
     try {
-        const month = monthFilter.value.toLocaleDateString('en-GB', { month: 'numeric', year: 'numeric', day: "numeric" }).replaceAll('/', '-');
-        const { data } = await api.get('earnings', { params: { parking_zone_id: 1, month } });
+        let dateFilter = {
+            start: null,
+            end: null
+        }
+        if (monthFilter.value[1]) {
+            dateFilter.end = monthFilter.value[1].toLocaleDateString('en-GB', { month: 'numeric', year: 'numeric', day: 'numeric' }).replaceAll('/', '-');
+        }
+        dateFilter.start = monthFilter.value[0].toLocaleDateString('en-GB', { month: 'numeric', year: 'numeric', day: "numeric" }).replaceAll('/', '-');
+        const { data } = await api.get('earnings', { params: { parking_zone_id: 1, dateFilter } });
         payments.value = data.payments;
         totals.value = data.totals
         status.value = data.status
@@ -149,6 +158,9 @@ watch(selectedParkingZone, async (newVal) => {
 })
 
 watch(monthFilter, async (newVal) => {
+    if (!newVal[0]) {
+        return
+    }
     await getEarnings()
 })
 
