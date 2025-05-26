@@ -26,8 +26,8 @@
                         <label for="date">Date filter</label>
                     </IftaLabel>
 
-                    <Select v-model="filters.status">
-
+                    <Select v-model="filters.status" class="md:w-80 w-full" placeholder="Select Status"
+                        :options="statusOptions" optionLabel="label" optionValue="value">
                     </Select>
                 </div>
                 <div class="flex flex-col items-end justify-end w-full">
@@ -104,8 +104,8 @@ import api from '../../../boot/api';
 import { useToast } from 'primevue';
 
 const filters = ref({
-    search: '',
-    status: ''
+    search: null,
+    status: null
 })
 
 const toast = useToast()
@@ -126,10 +126,17 @@ const totals = ref(null)
 
 const selectedParkingZone = ref(null)
 
+const statusOptions = ref([
+    { label: 'All', value: '' },
+    { label: 'Paid', value: 'paid' },
+    { label: 'Pending', value: 'pending' }
+])
+
 const getParkingZonesData = async () => {
     const { data } = await api.get('parking-zones')
     parkingZones.value = data.parking_zones.data
 }
+
 
 const getEarnings = async () => {
     loading.value = true
@@ -145,7 +152,7 @@ const getEarnings = async () => {
             dateFilter.end = monthFilter.value[1].toLocaleDateString('en-GB', { month: 'numeric', year: 'numeric', day: 'numeric' }).replaceAll('/', '-');
         }
         dateFilter.start = monthFilter.value[0].toLocaleDateString('en-GB', { month: 'numeric', year: 'numeric', day: "numeric" }).replaceAll('/', '-');
-        const { data } = await api.get('earnings', { params: { parking_zone_id: selectedParkingZone.value.id, dateFilter } });
+        const { data } = await api.get('earnings', { params: { parking_zone_id: selectedParkingZone.value.id, dateFilter, filters: filters.value } });
         payments.value = data.payments;
         totals.value = data.totals
         status.value = data.status
