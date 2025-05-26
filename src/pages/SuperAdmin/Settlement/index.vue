@@ -172,7 +172,7 @@ watch(monthFilter, async (newVal) => {
 onMounted(async () => {
     await getParkingZonesData()
     if (parkingZones.value.length > 0) {
-        selectedParkingZone.value = parkingZones.value[0]
+        selectedParkingZone.value = parkingZones.value[0].id
     }
 })
 </script>
