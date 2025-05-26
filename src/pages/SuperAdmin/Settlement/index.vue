@@ -160,7 +160,7 @@ const settle = async () => {
 
 watch(selectedParkingZone, async (newVal) => {
     await getEarnings()
-})
+}, { immediate: true })
 
 watch(monthFilter, async (newVal) => {
     if (!newVal[0]) {
