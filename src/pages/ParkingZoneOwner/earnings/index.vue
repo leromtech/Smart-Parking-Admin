@@ -110,7 +110,7 @@ const getEarnings = async () => {
         if (monthFilter.value[1]) {
             dateFilter.end = monthFilter.value[1].toLocaleDateString('en-GB', { month: 'numeric', year: 'numeric', day: 'numeric' }).replaceAll('/', '-');
         }
-        const month = monthFilter.value.toLocaleDateString('en-GB', { month: 'numeric', year: 'numeric', day: 'numeric' }).replaceAll('/', '-');
+        const month = monthFilter.value[0].toLocaleDateString('en-GB', { month: 'numeric', year: 'numeric', day: 'numeric' }).replaceAll('/', '-');
         const { data } = await api.get('earnings', { params: { parking_zone_id: parking_zone.value.id, month, filters: filters.value } });
         payments.value = data.payments;
         status.value = data.status
