@@ -19,9 +19,9 @@
                 </div>
             </div>
         </Panel>
-        <div class="flex flex-row items-start justify-start gap-4">
+        <div class="flex flex-col items-start justify-start gap-4">
             <Panel v-for="(item, index) in payments" class="w-full">
-                <DataTable :value="item">
+                <DataTable :value="item" class="max-h-[500px] overflow-y-scroll">
                     <Column header="id">
                         <template #body="slotProps">
                             {{ slotProps.data.id }}
