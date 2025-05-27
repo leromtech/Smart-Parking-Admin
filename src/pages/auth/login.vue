@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col items-center justify-center w-dvh h-dvh">
-        <h1 class="font-semiblod text-2xl mb-12">SMART PARKING (DAWKEK) ADMIN</h1>
+        <h1 class="font-semibold text-2xl mb-12">DAWKEK ADMIN</h1>
         <Panel header="Login">
             <form @submit.prevent="() => login(form, cb)" class="w-full h-full">
                 <div class="flex flex-col gap-2 mt-4">
