@@ -5,7 +5,7 @@
                 <InputText placeholder="Search" v-model="filter.search" />
                 <Select v-model="filter.role" :options="roles" placeholder="Select a Role" class="w-full md:w-56" />
             </div>
-            <Button icon="pi pi-plus" rounded @click="createOpen = true"></Button>
+            <Button icon="pi pi-plus" rounded @click="create"></Button>
         </div>
         <DataTable :value="users" tableStyle="min-width: 50rem" paginator :rows="pagination.per_page" :lazy="true"
             class="mt-6" :totalRecords="pagination.total" :rowsPerPageOptions="[5, 10, 15, 30]">
@@ -17,7 +17,7 @@
                 <template #body="slotProps">
                     <div class="flex flex-col">
                         <span>{{ slotProps.data.roles.length > 0 ? slotProps.data.roles[0].name.toUpperCase() : 'N/A'
-                        }}</span>
+                            }}</span>
                         <span v-if="slotProps.data.parking_zone_managed.length > 0" class="font-semibold">
                             {{ slotProps.data.parking_zone_managed[0].name }}</span>
                         <span v-if="slotProps.data.parking_zone_owned" class="font-semibold">
@@ -43,14 +43,14 @@
             <template #header>
                 <span class="font-semibold">Add a User</span>
             </template>
-            <Create />
+            <Create @success="() => { createOpen = false }" />
         </Dialog>
 
         <Dialog v-model:visible="editOpen">
             <template #header>
-                <span class="font-semibold">Edit {{ }}</span>
+                <span class="font-semibold">Edit</span>
             </template>
-            <create />
+            <Create @success="() => { editItem = null, editOpen = false }" />
         </Dialog>
 
         <Dialog v-model:visible="deleteOpen">
@@ -80,6 +80,11 @@ const deleteOpen = ref()
 const editOpen = ref()
 const createOpen = ref()
 
+const create = () => {
+    editItem.value = null
+    createOpen.value = true
+}
+
 const edit = (item) => {
     editItem.value = item
     editOpen.value = true
@@ -89,6 +94,7 @@ const confirmDelete = async () => {
     const fd = new FormData()
     fd.append('_method', 'DELETE')
     const { data } = api.post(`users/${deleteItem.value}`, fd)
+    deleteOpen.value = false
     await getUsers()
 }
 

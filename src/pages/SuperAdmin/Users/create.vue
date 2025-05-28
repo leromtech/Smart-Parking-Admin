@@ -25,7 +25,8 @@
             <div v-if="form.role === 'owner' || form.role === 'manager'" class="
                 flex flex-col w-full gap-2 mt-8">
                 <label for="role-managed">Pakring Zone<span class="text-red-500">*</span></label>
-                <Select :options="parkingZones" optionValue="value" optionLabel="label"></Select>
+                <Select :options="parkingZones" optionValue="value" optionLabel="label"
+                    v-model="form.parkingZone"></Select>
             </div>
 
             <div class="w-full flex items-center justify-center text-red-600 font-normal">
@@ -46,7 +47,7 @@ import { Select, useToast } from 'primevue';
 const message = ref()
 const { getUsers, editItem } = useUsers()
 
-const emit = defineEmits('created');
+const emit = defineEmits(['submit']);
 const toast = useToast()
 
 const form = ref({
@@ -77,10 +78,12 @@ const reset = () => {
 }
 
 const submit = async () => {
+    let create = true
     try {
         const fd = new FormData()
         if (form.value.id !== null && form.value.id !== undefined) {
             fd.append('_method', 'PATCH')
+            create = false
         }
 
         fd.append('name', form.value.name)
@@ -94,8 +97,12 @@ const submit = async () => {
         await api.post(`/users/${form.value.id ?? ''}`, fd)
         reset()
         await getUsers()
+        toast.add({ severity: 'success', closable: true, summary: 'Success', detail: `User ${create ? 'added' : 'updated'} successfully`, life: 3000 })
+        emit('success')
     } catch (error) {
         message.value = error.response.data.message
+        toast.add({ severity: 'error', closable: true, summary: 'Success', detail: `Failed to ${create ? 'add' : 'update'} user`, life: 3000 })
+        emit('error')
     }
 }
 
@@ -105,7 +112,6 @@ const getParkingZone = async () => {
         parkingZones.value = data.parking_zones.map((item) => {
             return { label: item.name, value: item.id }
         })
-        console.log(parkingZones.value)
     } catch (error) {
         toast.add({
             severity: 'error',
@@ -117,15 +123,32 @@ const getParkingZone = async () => {
 }
 
 onMounted(async () => {
+    // Load parking zones first
+    await getParkingZone()
+
     if (editItem.value) {
-        form.value.id = editItem.value.id
+        // Safely get parking zone with null checks
+        const parkingZoneOwned = editItem.value.parking_zone_owned
+        const parkingZoneManaged = editItem.value.parking_zone_managed
+
+        let selectedParkingZoneId = null
+
+        // Check if user owns a parking zone
+        if (parkingZoneOwned) {
+            selectedParkingZoneId = parkingZoneOwned.id
+        }
+        // If not owner, check if user manages a parking zone
+        else if (parkingZoneManaged && Array.isArray(parkingZoneManaged) && parkingZoneManaged.length > 0) {
+            selectedParkingZoneId = parkingZoneManaged[0].id
+        }
+
+        form.value.id = editItem.value.id || null
         form.value.name = editItem.value.name || ''
         form.value.email = editItem.value.email || ''
         form.value.phone = editItem.value.phone || ''
         form.value.password = editItem.value.password || ''
-        form.value.role = editItem.value.role || ''
+        form.value.role = editItem.value.roles?.[0]?.name || ''
+        form.value.parkingZone = selectedParkingZoneId || ''
     }
-    await getParkingZone()
 })
-
 </script>
