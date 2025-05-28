@@ -11,7 +11,7 @@
                     <label for="phone">Password</label>
                     <Password id="phone" class="p-2" :feedback="false" toggle-mask="true" v-model="form.password" />
                 </div>
-                <p class="text-red-500">{{ message }}</p>
+                <p class="text-red-500 mt-2">{{ message }}</p>
                 <Button type="submit" label="Login" class="w-full mt-6"></Button>
             </form>
         </Panel>
@@ -31,7 +31,6 @@ const form = ref({
 })
 
 const cb = (data) => {
-    console.log(data)
     message.value = data.message
 }
 </script>
