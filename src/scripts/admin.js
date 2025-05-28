@@ -18,10 +18,6 @@ const updateItem = () => {
 }
 
 export default function useAdmin() {
-    onMounted(async () => {
-        await getParkingZones()
-    })
-
     return {
         getParkingZones,
         parking_zones,

@@ -19,27 +19,10 @@
                 </div>
                 <div class="relative flex flex-col w-full gap-2 mt-8">
                     <label for="owner" class="font-semibold">Owner</label>
-                    <Select :options="users"  @update:modelValue="(e) => {form.owner_id = e.id}">
+                    <Select :options="users" optionLabel="label" optionValue="value" v-model="form.owner_id">
                         <template #header="slotProps">
                             <div class="flex items-center justify-center">
-                                <InputText v-model="search" class="w-full m-2" placeholder="Search User..."/>
-                            </div>
-                        </template>
-
-                        <template #value="slotProps">
-                            <div class="flex flex-row items-start justify-center gap-2" v-if="slotProps.value">
-                                <span>{{ slotProps.value.name }}</span>
-                                <span>( {{ slotProps.value.phone }} )</span>
-                            </div>
-                            <div v-else>
-                                Select the owner 
-                            </div>
-                        </template>
-
-                        <template #option="slotProps">
-                            <div class="flex flex-row items-start justify-center gap-2">
-                                <span>{{ slotProps.option.name }}</span>
-                                <span>( {{ slotProps.option.phone }} )</span>
+                                <InputText v-model="search" class="w-full m-2" placeholder="Search User..." />
                             </div>
                         </template>
                     </Select>
@@ -67,7 +50,7 @@
                     <GoogleMap :api-key="map_api_key" :center="{ lat: center.lat, lng: center.lng }" :zoom="map.zoom"
                         class="w-[500px] h-[500px]" @click="setPosition">
                         <Marker v-if="form.latitude"
-                                :options="{ position: { lat: parseFloat(form.latitude), lng: parseFloat(form.longitude) }, label: { text: form.name, className: 'mb-[160%] font-normal' }, title: form.name }" />
+                            :options="{ position: { lat: parseFloat(form.latitude), lng: parseFloat(form.longitude) }, label: { text: form.name, className: 'mb-[160%] font-normal' }, title: form.name }" />
                     </GoogleMap>
                 </template>
             </div>
@@ -79,7 +62,7 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref, watch } from 'vue';
+import { onMounted, onUnmounted, ref, vModelCheckbox, watch } from 'vue';
 import dSelect from '../../../components/d-select.vue';
 import api from '../../../boot/api';
 import { GoogleMap, Marker } from 'vue3-google-map';
@@ -135,11 +118,12 @@ watch(search, async (newVal) => {
 const setPosition = (e) => {
     form.value.latitude = e.latLng.lat()
     form.value.longitude = e.latLng.lng()
+    console.log(form.value)
 }
 
 const fetchUsers = async () => {
     const { data } = await api('users', { params: { filters: { search: search.value } } })
-    users.value = data.data
+    users.value = data.data.map((user) => ({ label: `${user.name} (${user.phone})`, value: user.id }))
     if (users.value.length > 0) {
         showSearchOpts.value = true
     } else {
@@ -150,10 +134,11 @@ const fetchUsers = async () => {
 const submit = async () => {
     try {
         const fd = new FormData()
-        if (form.value.id !== null) {
-            fd.append('id', form.value.id)
+
+        if (form.value.id) {
             fd.append('_method', 'PATCH')
         }
+
         fd.append('name', form.value.name)
         fd.append('address', form.value.address)
         fd.append('description', form.value.description)
@@ -161,19 +146,21 @@ const submit = async () => {
         fd.append('latitude', form.value.latitude)
         fd.append('longitude', form.value.longitude)
 
-        const { data } = await api.post('/parking-zones', fd)
+        // Use template literal for dynamic URL
+        const { data } = await api.post(`/parking-zones${form.value.id ? `/${form.value.id}` : ''}`, fd)
+
         reset()
         emit('created', data.message)
+
     } catch (error) {
-        message.value = error.response.data.message
-        reset()
+        message.value = error.response?.data?.message || 'An error occurred'
     }
 }
 
-onMounted(() => {
+onMounted(async () => {
     if (parking_zone_edit.value) {
         form.value = {
-            id: parking_zone_edit.value.id || '',
+            id: parking_zone_edit.value.id || null,
             name: parking_zone_edit.value.name || '',
             address: parking_zone_edit.value.address || '',
             description: parking_zone_edit.value.description || '',
@@ -181,13 +168,13 @@ onMounted(() => {
             latitude: parking_zone_edit.value.latitude || '',
             longitude: parking_zone_edit.value.longitude || '',
         };
-        // Optionally, set the map center based on the provided latitude and longitude
+        const { data: user } = await api.get(`users/${form.value.owner_id}`)
+        users.value.push({ label: `${user.name} (${user.phone})`, value: user.id })
+
         map.value.center = {
             lat: parseFloat(parking_zone_edit.value.latitude) || center.lat,
             lng: parseFloat(parking_zone_edit.value.longitude) || center.lng,
         };
-
-        users.value = [parking_zone_edit.value.owner]
     }
 });
 

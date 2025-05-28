@@ -6,7 +6,7 @@
                     <GoogleMap :api-key="map_api_key" :center="{ lat: center.lat, lng: center.lng }" :zoom="12"
                         class="w-full h-full">
                         <Marker v-for="zone in rows" :key="zone.id" @click="() => edit(zone)"
-                        :options="{ position: { lat: parseFloat(zone.latitude), lng: parseFloat(zone.longitude) }, label: { text: zone.name, className: 'mb-[160%] font-normal' }, title: zone.name }" />
+                            :options="{ position: { lat: parseFloat(zone.latitude), lng: parseFloat(zone.longitude) }, label: { text: zone.name, className: 'mb-[160%] font-normal' }, title: zone.name }" />
                     </GoogleMap>
                 </template>
             </div>
@@ -116,5 +116,9 @@ const pagination = ref({
 watch(parking_zones, () => {
     rows.value = parking_zones.value.data
     console.log(rows.value)
+})
+
+onMounted(async () => {
+    await getParkingZones()
 })
 </script>
