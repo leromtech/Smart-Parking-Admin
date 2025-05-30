@@ -29,6 +29,8 @@ import { useToast } from 'primevue';
 
 const toast = useToast()
 
+const emit = defineEmits(['created'])
+
 const { form, getWalletRechargeAmounts, getCoinsMoneyValue, coinsMoneyValue } = useRechargeAmounts()
 
 // Handle amount input - calculate coins based on amount
@@ -60,7 +62,7 @@ const submit = async () => {
         }
 
         const { data } = await api.post(url, fd)
-
+        emit('created')
         if (data.success) {
             toast.add({
                 severity: 'success',
@@ -97,7 +99,6 @@ const submit = async () => {
 }
 
 onMounted(async () => {
-    // Ensure coins money value is loaded
     await getCoinsMoneyValue()
 })
 

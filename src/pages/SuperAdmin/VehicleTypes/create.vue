@@ -1,7 +1,7 @@
 <template>
     <div @click.stop>
         <p class="text-xl font-semibold">
-            CREATE A VEHICLE TYPE
+            {{ form.id ? 'EDIT ' : 'CREATE A ' }} VEHICLE TYPE
         </p>
         <form @submit.prevent="submit" class="flex flex-col">
             <div class="flex flex-row gap-4">
@@ -30,7 +30,6 @@
 
 <script setup>
 import { onMounted, onUnmounted, ref, watch } from 'vue';
-import dInput from '../../../components/d-input.vue';
 import api from '../../../boot/api';
 import useVehicleTypes from '../../../scripts/admin/vehicleTypes';
 import { useToast } from 'primevue';
@@ -41,12 +40,11 @@ const { editItem, getVehicleTypes } = useVehicleTypes()
 
 const emit = defineEmits(['created']);
 
-const showSearchOpts = ref(false)
-
 const search = ref('')
 const users = ref([])
 
 const form = ref({
+    id: null,
     name: '',
     space_occupied: '',
 })
@@ -75,11 +73,14 @@ const submit = async () => {
         fd.append('name', form.value.name)
         fd.append('space_occupied', form.value.space_occupied)
 
-        const { data } = await api.post('/vehicle-types', fd)
+        const path = form.value.id ? `/vehicle-types/${form.value.id}` : '/vehicle-types'
+
+        const { data } = await api.post(path, fd)
         toast.add({ severity: 'success', summary: 'Success', detail: data.message, life: 3000 });
 
         reset()
         await getVehicleTypes()
+        emit('created')
     } catch (error) {
         toast.add({ severity: 'error', summary: 'Error', detail: error.message, life: 3000 });
         reset()
@@ -88,6 +89,7 @@ const submit = async () => {
 
 onMounted(() => {
     if (editItem.value) {
+        form.value.id = editItem.value.id
         form.value.name = editItem.value.name
         form.value.space_occupied = editItem.value.space_occupied
     }

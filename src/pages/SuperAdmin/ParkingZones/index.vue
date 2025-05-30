@@ -16,7 +16,8 @@
                 </span>
             </div>
             <DataTable :value="rows" tableStyle="min-width: 50rem" paginator :rows="pagination.per_page" :lazy="true"
-                class="mt-6" :totalRecords="pagination.total" :rowsPerPageOptions="[5, 10, 15, 30]">
+                class="mt-6" :totalRecords="pagination.total_records" :rowsPerPageOptions="[5, 10, 15, 30]"
+                @page="(e) => getParkingZones(e)">
                 <template #header>
                     <div class="flex flex-row justify-between">
                         <InputText icon="pi pi-search" />
@@ -49,14 +50,14 @@
             <template #header>
                 <span class="font-semibold">Add a Parking Zone</span>
             </template>
-            <create />
+            <create @created="refresh" />
         </Dialog>
 
         <Dialog v-model:visible="editOpen">
             <template #header>
-                <span class="font-semibold">Edit {{ }}</span>
+                <span class="font-semibold">Edit</span>
             </template>
-            <create />
+            <create @created="refresh" />
         </Dialog>
 
         <Dialog v-model:visible="deleteOpen">
@@ -83,7 +84,7 @@ import { onMounted, ref, watch } from 'vue';
 import api from '../../../boot/api';
 
 const { map_api_key, center } = useMap()
-const { parking_zones, parking_zone_delete, parking_zone_edit, getParkingZones } = useAdmin()
+const { parking_zones, parking_zone_delete, parking_zone_edit, getParkingZones, pagination } = useAdmin()
 
 const createOpen = ref(false)
 const editOpen = ref(false)
@@ -104,14 +105,16 @@ const confirmDelete = async () => {
     fd.append('_method', 'DELETE')
     const { data } = api.post(`parking-zones/${parking_zone_delete.value}`, fd)
     await getParkingZones()
+    deleteOpen.value = false
 }
 
 const rows = ref()
 
-const pagination = ref({
-    per_page: 10,
-    total: 0
-})
+const refresh = async () => {
+    await getParkingZones()
+    createOpen.value = false
+    editOpen.value = false
+}
 
 watch(parking_zones, () => {
     rows.value = parking_zones.value.data

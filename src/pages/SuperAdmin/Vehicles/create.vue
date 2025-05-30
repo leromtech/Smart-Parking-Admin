@@ -1,7 +1,7 @@
 <template>
     <div @click.stop>
         <p class="text-xl font-semibold">
-            CREATE A VEHICLE
+            {{ form.id ? 'EDIT ' : 'CREATE A ' }} VEHICLE
         </p>
         <form @submit.prevent="submit" class="grid grid-cols-2 gap-4">
             <div class="flex flex-row gap-4 w-[80%]">
@@ -9,6 +9,11 @@
                     <div class="flex flex-col w-full gap-2 mt-8">
                         <label>Registration no</label>
                         <InputText v-model="form.registration_no" />
+                    </div>
+
+                    <div class="flex flex-col w-full gap-2 mt-8">
+                        <label>Model</label>
+                        <InputText v-model="form.model" />
                     </div>
 
                     <div class="flex flex-col w-full gap-2 mt-8">
@@ -63,11 +68,11 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue';
 import api from '../../../boot/api';
-import { InputText, Select } from 'primevue';
+import { InputText, Select, useToast } from 'primevue';
 import useVehicles from '../../../scripts/admin/vehicles';
 
 const { vehicleTypes, editItem } = useVehicles()
-
+const toast = useToast()
 const message = ref()
 
 const props = defineProps(['vehicleTypes'])
@@ -84,7 +89,8 @@ const form = ref({
     registration_no: '',
     vehicle_type: '',
     user_id: '',
-    displayName: ''
+    displayName: '',
+    model: ''
 })
 
 const reset = () => {
@@ -118,15 +124,29 @@ const submit = async () => {
         fd.append('registration_no', form.value.registration_no)
         fd.append('color', form.value.color)
         fd.append('user_id', form.value.user_id)
+        fd.append('model', form.value.model)
         if (form.value.id) {
             fd.append('_method', 'PATCH')
         }
         const path = form.value.id ? `/vehicles/${form.value.id}` : '/vehicles'
 
         const { data } = await api.post(path, fd)
+
+        toast.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Vehicle added successfully',
+            life: 3000
+        })
         reset()
         emit('created', data.message)
     } catch (error) {
+        toast.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to add vehicle',
+            life: 3000
+        })
         message.value = error.response.data.message
         reset()
     }

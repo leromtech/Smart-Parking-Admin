@@ -22,11 +22,20 @@ const filter = ref(
     }
 )
 
-const getUsers = async () => {
+const getUsers = async (pageParams = null) => {
+    if (pageParams) {
+        pagination.value = {
+            per_page: pageParams.rows,
+            page: pageParams.page + 1,
+        }
+    }
     const { data } = await api.get('users', { params: { pagination: pagination.value, filters: filter.value } })
     users.value = data.data
-
-    console.log(users.value)
+    pagination.value = {
+        per_page: data.per_page,
+        total_records: data.total,
+        page: data.current_page
+    }
 }
 
 watch(filter, async () => {
@@ -34,10 +43,6 @@ watch(filter, async () => {
 }, { deep: true })
 
 export default function useUsers() {
-    onMounted(() => {
-        getUsers()
-    })
-
     return {
         getUsers,
         users,

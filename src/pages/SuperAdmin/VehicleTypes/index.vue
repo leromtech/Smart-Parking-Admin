@@ -8,14 +8,19 @@
             </div>
             <Button icon="pi pi-plus" rounded @click="createOpen = true"></Button>
         </div>
+        <div class="mt-2 flex flex-row gap-2 border border-neutral-200 p-2 rounded-md">
+            <p class="text-blue-500 font-semibold">Note:</p>
+            <p>Space occupied is calculated as Two wheeler = 1 space</p>
+        </div>
         <DataTable :value="vehicleTypes" tableStyle="min-width: 50rem" paginator :rows="pagination.per_page"
-            :lazy="true" class="mt-6" :totalRecords="pagination.total" :rowsPerPageOptions="[5, 10, 15, 30]">
-            <Column header="Registration No.">
+            :lazy="true" class="mt-6" :totalRecords="pagination.total_records" :rowsPerPageOptions="[5, 10, 15, 30]"
+            @page="(e) => getVehicleTypes(e)">
+            <Column header="Type">
                 <template #body="slotProps">
                     {{ slotProps.data.name }}
                 </template>
             </Column>
-            <Column header="Owner">
+            <Column header="Space occupied">
                 <template #body="slotProps">
                     {{ slotProps.data.space_occupied }}
                 </template>
@@ -34,16 +39,16 @@
 
         <Dialog v-model:visible="createOpen">
             <template #header>
-                <span class="font-semibold">Add a User</span>
+                <span class="font-semibold">Create</span>
             </template>
-            <Create />
+            <create @created="handleCreated" />
         </Dialog>
 
         <Dialog v-model:visible="editOpen">
             <template #header>
-                <span class="font-semibold">Edit {{ }}</span>
+                <span class="font-semibold">Edit</span>
             </template>
-            <create />
+            <create @created="handleCreated" />
         </Dialog>
 
         <Dialog v-model:visible="deleteOpen">
@@ -62,13 +67,14 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import Create from './create.vue';
 import api from '../../../boot/api';
 import useVehicleTypes from '../../../scripts/admin/vehicleTypes';
+import { useToast } from 'primevue';
 
 const { vehicleTypes, spaceOccupiedOptions, pagination, filter, deleteItem, editItem, getVehicleTypes } = useVehicleTypes()
-
+const toast = useToast()
 const deleteOpen = ref()
 const editOpen = ref()
 const createOpen = ref()
@@ -81,9 +87,40 @@ const edit = (item) => {
 const confirmDelete = async () => {
     const fd = new FormData()
     fd.append('_method', 'DELETE')
-    const { data } = api.post(`vehicle_types/${deleteItem.value}`, fd)
+    try {
+
+        const { data } = await api.post(`vehicle-types/${deleteItem.value}`, fd)
+        await getVehicleTypes()
+        deleteItem.value = null
+        deleteOpen.value = false
+
+        toast.add({
+            severity: 'success',
+            closable: true,
+            summary: 'Success',
+            detail: data.message,
+            life: 3000
+        })
+    } catch (error) {
+        toast.add({
+            severity: 'error',
+            closable: true,
+            summary: "Error",
+            detail: 'Failed to delete vehicle type' + error,
+            life: 3000
+        })
+    }
+}
+
+const handleCreated = async () => {
+    createOpen.value = false
+    editOpen.value = false
+    editItem.value = null
     await getVehicleTypes()
 }
 
+onMounted(async () => {
+    getVehicleTypes()
+})
 
 </script>

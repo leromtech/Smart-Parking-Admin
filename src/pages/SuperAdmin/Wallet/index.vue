@@ -32,42 +32,44 @@
                 </div>
             </div>
         </template>
-        <Panel v-for="rechargeAmount in walletRechargeAmounts">
-            <template #header="slotProps">
-                <div class="flex flex-row items-center justify-between w-full">
-                    <span class="font-semibold">
-                        {{ rechargeAmount.name }}
-                    </span>
-                    <div class="flex flex-row gap-2">
-                        <Button icon="pi pi-trash" severity="danger" rounded outlined
-                            @click="() => initiateDelete(rechargeAmount.id)"></Button>
-                        <Button icon="pi pi-pen-to-square" severity="warn" rounded outlined
-                            @click="() => edit(rechargeAmount)"></Button>
+        <div class="flex flex-col gap-4 bg-neutral-100 p-2">
+            <Panel v-for="rechargeAmount in walletRechargeAmounts">
+                <template #header="slotProps">
+                    <div class="flex flex-row items-center justify-between w-full">
+                        <span class="font-semibold">
+                            {{ rechargeAmount.name }}
+                        </span>
+                        <div class="flex flex-row gap-2">
+                            <Button icon="pi pi-trash" severity="danger" rounded outlined
+                                @click="() => initiateDelete(rechargeAmount.id)"></Button>
+                            <Button icon="pi pi-pen-to-square" severity="warn" rounded outlined
+                                @click="() => edit(rechargeAmount)"></Button>
+                        </div>
+                    </div>
+                </template>
+                <div class="grid grid-cols-3">
+                    <div class="flex flex-col flex-1 items-center justify-center">
+                        <span class="font font-semibold">Cost</span>
+                        {{ rechargeAmount.amount }}
+                    </div>
+                    <div class="flex flex-col flex-1 items-center justify-center">
+                        <span class="font font-semibold">Coins</span>
+                        {{ rechargeAmount.coins }}
+                    </div>
+                    <div class="flex flex-col flex-1 items-center justify-center">
+                        <span class="font font-semibold">Active</span>
+                        <i
+                            :class="[Boolean(rechargeAmount.active) ? 'pi pi-check text-green-600' : 'pi pi-times text-red-600']"></i>
                     </div>
                 </div>
-            </template>
-            <div class="grid grid-cols-3">
-                <div class="flex flex-col flex-1 items-center justify-center">
-                    <span class="font font-semibold">Cost</span>
-                    {{ rechargeAmount.amount }}
-                </div>
-                <div class="flex flex-col flex-1 items-center justify-center">
-                    <span class="font font-semibold">Coins</span>
-                    {{ rechargeAmount.coins }}
-                </div>
-                <div class="flex flex-col flex-1 items-center justify-center">
-                    <span class="font font-semibold">Active</span>
-                    <i
-                        :class="[Boolean(rechargeAmount.active) ? 'pi pi-check text-green-600' : 'pi pi-times text-red-600']"></i>
-                </div>
-            </div>
-        </Panel>
+            </Panel>
+        </div>
 
         <Dialog v-model:visible="openCreate" header="Create a recharge amount">
             <template #header>
                 <span class="font-semibold">{{ form.id ? 'Edit' : "Create" }}</span>
             </template>
-            <create />
+            <create @created="handleCreated" />
         </Dialog>
 
         <Dialog v-model:visible="openDelete">
@@ -78,7 +80,7 @@
                 <span>Do you really want to delete the user ?</span>
                 <div class="w-full flex flex-row mt-2">
                     <Button icon="pi pi-trash" label="DELETE" outlined severity="danger" class="w-[40%]"
-                        @click="confirmDelete"></Button>
+                        @click="confirmDelete(() => openDelete = false)"></Button>
                 </div>
             </div>
         </Dialog>
@@ -95,7 +97,7 @@ import api from '../../../boot/api';
 
 const toast = useToast()
 
-const { editItem, deleteItem, walletRechargeAmounts, form, confirmDelete, coinsMoneyValue, getCoinsMoneyValue } = useRechargeAmounts()
+const { editItem, deleteItem, walletRechargeAmounts, form, confirmDelete, coinsMoneyValue, getCoinsMoneyValue, getWalletRechargeAmounts } = useRechargeAmounts()
 
 const { notify } = useNotification()
 
@@ -112,6 +114,10 @@ const ensurePositiveValue = (value) => {
     return (numValue && numValue > 0) ? numValue : 1
 }
 
+const handleCreated = () => {
+    openCreate.value = false
+}
+
 // Validation functions for individual fields
 const validateCoins = () => {
     coinsForm.value.coins = ensurePositiveValue(coinsForm.value.coins)
@@ -123,8 +129,6 @@ const validateMoney = () => {
 
 // Watch for changes in coinsMoneyValue and update coinsForm
 watch(coinsMoneyValue, (newValue) => {
-    console.log('coinsMoneyValue changed:', newValue) // Debug log
-
     if (newValue && newValue.coins && newValue.money) {
         coinsForm.value = {
             coins: ensurePositiveValue(newValue.coins),
@@ -193,7 +197,7 @@ const edit = (item) => {
 onMounted(async () => {
     try {
         await getCoinsMoneyValue()
-
+        await getWalletRechargeAmounts()
         // Set coinsForm values after data is loaded
         if (coinsMoneyValue?.value) {
             coinsForm.value = {

@@ -9,7 +9,8 @@
             <Button icon="pi pi-plus" rounded @click="createOpen = true"></Button>
         </div>
         <DataTable :value="vehicles" tableStyle="min-width: 50rem" paginator :rows="pagination.per_page" :lazy="true"
-            class="mt-6" :totalRecords="pagination.total" :rowsPerPageOptions="[5, 10, 15, 30]">
+            :loading="loading" class="mt-6" :totalRecords="pagination.total_records"
+            :rowsPerPageOptions="[5, 10, 15, 30]" @page="(e) => getVehicles(e)">
             <Column header="Registration No.">
                 <template #body="slotProps">
                     {{ slotProps.data.registration_no }}
@@ -17,12 +18,12 @@
             </Column>
             <Column header="Owner">
                 <template #body="slotProps">
-                    {{ slotProps.data.user.name }}
+                    {{ slotProps.data.user?.name || 'N/A' }}
                 </template>
             </Column>
             <Column header="Vehicle Type">
                 <template #body="slotProps">
-                    {{ slotProps.data.vehicle_type.name }}
+                    {{ slotProps.data.vehicle_type?.name || 'N/A' }}
                 </template>
             </Column>
             <Column>
@@ -39,16 +40,16 @@
 
         <Dialog v-model:visible="createOpen" class="md:w-[80%] w-full">
             <template #header>
-                <span class="font-semibold">Add a User</span>
+                <span class="font-semibold">Add a Vehicle</span>
             </template>
             <Create @created="handleCreated" />
         </Dialog>
 
         <Dialog v-model:visible="editOpen">
             <template #header>
-                <span class="font-semibold">Edit</span>
+                <span class="font-semibold">Edit Vehicle</span>
             </template>
-            <create @created="handleCreated" />
+            <Create @created="handleCreated" />
         </Dialog>
 
         <Dialog v-model:visible="deleteOpen">
@@ -56,7 +57,7 @@
                 <span class="font-semibold">Confirm delete?</span>
             </template>
             <div class="flex flex-col">
-                <span>Do you really want to delete the user ?</span>
+                <span>Do you really want to delete the vehicle?</span>
                 <div class="w-full flex flex-row mt-2">
                     <Button icon="pi pi-trash" label="DELETE" outlined severity="danger" class="w-[40%]"
                         @click="confirmDelete"></Button>
@@ -67,20 +68,19 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import Create from './create.vue';
 import api from '../../../boot/api';
 import useVehicles from '../../../scripts/admin/vehicles';
-import { faL } from '@fortawesome/free-solid-svg-icons';
 import { useToast } from 'primevue';
 
 const toast = useToast()
 
-const { vehicles, vehicleTypes, pagination, filter, deleteItem, editItem, getVehicles } = useVehicles()
+const { vehicles, vehicleTypes, pagination, filter, deleteItem, editItem, getVehicles, loading, onPage } = useVehicles()
 
-const deleteOpen = ref()
-const editOpen = ref()
-const createOpen = ref()
+const deleteOpen = ref(false)
+const editOpen = ref(false)
+const createOpen = ref(false)
 
 const edit = (item) => {
     editItem.value = item
@@ -90,18 +90,38 @@ const edit = (item) => {
 const handleCreated = async () => {
     createOpen.value = false
     editOpen.value = false
+    editItem.value = null
     await getVehicles()
 }
 
 const confirmDelete = async () => {
-    const fd = new FormData()
-    fd.append('_method', 'DELETE')
-    const { data } = await api.post(`vehicles/${deleteItem.value}`, fd)
-    deleteOpen.value = false
-    deleteItem.value = null
-    await getVehicles()
-    toast.add({ closable: true, detail: data.message, life: 3000 })
+    try {
+        const fd = new FormData()
+        fd.append('_method', 'DELETE')
+        const { data } = await api.post(`vehicles/${deleteItem.value}`, fd)
+
+        deleteOpen.value = false
+        deleteItem.value = null
+
+        toast.add({
+            severity: 'success',
+            closable: true,
+            detail: data.message,
+            life: 3000
+        })
+
+        await getVehicles()
+    } catch (error) {
+        toast.add({
+            severity: 'error',
+            closable: true,
+            detail: 'Failed to delete vehicle',
+            life: 3000
+        })
+    }
 }
 
-
+onMounted(async () => {
+    await getVehicles()
+})
 </script>

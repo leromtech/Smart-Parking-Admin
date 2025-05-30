@@ -22,12 +22,15 @@ const getWalletRechargeAmounts = async () => {
     walletRechargeAmounts.value = data
 }
 
-const confirmDelete = async () => {
+const confirmDelete = async (cb = null) => {
     const fd = new FormData()
     fd.append('_method', 'DELETE')
     const { data } = await api.post(`wallet-recharge-amount/${deleteItem.value}`, fd)
     await getWalletRechargeAmounts()
     deleteItem.value = null
+    if (cb) {
+        cb()
+    }
 }
 
 const getCoinsMoneyValue = async () => {
@@ -42,11 +45,6 @@ const getCoinsMoneyValue = async () => {
 }
 
 export default function useRechargeAmounts() {
-    onMounted(async () => [
-        await getWalletRechargeAmounts(),
-        await getCoinsMoneyValue()
-    ])
-
     return {
         getCoinsMoneyValue,
         coinsMoneyValue,

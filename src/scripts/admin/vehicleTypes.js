@@ -23,8 +23,19 @@ const filter = ref(
     }
 )
 
-const getVehicleTypes = async () => {
+const getVehicleTypes = async (pageParams) => {
+    if (pageParams) {
+        pagination.value = {
+            per_page: pageParams.rows,
+            page: pageParams.page + 1,
+        }
+    }
     const { data } = await api.get('vehicle-types', { params: { pagination: pagination.value, filters: filter.value } })
+    pagination.value = {
+        per_page: data.vehicle_types.per_page,
+        total_records: data.vehicle_types.total,
+        page: data.vehicle_types.current_page
+    }
     vehicleTypes.value = data.vehicle_types.data
     spaceOccupiedOptions.value = data.space_occupied_options
 }
@@ -34,10 +45,6 @@ watch(filter, async () => {
 }, { deep: true })
 
 export default function useVehicleTypes() {
-    onMounted(async () => {
-        await getVehicleTypes()
-    })
-
     return {
         getVehicleTypes,
         spaceOccupiedOptions,

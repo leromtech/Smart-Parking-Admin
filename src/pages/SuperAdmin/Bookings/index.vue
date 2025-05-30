@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-row gap-4 w-full">
-        <Panel class="w-full"> 
+        <Panel class="w-full">
             <template #header>
                 <div class="flex flex-row items-center justify-between w-full">
                     <div>Booking Reminder Intervals</div>
@@ -41,13 +41,17 @@
                 </div>
             </template>
             <div>
-                <InputNumber v-model="bookingRate" mode="currency" currency="INR" locale="en-IN" :min="0" :max="1000000"
-                    :showButtons="true" :buttonLayout="'horizontal'" :incrementButtonClass="'p-button-success'"
-                    :decrementButtonClass="'p-button-danger'" :style="{ width: '100%' }">
-                    <template #prefix>
-                        <i class="pi pi-rupee"></i>
-                    </template>
-                </InputNumber>
+                <InputGroup>
+                    <InputNumber v-model="bookingRate" mode="currency" currency="INR" locale="en-IN" :min="0"
+                        :max="1000000" :style="{ width: '100%' }">
+                        <template #prefix>
+                            <i class="pi pi-rupee"></i>
+                        </template>
+                    </InputNumber>
+                    <InputGroupAddon>
+                        <span>Minute</span>
+                    </InputGroupAddon>
+                </InputGroup>
             </div>
         </Panel>
     </div>
@@ -101,29 +105,48 @@ const saveRate = async () => {
     const fd = new FormData()
     fd.append('key', 'booking_rate')
     fd.append('value', bookingRate.value)
-    const { data } = await api.post('settings', fd)
+    try {
+        await api.post('settings', fd)
 
-    toast.add({
-        severity: data.success ? 'success' : 'error',
-        summary: data.success ? 'Success' : 'Error',
-        detail: data.message
-    })
-
-    await getbookingRate()
+        toast.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Booking rate saved successfully',
+            life: 3000
+        })
+        await getbookingRate()
+    } catch (error) {
+        toast.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to save booking rate',
+            life: 3000
+        })
+    }
 }
 
 const save = async () => {
     const fd = new FormData()
     fd.append('key', 'booking_reminder_intervals')
     fd.append('value', (JSON.stringify(bookingIntervals.value)))
-    const { data } = await api.post('settings', fd)
 
+    try {
+        await api.post('settings', fd)
 
-    toast.add({
-        severity: data.success ? 'success' : 'error',
-        summary: data.success ? 'Success' : 'Error',
-        detail: data.message
-    })
+        toast.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Booking intervals saved successfully',
+            life: 3000
+        })
+    } catch (error) {
+        toast.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to save booking intervals',
+            life: 3000
+        })
+    }
 }
 
 const getbookingRate = async () => {
