@@ -103,7 +103,7 @@ const deleteRow = (id) => {
 const confirmDelete = async () => {
     const fd = new FormData()
     fd.append('_method', 'DELETE')
-    const { data } = api.post(`parking-zones/${parking_zone_delete.value}`, fd)
+    const { data } = await api.post(`parking-zones/${parking_zone_delete.value}`, fd)
     await getParkingZones()
     deleteOpen.value = false
 }
