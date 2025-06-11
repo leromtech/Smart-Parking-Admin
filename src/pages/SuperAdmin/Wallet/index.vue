@@ -80,7 +80,7 @@
                 <span>Do you really want to delete the user ?</span>
                 <div class="w-full flex flex-row mt-2">
                     <Button icon="pi pi-trash" label="DELETE" outlined severity="danger" class="w-[40%]"
-                        @click="confirmDelete(() => openDelete = false)"></Button>
+                        @click="confirmDelete(handleDeleteCallback())"></Button>
                 </div>
             </div>
         </Dialog>
@@ -178,6 +178,11 @@ const saveCoinsToMoneyRate = async () => {
     if (data.success) {
         await getCoinsMoneyValue()
     }
+}
+
+const handleDeleteCallback = () => {
+    openDelete.value = false
+    toast.add({ severity: 'success', summary: 'Success', detail: 'Wallet recharge pack deleted successfully', closable: true })
 }
 
 const openCreate = ref(false)
