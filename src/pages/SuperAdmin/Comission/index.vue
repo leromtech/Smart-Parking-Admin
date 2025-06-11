@@ -36,7 +36,7 @@ import api from '../../../boot/api';
 import { useToast } from 'primevue/usetoast';
 
 const toast = useToast();
-const commission = ref(0);
+const commission = ref();
 
 const submit = async () => {
     try {
