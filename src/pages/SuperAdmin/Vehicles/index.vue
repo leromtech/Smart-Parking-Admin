@@ -3,7 +3,7 @@
         <div class="flex flex-row items-center gap-2 justify-between">
             <div class="flex flex-row gap-2">
                 <InputText placeholder="Search" v-model="filter.search" />
-                <Select v-model="filter.type" :options="vehicleTypes" optionLabel="name"
+                <Select showClear="true" v-model="filter.type" :options="vehicleTypes" optionLabel="name"
                     placeholder="Select a Vehicle Type" class="w-full md:w-56" />
             </div>
             <Button icon="pi pi-plus" rounded @click="createOpen = true"></Button>
