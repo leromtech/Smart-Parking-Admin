@@ -47,11 +47,6 @@
             <Panel :header="k.toUpperCase()" v-for="[k, v] in Object.entries(payments)" :key="k">
                 <DataTable :value="v" scrollable scrollHeight="400px" tableStyle="min-width: 50rem" :loading="loading"
                     lazy>
-                    <Column header="Id">
-                        <template #body="slotProps">
-                            {{ slotProps.data.id ?? '--' }}
-                        </template>
-                    </Column>
                     <Column header="Receipt No.">
                         <template #body="slotProps">
                             {{ slotProps.data.receipt_number ?? '--' }}
