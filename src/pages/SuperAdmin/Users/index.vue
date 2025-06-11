@@ -18,7 +18,7 @@
                 <template #body="slotProps">
                     <div class="flex flex-col">
                         <span>{{ slotProps.data.roles.length > 0 ? slotProps.data.roles[0].name.toUpperCase() : 'N/A'
-                        }}</span>
+                            }}</span>
                         <span v-if="slotProps.data.parking_zone_managed.length > 0" class="font-semibold">
                             {{ slotProps.data.parking_zone_managed[0].name }}</span>
                         <span v-if="slotProps.data.parking_zone_owned" class="font-semibold">
@@ -94,7 +94,7 @@ const edit = (item) => {
 const confirmDelete = async () => {
     const fd = new FormData()
     fd.append('_method', 'DELETE')
-    const { data } = api.post(`users/${deleteItem.value}`, fd)
+    const { data } = await api.post(`users/${deleteItem.value}`, fd)
     deleteOpen.value = false
     await getUsers()
 }
