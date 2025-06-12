@@ -94,25 +94,40 @@ const form = ref({
 })
 
 const reset = () => {
-    form.value.registration_no = ''
-    form.value.vehicle_type = ''
-    form.value.user_id = ''
+    form.value = {
+        id: '',
+        registration_no: '',
+        vehicle_type: '',
+        user_id: '',
+        displayName: '',
+        model: ''
+    }
 }
 
+// Watch search input and fetch users when typing
 watch(search, async (newVal) => {
-    if (newVal != '') {
+    if (newVal && newVal.trim().length > 2) { // Start searching after 3 characters
         await fetchUsers()
     } else {
         users.value = []
+        showSearchOpts.value = false
     }
 })
 
 const fetchUsers = async () => {
-    const { data } = await api('users', { params: { filters: { search: search.value } } })
-    users.value = data.data
-    if (users.value.length > 0) {
-        showSearchOpts.value = true
-    } else {
+    try {
+        const { data } = await api.get('users', {
+            params: {
+                filters: {
+                    search: search.value.trim()
+                }
+            }
+        })
+        users.value = data.data || []
+        showSearchOpts.value = users.value.length > 0
+    } catch (error) {
+        console.error('Error fetching users:', error)
+        users.value = []
         showSearchOpts.value = false
     }
 }
@@ -125,48 +140,67 @@ const submit = async () => {
         fd.append('color', form.value.color)
         fd.append('user_id', form.value.user_id)
         fd.append('model', form.value.model)
+
         if (form.value.id) {
             fd.append('_method', 'PATCH')
         }
-        const path = form.value.id ? `/vehicles/${form.value.id}` : '/vehicles'
 
+        const path = form.value.id ? `/vehicles/${form.value.id}` : '/vehicles'
         const { data } = await api.post(path, fd)
 
         toast.add({
             severity: 'success',
             summary: 'Success',
-            detail: 'Vehicle added successfully',
+            detail: form.value.id ? 'Vehicle updated successfully' : 'Vehicle added successfully',
             life: 3000
         })
+
         reset()
         emit('created', data.message)
     } catch (error) {
         toast.add({
             severity: 'error',
             summary: 'Error',
-            detail: 'Failed to add vehicle',
+            detail: form.value.id ? 'Failed to update vehicle' : 'Failed to add vehicle',
             life: 3000
         })
-        message.value = error.response.data.message
-        reset()
+        message.value = error.response?.data?.message || 'An error occurred'
     }
 }
 
 const setVehicleOwner = (id) => {
-    console.log(id)
     form.value.user_id = id
     const user = users.value.find((item) => item.id === id)
-    form.value.displayName = `${user.name} - (${user.phone})`
+    if (user) {
+        form.value.displayName = `${user.name} - (${user.phone})`
+        search.value = '' // Clear search after selection
+        users.value = [] // Clear user list
+        showSearchOpts.value = false
+    }
 }
 
 onMounted(async () => {
+    // Only populate form data in edit mode, don't fetch users
     if (editItem.value) {
         form.value.id = editItem.value.id
-        form.value.registration_no = editItem.value.registration_no
-        form.value.vehicle_type = editItem.value.vehicle_type.id
-        form.value.user_id = editItem.value.user_id
-    }
-    await fetchUsers()
-})
+        form.value.registration_no = editItem.value.registration_no || ''
+        form.value.vehicle_type = editItem.value.vehicle_type?.id || ''
+        form.value.user_id = editItem.value.user_id || ''
+        form.value.model = editItem.value.model || ''
 
+        // Set owner display name if user data is available
+        if (editItem.value.user) {
+            form.value.displayName = `${editItem.value.user.name} - (${editItem.value.user.phone || editItem.value.user.email})`
+        } else if (editItem.value.user_id) {
+            // If user data is not included, fetch only the specific user
+            try {
+                const { data: user } = await api.get(`users/${editItem.value.user_id}`)
+                form.value.displayName = `${user.name} - (${user.phone || user.email})`
+            } catch (error) {
+                console.error('Error fetching user:', error)
+                form.value.displayName = `User ID: ${editItem.value.user_id}`
+            }
+        }
+    }
+})
 </script>
