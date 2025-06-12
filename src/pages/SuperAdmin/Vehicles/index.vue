@@ -45,7 +45,7 @@
             <Create @created="handleCreated" />
         </Dialog>
 
-        <Dialog v-model:visible="editOpen">
+        <Dialog v-model:visible="editOpen" class="md:w-[80%] w-full">
             <template #header>
                 <span class="font-semibold">Edit Vehicle</span>
             </template>
