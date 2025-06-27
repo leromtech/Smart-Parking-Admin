@@ -4,7 +4,7 @@ import useAuth from "./auth";
 
 const { user } = useAuth()
 
-const parking_zone = ref(null)
+const parking_zone = ref([])
 const rates = ref(null)
 const intervals = ref(null)
 
@@ -19,8 +19,10 @@ const refresh = async () => {
     await getRates()
 }
 
-const getParkingZone = async (id) => {
-    const { data } = await api.get(`parking-zones/${id}`)
+const getParkingZone = async () => {
+    console.log(user.value.id)
+    const { data } = await api.get(`parking-zones/${user.value.parking_zone_owned.id}`)
+    console.log(data)
     parking_zone.value = data
 }
 
@@ -90,23 +92,18 @@ const addFreeParkingUser = async (id) => {
 }
 
 export function useParkingZone() {
-    if (user.value && user.value.parking_zone_owned) {
-        getParkingZone(user.value.parking_zone_owned.id)
-        getIntevalSettings()
-
-        return {
-            newRateForm,
-            parking_zone,
-            rates,
-            intervals,
-            refresh,
-            getParkingZone,
-            updateParkingZone,
-            addManager,
-            removeManager,
-            getRates,
-            pagination,
-            addFreeParkingUser
-        }
+    return {
+        newRateForm,
+        parking_zone,
+        rates,
+        intervals,
+        refresh,
+        getParkingZone,
+        updateParkingZone,
+        addManager,
+        removeManager,
+        getRates,
+        pagination,
+        addFreeParkingUser
     }
-} 
+}

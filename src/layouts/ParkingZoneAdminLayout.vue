@@ -58,37 +58,42 @@ const menuItems = ref([
             {
                 label: 'Account',
                 route: '/parking-zone/account',
-                icon: 'pi pi-warehouse'
+                icon: 'pi pi-money-bill'
             },
             {
                 label: 'Capacity',
                 route: '/parking-zone/capacity',
-                icon: 'pi pi-warehouse'
+                icon: 'pi pi-car'
             },
             {
                 label: 'Managers',
                 route: '/parking-zone/managers',
-                icon: 'pi pi-user'
+                icon: 'pi pi-users'
             },
             {
                 label: 'Rates',
                 route: '/parking-zone/rates',
-                icon: 'pi pi-user'
+                icon: 'pi pi-calendar-clock'
             },
             {
                 label: 'Earnings Report',
                 route: '/parking-zone/earnings',
-                icon: 'pi pi-user'
+                icon: 'pi pi-indian-rupee'
+            },
+            {
+                label: 'Subscriptions',
+                route: '/parking-zone/subscriptions',
+                icon: 'pi pi-calendar-plus'
             },
             {
                 label: 'Closed Days',
                 route: '/parking-zone/closed-days',
-                icon: 'pi pi-user'
+                icon: 'pi pi-exclamation-triangle'
             },
             {
                 label: 'Free Parking Lists',
                 route: '/parking-zone/free-parking-lists',
-                icon: 'pi pi-user'
+                icon: 'pi pi-user-plus'
             },
         ]
     }

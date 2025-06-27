@@ -1,17 +1,47 @@
 <template>
     <form @submit.prevent="submitRatePolicy">
-        <div class="flex flex-col gap-4 md:w-[500px]">
-            <InputText v-model="ratePolicyForm.name" placeholder="Name" />
-            <Select :options="vehicleTypes" optionValue="id" optionLabel="name" fluid
-                placeholder="Select a vehicle type for the policy" v-model="ratePolicyForm.vehicle_type"></Select>
+        <div class="flex flex-col gap-4 md:w-[500px] text-sm text-neutral-500">
+            <div class="flex flex-col items-start justify-center gap-1">
+                <label class="text-sm text-neutral-500">Policy name</label>
+                <InputText v-model="ratePolicyForm.name" placeholder="Name" name="name" fluid
+                    class="text-sm text-neutral-500" />
+            </div>
 
-            <Select :options="policyIntervals" placeholder="Select a policy interval" fluid
-                v-model="selectedPolicyInterval" optionLabel="label" optionValue="value"></Select>
+            <div class="flex flex-col items-start justify-center gap-1">
+                <label class="text-sm text-neutral-500">Vehicle type</label>
+                <Select :options="vehicleTypes" optionValue="id" optionLabel="name" fluid
+                    placeholder="Select a vehicle type for the policy" v-model="ratePolicyForm.vehicle_type">
+                    <template #empty>
+                        <div class="text-sm text-neutral-500">
+                            No vehicle types found
+                        </div>
+                    </template>
+                </Select>
+            </div>
+
+            <div class="flex flex-col items-start justify-center gap-1">
+                <label class="text-sm text-neutral-500">Scheme type</label>
+                <Select v-model="ratePolicyForm.scheme_type" :options="schemeTypeOptions" fluid
+                    placeholder="Select scheme type" optionValue="value" optionLabel="label"></Select>
+            </div>
+
+            <div class="flex flex-col items-start justify-center gap-1"
+                v-if="ratePolicyForm.scheme_type === 'subscription'">
+                <label class="text-sm text-neutral-500">Subscription days</label>
+                <InputNumber v-model="ratePolicyForm.days" fluid />
+            </div>
+
+            <div class="flex flex-col items-start justify-center gap-1">
+                <label class="text-sm text-neutral-500">Policy period</label>
+                <Select :options="filteredInterval" placeholder="Select a policy interval" fluid
+                    v-model="selectedPolicyInterval" optionLabel="label" optionValue="value">
+                </Select>
+            </div>
 
             <div class="flex flex-col gap-2">
                 <div class="flex flex-row items-center gap-2">
-                    <Checkbox binary v-model="fixedRateToggle" :disabled="selectedPolicyInterval == 'hourly'"
-                        id="fixed-rate-toggle" @change="handleFixedRateToggle" />
+                    <Checkbox binary v-model="fixedRateToggle" :disabled="true" id="fixed-rate-toggle"
+                        @change="handleFixedRateToggle" />
                     <label for="fixed-rate-toggle">Fixed Rate</label>
                 </div>
                 <div v-if="fixedRateToggle" class="flex flex-row gap-4">
@@ -56,14 +86,16 @@
 </template>
 
 <script setup>
-import { watch } from 'vue';
+import { onMounted, watch, ref } from 'vue';
 import useVehicleTypes from '../../../scripts/admin/vehicleTypes';
-import { useToast } from 'primevue';
+import { Select, useToast } from 'primevue';
 import useCreateRate from '../../../scripts/parkingZoneOwner/rate';
 import { useParkingZone } from '../../../scripts/parkingZone';
 
 const { parking_zone } = useParkingZone()
 const toast = useToast()
+
+const filteredInterval = ref([])
 
 const {
     fixedRateToggle,
@@ -71,17 +103,18 @@ const {
     selectedPolicyInterval,
     ratePolicyForm,
     timingToggle,
-    submitRatePolicy
+    submitRatePolicy,
+    schemeTypeOptions
 } = useCreateRate(parking_zone.id, toast)
 
-const { vehicleTypes } = useVehicleTypes()
+const { vehicleTypes, getVehicleTypes } = useVehicleTypes()
 
 // Handle toggle changes
 const handleFixedRateToggle = (value) => {
     // If toggle is off, set fixedRate to null or 0
     if (!value) {
-        ratePolicyForm.fixedRate = null;
-    } else if (ratePolicyForm.fixedRate === null) {
+        ratePolicyForm.value.fixedRate = null;
+    } else if (ratePolicyForm.value.fixedRate === null) {
         // If turning on and value is null, initialize with 0
         ratePolicyForm.fixedRate = 0;
     }
@@ -103,4 +136,24 @@ watch(selectedPolicyInterval, (newVal) => {
         ratePolicyForm.fixedRate = null;
     }
 });
+
+watch(() => ratePolicyForm.value.scheme_type, (newVal) => {
+    console.log(newVal)
+    if (newVal === 'subscription') {
+        const filtered = policyIntervals.filter((item) => { return item.value !== 'hourly' }
+        )
+        filteredInterval.value = filtered
+        fixedRateToggle.value = true
+    } else {
+        const filtered = policyIntervals.filter((item) => {
+            return item.value === 'hourly'
+        })
+        filteredInterval.value = filtered
+        fixedRateToggle.value = false
+    }
+})
+
+onMounted(() => {
+    getVehicleTypes()
+})
 </script>

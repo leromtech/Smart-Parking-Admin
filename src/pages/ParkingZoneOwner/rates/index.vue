@@ -55,8 +55,7 @@
                 </div>
 
                 <!-- Intervals -->
-
-                <Fieldset legend="Intervals" toggleable v-if="rate.intervals?.length >= 0">
+                <Fieldset legend="Intervals" toggleable v-if="rate.fixed_rate === '0.00'">
                     <div class="flex flex-row items-center justify-end mb-2">
                         <Button icon="pi pi-plus" rounded @click="() => addIntervalLocal(rate.id, parking_zone.id)"
                             v-if="activeRateId !== rate.id"></Button>
@@ -115,7 +114,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import CreatePolicy from './createPolicy.vue';
 import { useParkingZone } from '../../../scripts/parkingZone';
 import { Fieldset, InputNumber, useToast } from 'primevue';
@@ -123,7 +122,7 @@ import useCreateRate from '../../../scripts/parkingZoneOwner/rate';
 
 const toast = useToast();
 
-const { parking_zone, refresh } = useParkingZone();
+const { parking_zone, getParkingZone, refresh } = useParkingZone();
 
 // Track which rate is currently being edited
 const activeRateId = ref(null);
@@ -168,4 +167,8 @@ function formatTime12Hour(date) {
 
     return `${hours}:${minutes} ${ampm}`;
 }
+
+onMounted(() => {
+    getParkingZone()
+})
 </script>

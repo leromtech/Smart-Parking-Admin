@@ -5,7 +5,7 @@
                 <div class="flex flex-row gap-4 w-full">
                     <IftaLabel>
                         <DatePicker v-model="monthFilter" selectionMode="range" :manualInput="false"
-                            class="w-full md:w-40" dateFormat="MM yy dd" />
+                            class="w-full md:w-40" dateFormat="dd/mm/yy" />
                         <label for="date">Date filter</label>
                     </IftaLabel>
 
@@ -23,14 +23,9 @@
                 </div>
             </div>
         </Panel>
-        <div class="flex flex-col items-start justify-start gap-4">
+        <div class="flex flex-col items-start justify-start gap-4 text-neutral-500 text-sm">
             <Panel v-for="(item, index) in payments" class="w-full">
                 <DataTable :value="item" class="max-h-[500px] overflow-y-scroll">
-                    <Column header="id">
-                        <template #body="slotProps">
-                            {{ slotProps.data.id }}
-                        </template>
-                    </Column>
                     <Column header="Receipt No.">
                         <template #body="slotProps">
                             {{ slotProps.data.receipt_no ?? "--NA--" }}
@@ -52,14 +47,14 @@
                         </template>
                     </Column>
                     <template #footer>
-                        <div class="flex justify-between p-2 font-bold">
-                            <span>Total: </span>
-                            <span class="text-end">₹ {{ totals[index] }}</span>
+                        <div class="flex justify-end p-2 font-bold gap-4">
+                            <span class="text-end text-sm text-neutral-500">Total</span>
+                            <span class="text-end text-sm text-neutral-500">₹ {{ totals[index] }}</span>
                         </div>
                     </template>
                     <template #empty>
-                        <div class="flex items-center justify-center w-full ">
-                            NO RECORD FOUND
+                        <div class="flex items-center justify-center w-full text-sm text-neutral-500">
+                            No records found
                         </div>
                     </template>
                 </DataTable>
