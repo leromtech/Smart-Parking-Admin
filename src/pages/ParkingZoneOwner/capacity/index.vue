@@ -37,7 +37,7 @@ import { useParkingZone } from '../../../scripts/parkingZone';
 import { InputNumber, useToast } from 'primevue';
 
 const { user } = useAuth()
-const { parking_zone, updateParkingZone } = useParkingZone(user.value.parking_zone_owned.id)
+const { parking_zone, updateParkingZone } = useParkingZone()
 const toast = useToast()
 
 const capacity_total = ref(0);
@@ -90,11 +90,11 @@ const submit = async () => {
     }
 }
 
-watch(parking_zone, () => {
-    capacity_total.value = parking_zone.value.capacity_total
-    reserved_space.value = parking_zone.value.reserved_space
-    declared_for_app.value = parking_zone.value.declared_for_app
-}, { deep: true })
+onMounted(() => {
+    capacity_total.value = user.value.parking_zone_owned.capacity_total
+    reserved_space.value = user.value.parking_zone_owned.reserved_space
+    declared_for_app.value = user.value.parking_zone_owned.declared_for_app
+})
 
 // Automatically clear error message after a delay
 watch(error, (newError) => {

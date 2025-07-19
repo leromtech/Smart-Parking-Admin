@@ -32,6 +32,7 @@ const routes = [
             { name: 'parking Zone Free Parking List', path: 'free-parking-lists', component: () => import('../pages/ParkingZoneOwner/freeParkingList/index.vue') },
             { name: 'parking Zone Closed Days', path: 'closed-days', component: () => import('../pages/ParkingZoneOwner/closedDays/index.vue') },
             { name: 'parking Zone Subscription', path: 'subscriptions', component: () => import('../pages/ParkingZoneOwner/subscriptions/index.vue') },
+            { name: 'parking Zone Subscription Rates', path: 'subscription-rates', component: () => import('../pages/ParkingZoneOwner/subscriptionRates/index.vue') },
         ]
     },
 ];

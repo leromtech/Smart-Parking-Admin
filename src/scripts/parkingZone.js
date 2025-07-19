@@ -20,7 +20,6 @@ const refresh = async () => {
 }
 
 const getParkingZone = async () => {
-    console.log(user.value.id)
     const { data } = await api.get(`parking-zones/${user.value.parking_zone_owned.id}`)
     console.log(data)
     parking_zone.value = data
@@ -41,7 +40,7 @@ const updateParkingZone = async (item) => {
         fd.append(key, item[key])
     }
     fd.append('_method', 'PATCH')
-    const { data } = await api.post(`parking-zones/${parking_zone.value.id}`, fd)
+    const { data } = await api.post(`parking-zones/${user.value.parking_zone_owned.id}`, fd)
 
     await getParkingZone(parking_zone.value.id)
 

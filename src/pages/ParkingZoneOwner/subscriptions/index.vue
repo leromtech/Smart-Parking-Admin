@@ -3,6 +3,11 @@
         <DataTable :value="subscriptions" tableStyle="min-width: 50rem" paginator :rows="pagination.per_page"
             :lazy="true" :totalRecords="pagination.total" :rowsPerPageOptions="[5, 10, 15, 30]"
             @page="(e) => fetchSubscriptions(e)">
+            <template #empty>
+                <div class="flex items-center justify-center text-neutral-400 py-2">
+                    No subscriptions yet
+                </div>
+            </template>
             <template #header>
                 <div class="flex flex-row justify-between">
                     <InputText icon="pi pi-search" placeholder="Search" />
@@ -19,14 +24,21 @@
             <Column header="Rate">
                 <template #body="slotProps">
                     <div class="flex flex-col">
-                        {{ slotProps.data.rate.name }}
+                        {{ slotProps.data.subscription_rate.name }}
                     </div>
                 </template>
             </Column>
-            <Column header="Duration">
+            <Column header="From - To">
                 <template #body="slotProps">
                     <div class="flex flex-col">
-                        {{ slotProps.data.rate.days }}
+                        {{ slotProps.data.start_date }} - {{ slotProps.data.end_date }}
+                    </div>
+                </template>
+            </Column>
+            <Column header="Month">
+                <template #body="slotProps">
+                    <div class="flex flex-col">
+                        {{ deduceMonth(slotProps.data.start_date) }}
                     </div>
                 </template>
             </Column>
@@ -37,10 +49,9 @@
                     </div>
                 </template>
             </Column>
-            <Column>
+            <Column header="Status">
                 <template #body="slotProps">
-                    <Button icon="pi pi-trash" variant="text" severity="danger"
-                        @click="() => initiateDelete(slotProps.data.id)"></Button>
+                    {{ slotProps.data.status }}
                 </template>
             </Column>
         </DataTable>
@@ -83,6 +94,7 @@ const fetchSubscriptions = async (pageParams) => {
         }
     })
     subscriptions.value = data.data
+    console.log(subscriptions.value)
     pagination.value = {
         per_page: data.per_page,
         total_records: data.total,
@@ -97,6 +109,12 @@ const getRemainingDays = (endDate) => {
     if (diff <= 0) return 'Expired';
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     return days + ' day' + (days !== 1 ? 's' : '') + ' left';
+}
+
+const deduceMonth = (startDate) => {
+    const date = new Date(startDate);
+    const month = date.toLocaleString('default', { month: 'long' });
+    return month.charAt(0).toUpperCase() + month.slice(1); // Capitalize the first letter
 }
 
 onMounted(async () => {

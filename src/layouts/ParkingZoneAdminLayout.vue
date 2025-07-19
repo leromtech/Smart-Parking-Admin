@@ -76,14 +76,19 @@ const menuItems = ref([
                 icon: 'pi pi-calendar-clock'
             },
             {
-                label: 'Earnings Report',
-                route: '/parking-zone/earnings',
-                icon: 'pi pi-indian-rupee'
+                label: 'Subscription Rates',
+                route: '/parking-zone/subscription-rates',
+                icon: 'pi pi-calendar-plus'
             },
             {
                 label: 'Subscriptions',
                 route: '/parking-zone/subscriptions',
                 icon: 'pi pi-calendar-plus'
+            },
+            {
+                label: 'Earnings Report',
+                route: '/parking-zone/earnings',
+                icon: 'pi pi-indian-rupee'
             },
             {
                 label: 'Closed Days',

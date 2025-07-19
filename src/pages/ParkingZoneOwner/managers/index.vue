@@ -3,6 +3,11 @@
         <DataTable :value="rows" tableStyle="min-width: 50rem" paginator :rows="pagination.per_page" :lazy="true"
             :totalRecords="pagination.total" :rowsPerPageOptions="[5, 10, 15, 30]"
             @page="() => console.log(pagination)">
+            <template #empty>
+                <div class="flex items-center justify-center text-neutral-400 py-2">
+                    No managers found
+                </div>
+            </template>
             <template #header>
                 <div class="flex flex-row justify-between">
                     <InputText icon="pi pi-search" />

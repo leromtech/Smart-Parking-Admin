@@ -31,9 +31,6 @@
                                 @click="pagination.page = Math.ceil(pagination.total / pagination.per_page)"></Button>
                         </div>
                     </div>
-                    <div class="flex justify-center">
-                        <span>No data available</span>
-                    </div>
                 </template>
             </DataTable>
         </Panel>
