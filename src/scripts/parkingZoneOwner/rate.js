@@ -121,7 +121,6 @@ const submitRatePolicy = async () => {
             fd.append('to', '')
         }
         fd.append('name', ratePolicyForm.value.name)
-        fd.append('scheme_type', ratePolicyForm.value.scheme_type)
         fd.append('days', ratePolicyForm.value.days)
         if (fixedRateToggle.value && ratePolicyForm.value.fixedRate !== null) {
             fd.append('fixed_rate', ratePolicyForm.value.fixedRate);

@@ -38,7 +38,7 @@
                 </Select>
             </div>
 
-            <div class="flex flex-col gap-2">
+            <!-- <div class="flex flex-col gap-2">
                 <div class="flex flex-row items-center gap-2">
                     <Checkbox binary v-model="fixedRateToggle" :disabled="true" id="fixed-rate-toggle"
                         @change="handleFixedRateToggle" />
@@ -52,9 +52,9 @@
                         <InputNumber v-model="ratePolicyForm.fixedRate" mode="currency" currency="INR" />
                     </InputGroup>
                 </div>
-            </div>
+            </div> -->
 
-            <div class="flex flex-row items-center gap-2">
+            <!-- <div class="flex flex-row items-center gap-2">
                 <Checkbox binary v-model="timingToggle" :disabled="selectedPolicyInterval !== 'hourly'"
                     @change="handleTimingToggle" />
                 <label for="timing-toggle">Timing</label>
@@ -78,7 +78,7 @@
                         </template>
                     </DatePicker>
                 </div>
-            </div>
+            </div> -->
 
             <Button type="submit">Submit</Button>
         </div>
