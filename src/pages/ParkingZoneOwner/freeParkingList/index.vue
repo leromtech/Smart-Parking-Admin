@@ -54,7 +54,7 @@
             <template #header>
                 <span class="font-semibold">Add a free parking for User</span>
             </template>
-            <create />
+            <create @save="handleCreateSave" />
         </Dialog>
     </div>
 </template>
@@ -133,6 +133,11 @@ const deleteUser = async (userId) => {
             life: 3000
         })
     }
+    await getAllFreeParkingList()
+}
+
+const handleCreateSave = async () => {
+    createOpen.value = false
     await getAllFreeParkingList()
 }
 

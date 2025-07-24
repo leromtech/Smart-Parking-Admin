@@ -47,6 +47,8 @@ import { useToast } from 'primevue'
 import api from '../../../boot/api'
 import { onMounted, ref, watch } from 'vue'
 
+const emit = defineEmits(['save'])
+
 const toast = useToast()
 
 const rows = ref([])
@@ -115,6 +117,7 @@ const submit = async (userId) => {
             })
 
             await getUsers()
+            emit('save', data)
         } else {
             throw new Error('Failed to assign free parking: ' + JSON.stringify(data))
         }
