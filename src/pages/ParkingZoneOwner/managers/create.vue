@@ -70,14 +70,14 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import dInput from '../../../components/d-input.vue';
 import api from '../../../boot/api';
 import { useParkingZone } from '../../../scripts/parkingZone';
 import { useToast } from 'primevue';
 import useAuth from '../../../scripts/auth';
 
-const { addManager, refresh } = useParkingZone()
+const { addManager, refresh, getParkingZone } = useParkingZone()
 const { user } = useAuth()
 
 const toast = useToast()
@@ -114,6 +114,10 @@ const search = async () => {
     const { data } = await api.get('users', { params: { 'filters': { 'search': searchQuery.value } } })
     rows.value = data.data
 }
+
+onMounted(() => {
+    getParkingZone()
+})
 </script>
 
 <style scoped>
