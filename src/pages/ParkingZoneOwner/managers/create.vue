@@ -75,8 +75,10 @@ import dInput from '../../../components/d-input.vue';
 import api from '../../../boot/api';
 import { useParkingZone } from '../../../scripts/parkingZone';
 import { useToast } from 'primevue';
+import useAuth from '../../../scripts/auth';
 
 const { addManager, refresh } = useParkingZone()
+const { user } = useAuth()
 
 const toast = useToast()
 
@@ -96,6 +98,7 @@ const submit = async () => {
         fd.append('name', form.value.name)
         fd.append('phone', form.value.phone)
         fd.append('email', form.value.email)
+        fd.append('parking_zone_id', user.value.parking_zone_owned.id)
         const { data } = await api.post('manager/create', fd)
 
         if (data.success) {
