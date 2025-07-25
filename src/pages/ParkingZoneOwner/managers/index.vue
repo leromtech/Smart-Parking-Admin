@@ -56,7 +56,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { useParkingZone } from '../../../scripts/parkingZone';
 import create from './create.vue'
 import api from '../../../boot/api';
