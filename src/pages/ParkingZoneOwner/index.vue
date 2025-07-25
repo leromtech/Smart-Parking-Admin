@@ -72,7 +72,7 @@ import api from '../../boot/api';
 
 const { user } = useAuth()
 const chart = ref(null)
-const { parking_zone } = useParkingZone()
+const { parking_zone, getParkingZone } = useParkingZone()
 const availabiltiy = ref(null)
 const yearFilter = ref(new Date())
 
@@ -124,4 +124,8 @@ watch(
     },
     { immediate: true }
 );
+
+onMounted(async () => {
+    await getParkingZone()
+})
 </script>
