@@ -64,7 +64,7 @@ import { faL } from '@fortawesome/free-solid-svg-icons';
 import { useToast } from "primevue/usetoast";
 const toast = useToast();
 
-const { parking_zone, removeManager, pagination } = useParkingZone();
+const { parking_zone, removeManager, pagination, getParkingZone } = useParkingZone();
 const createOpen = ref(false)
 const openDelete = ref(false)
 
@@ -91,4 +91,9 @@ const confirmDelete = async () => {
 watch(parking_zone, () => {
     rows.value = parking_zone.value.managers;
 });
+
+onMounted(() => {
+    getParkingZone()
+});
+
 </script>
