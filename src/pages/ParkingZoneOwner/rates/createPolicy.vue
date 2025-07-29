@@ -1,5 +1,5 @@
 <template>
-    <form @submit.prevent="submitRatePolicy">
+    <form @submit.prevent="handleSubmit">
         <div class="flex flex-col gap-4 md:w-[500px] text-sm text-neutral-500">
             <div class="flex flex-col items-start justify-center gap-1">
                 <label class="text-sm text-neutral-500">Policy name</label>
@@ -19,67 +19,6 @@
                 </Select>
             </div>
 
-            <div class="flex flex-col items-start justify-center gap-1">
-                <label class="text-sm text-neutral-500">Scheme type</label>
-                <Select v-model="ratePolicyForm.scheme_type" :options="schemeTypeOptions" fluid
-                    placeholder="Select scheme type" optionValue="value" optionLabel="label"></Select>
-            </div>
-
-            <div class="flex flex-col items-start justify-center gap-1"
-                v-if="ratePolicyForm.scheme_type === 'subscription'">
-                <label class="text-sm text-neutral-500">Subscription days</label>
-                <InputNumber v-model="ratePolicyForm.days" fluid />
-            </div>
-
-            <div class="flex flex-col items-start justify-center gap-1">
-                <label class="text-sm text-neutral-500">Policy period</label>
-                <Select :options="filteredInterval" placeholder="Select a policy interval" fluid
-                    v-model="selectedPolicyInterval" optionLabel="label" optionValue="value">
-                </Select>
-            </div>
-
-            <!-- <div class="flex flex-col gap-2">
-                <div class="flex flex-row items-center gap-2">
-                    <Checkbox binary v-model="fixedRateToggle" :disabled="true" id="fixed-rate-toggle"
-                        @change="handleFixedRateToggle" />
-                    <label for="fixed-rate-toggle">Fixed Rate</label>
-                </div>
-                <div v-if="fixedRateToggle" class="flex flex-row gap-4">
-                    <InputGroup>
-                        <InputGroupAddon>
-                            <span>₹</span>
-                        </InputGroupAddon>
-                        <InputNumber v-model="ratePolicyForm.fixedRate" mode="currency" currency="INR" />
-                    </InputGroup>
-                </div>
-            </div> -->
-
-            <!-- <div class="flex flex-row items-center gap-2">
-                <Checkbox binary v-model="timingToggle" :disabled="selectedPolicyInterval !== 'hourly'"
-                    @change="handleTimingToggle" />
-                <label for="timing-toggle">Timing</label>
-            </div>
-            <div v-if="timingToggle" class="flex flex-row gap-4">
-                <div>
-                    <label for="from">From</label>
-                    <DatePicker v-model="ratePolicyForm.from" showIcon fluid iconDisplay="input" id="from" timeOnly
-                        hourFormat="12">
-                        <template #inputicon="slotProps">
-                            <i class="pi pi-clock" @click="slotProps.clickCallback" />
-                        </template>
-                    </DatePicker>
-                </div>
-                <div>
-                    <label for="to">To</label>
-                    <DatePicker v-model="ratePolicyForm.to" showIcon fluid iconDisplay="input" id="to" timeOnly
-                        hourFormat="12">
-                        <template #inputicon="slotProps">
-                            <i class="pi pi-clock" @click="slotProps.clickCallback" />
-                        </template>
-                    </DatePicker>
-                </div>
-            </div> -->
-
             <Button type="submit">Submit</Button>
         </div>
     </form>
@@ -91,6 +30,8 @@ import useVehicleTypes from '../../../scripts/admin/vehicleTypes';
 import { Select, useToast } from 'primevue';
 import useCreateRate from '../../../scripts/parkingZoneOwner/rate';
 import { useParkingZone } from '../../../scripts/parkingZone';
+
+const emit = defineEmits(['success', 'failure'])
 
 const { parking_zone } = useParkingZone()
 const toast = useToast()
@@ -117,6 +58,15 @@ const handleFixedRateToggle = (value) => {
     } else if (ratePolicyForm.value.fixedRate === null) {
         // If turning on and value is null, initialize with 0
         ratePolicyForm.fixedRate = 0;
+    }
+}
+
+const handleSubmit = async () => {
+    const response = await submitRatePolicy()
+    if (response) {
+        emit('success')
+    } else {
+        emit('failure')
     }
 }
 

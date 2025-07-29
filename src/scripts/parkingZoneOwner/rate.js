@@ -27,8 +27,6 @@ const ratePolicyForm = ref({
     rate_id: null,
     vehicle_type: null,
     parking_zone_id: null,
-    scheme_type: '',
-    days: null,
     name: '',
     from: null,
     to: null,
@@ -65,11 +63,8 @@ const editRatePolicy = (rate) => {
     ratePolicyForm.value.name = rate.name
     ratePolicyForm.value.rate_id = rate.id
     ratePolicyForm.value.vehicle_type = rate.vehicle_type.id
-    ratePolicyForm.value.days = rate.days ?? null
-    ratePolicyForm.value.scheme_type = rate.scheme_type
     ratePolicyForm.value.from = parseTimeToDate(rate.from) ?? null
     ratePolicyForm.value.to = parseTimeToDate(rate.to) ?? null
-    selectedPolicyInterval.value = rate.interval
     timingToggle.value = rate.from === '' && rate.to === ''
 }
 
@@ -85,7 +80,7 @@ const saveInterval = async () => {
         fd.append('interval', intervalForm.value.interval)
         fd.append('rate_amount', intervalForm.value.rate_amount)
         fd.append('duration', intervalForm.value.duration)
-        fd.append('is_additive', intervalForm.value.is_additive)
+        fd.append('is_additive', false)
         fd.append('parking_zone_id', intervalForm.value.parking_zone_id)
 
         const { data } = await api.post('rate-intervals', fd)
@@ -135,12 +130,12 @@ const submitRatePolicy = async () => {
         fd.append('parking_zone_id', useParkingZone().parking_zone.value.id)
         const { data } = await api.post('rates', fd)
         reset()
-        await this_refresh.value()
         this_toast.value.add({ severity: data.success ? 'success' : 'error', summary: data.success ? 'Success' : 'Error', detail: data.message, life: 3000 })
+        return true
     } catch (error) {
         reset()
-        await this_refresh.value()
-        this_toast.value.add({ severity: 'error', summary: 'Error', detail: error, life: 3000 })
+        this_toast.value.add({ severity: 'error', summary: 'Error', detail: error.response.data.message, life: 3000 })
+        return false
     }
 }
 

@@ -1,6 +1,10 @@
 <template>
     <div class="card flex flex-row w-full gap-4">
         <Panel header="CAPACITY" class="w-[50%]">
+            <div class="flex flex-row gap-2 border border-neutral-200 p-2 rounded-md mb-2">
+                <p class="text-blue-500 font-semibold">Note:</p>
+                <p>Space occupied is calculated as Two wheeler = 1 space</p>
+            </div>
             <div class="flex flex-col gap-6">
                 <div class="flex flex-col gap-2">
                     <label for="capacity_total">Total Capacity</label>
@@ -19,6 +23,14 @@
                     <label for="reserved_space">Reserved for Booking</label>
                     <InputNumber id="reserved_space" v-model="reserved_space" aria-describedby="reserved-help"
                         @blur="validateReserved" />
+                    <Message size="small" severity="secondary" variant="simple">Enter the capacity reserved for
+                        subscription
+                    </Message>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <label for="reserved_subscriptionß">Reserved for Subscription</label>
+                    <InputNumber id="reserved_subscription" v-model="reserved_for_subscription"
+                        aria-describedby="reserved-help" @blur="validateReserved" />
                     <Message size="small" severity="secondary" variant="simple">Enter the capacity reserved for booking
                     </Message>
                 </div>
@@ -43,6 +55,7 @@ const toast = useToast()
 const capacity_total = ref(0);
 const reserved_space = ref(0);
 const declared_for_app = ref(0);
+const reserved_for_subscription = ref(0)
 const error = ref('');
 const error_timer = ref(null);
 
@@ -84,7 +97,8 @@ const submit = async () => {
         const data = await updateParkingZone({
             capacity_total: capacity_total.value,
             reserved_space: reserved_space.value,
-            declared_for_app: declared_for_app.value
+            declared_for_app: declared_for_app.value,
+            reserved_for_subscription: reserved_for_subscription.value
         })
         toast.add({ severity: data.success ? 'success' : 'error', summary: data.success ? 'Success' : 'Error', detail: data.message })
     }
@@ -94,6 +108,7 @@ onMounted(() => {
     capacity_total.value = user.value.parking_zone_owned.capacity_total
     reserved_space.value = user.value.parking_zone_owned.reserved_space
     declared_for_app.value = user.value.parking_zone_owned.declared_for_app
+    reserved_for_subscription.value = user.value.parking_zone_owned.reserved_for_subscription
 })
 
 // Automatically clear error message after a delay

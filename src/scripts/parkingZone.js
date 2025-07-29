@@ -21,7 +21,6 @@ const refresh = async () => {
 
 const getParkingZone = async () => {
     const { data } = await api.get(`parking-zones/${user.value.parking_zone_owned.id}`)
-    console.log(data)
     parking_zone.value = data
 }
 
