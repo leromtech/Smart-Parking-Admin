@@ -69,7 +69,7 @@ import api from '../../../boot/api';
 import { useToast } from 'primevue';
 import { useParkingZone } from '../../../scripts/parkingZone';
 
-const { parking_zone } = useParkingZone()
+const { parking_zone, getParkingZone } = useParkingZone()
 const filters = ref({
     search: '',
     status: ''
@@ -127,4 +127,8 @@ watch(monthFilter, async (newVal) => {
 watch(parking_zone, async () => {
     await getEarnings()
 }, { deep: true })
+
+onMounted(async () => {
+    await getParkingZone()
+})
 </script>
