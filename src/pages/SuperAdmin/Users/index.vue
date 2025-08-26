@@ -4,6 +4,7 @@
             <div class="flex flex-row gap-2">
                 <InputText placeholder="Search" v-model="filter.search" />
                 <Select v-model="filter.role" :options="roles" placeholder="Select a Role" class="w-full md:w-56" />
+                <Button icon="pi pi-times" rounded outlined severity="secondary" @click="clearFilters" label="Clear" />
             </div>
             <Button icon="pi pi-plus" rounded @click="create"></Button>
         </div>
@@ -16,14 +17,23 @@
             <!-- Roles -->
             <Column field="roles" header="Roles">
                 <template #body="slotProps">
-                    <div class="flex flex-col">
-                        <span>{{ slotProps.data.roles.length > 0 ? slotProps.data.roles[0].name.toUpperCase() : 'N/A'
-                            }}</span>
-                        <span v-if="slotProps.data.parking_zone_managed.length > 0" class="font-semibold">
-                            {{ slotProps.data.parking_zone_managed[0].name }}</span>
-                        <span v-if="slotProps.data.parking_zone_owned" class="font-semibold">
-                            {{ slotProps.data.parking_zone_owned.name }}
-                        </span>
+                    <div class="flex flex-col gap-1">
+                        <!-- Show all roles -->
+                        <div v-for="role in slotProps.data.roles" :key="role.id" class="flex items-center gap-1">
+                            <span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">{{ role.name.toUpperCase() }}</span>
+                        </div>
+                        <!-- Show owned parking zone -->
+                        <div v-if="slotProps.data.parking_zone_owned" class="mt-1">
+                            <span class="text-xs text-gray-600">Owns:</span>
+                            <span class="text-xs font-semibold text-green-600">{{ slotProps.data.parking_zone_owned.name }}</span>
+                        </div>
+                        <!-- Show all managed parking zones -->
+                        <div v-if="slotProps.data.parking_zone_managed && slotProps.data.parking_zone_managed.length > 0" class="mt-1">
+                            <span class="text-xs text-gray-600">Manages:</span>
+                            <div v-for="zone in slotProps.data.parking_zone_managed" :key="zone.id" class="ml-2">
+                                <span class="text-xs font-semibold text-orange-600">{{ zone.name }}</span>
+                            </div>
+                        </div>
                     </div>
                 </template>
             </Column>
@@ -106,6 +116,11 @@ const roles = [
     'owner',
     'manager',
 ]
+
+const clearFilters = () => {
+    filter.value.search = ''
+    filter.value.role = ''
+}
 
 onMounted(async () => {
     await getUsers()

@@ -95,7 +95,7 @@ const deleteInterval = async (rate) => {
     try {
         const fd = new FormData()
         fd.append('_method', 'DELETE')
-        const { data } = await api.post(`rates/${rate}`, fd)
+        const { data } = await api.post(`rate-intervals/${rate}`, fd)
         this_toast.value.add({ severity: data.success ? 'success' : 'error', summary: data.success ? 'Success' : 'Error', detail: data.message, life: 3000 })
     } catch (error) {
         this_toast.value.add({ severity: 'error', summary: 'Error', detail: error, life: 3000 })

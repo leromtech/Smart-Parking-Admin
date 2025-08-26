@@ -20,7 +20,7 @@
                 @page="(e) => getParkingZones(e)">
                 <template #header>
                     <div class="flex flex-row justify-between">
-                        <InputText icon="pi pi-search" />
+                        <InputText icon="pi pi-search" placeholder="Search parking zones..." v-model="search" />
                         <Button icon="pi pi-plus" @click="createOpen = true"></Button>
                     </div>
                 </template>
@@ -82,6 +82,7 @@ import useAdmin from '../../../scripts/admin';
 import create from './create.vue'
 import { onMounted, ref, watch } from 'vue';
 import api from '../../../boot/api';
+import { debounce } from '../../../scripts/utils';
 
 const { map_api_key, center } = useMap()
 const { parking_zones, parking_zone_delete, parking_zone_edit, getParkingZones, pagination } = useAdmin()
@@ -89,6 +90,15 @@ const { parking_zones, parking_zone_delete, parking_zone_edit, getParkingZones, 
 const createOpen = ref(false)
 const editOpen = ref(false)
 const deleteOpen = ref(false)
+const search = ref('')
+
+// Debounced search function
+const debouncedSearch = debounce(() => {
+    getParkingZones(null, search.value)
+}, 300)
+
+// Watch for search changes
+watch(search, debouncedSearch)
 
 const edit = (item) => {
     parking_zone_edit.value = item

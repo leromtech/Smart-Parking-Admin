@@ -9,14 +9,22 @@ const router = createRouter({
   routes: routes,
 });
 
+// Role-based redirect mapping
+const roleRedirects = {
+  'owner': '/parking-zone',
+  'customer': '/customer',
+  'manager': '/manager'
+};
+
 router.beforeEach(async (to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
-  const requiredRoles = to.meta.roles; // Roles required by the route
+  const requiredRoles = to.meta.roles;
 
   // Check if the route requires authentication
   if (requiresAuth && !loggedIn()) {
-    return next('/'); // Redirect to home or login if not logged in
+    return next('/');
   }
+
   try {
     // If user is logged in but user data is not fetched, fetch it
     if (loggedIn() && !user.value) {
@@ -24,80 +32,31 @@ router.beforeEach(async (to, from, next) => {
     }
   } catch (error) {
     console.error('Error fetching user:', error);
-    return next('/'); // Redirect to home or login on error
+    return next('/');
   }
 
   // If the route has role restrictions, check if the user has the required role(s)
   if (requiredRoles && user.value) {
-    const userRoles = user.value.roles.map(role => role.name); // Extract role names
+    const userRoles = user.value.roles.map(role => role.name);
 
     // Allow superadmin role to access any route
     if (userRoles.includes('superadmin')) {
       return next();
     }
 
-    // Check if the user has at least one of the required roles for non-superadmin roles
+    // Check if the user has at least one of the required roles
     const hasRequiredRole = requiredRoles.some(role => userRoles.includes(role));
 
     if (!hasRequiredRole) {
-      // Redirect customers to the CustomerLayout route if they don't have access to the current route
-      if (userRoles.includes('owner')) {
-        return next('/parking-zone'); // Redirect to CustomerLayout
-      }
-      return next('/'); // Redirect to a 'Not Authorized' page or fallback for other roles
-    }
-    if (!hasRequiredRole) {
-      // Redirect customers to the CustomerLayout route if they don't have access to the current route
-      if (userRoles.includes('customer')) {
-         // Redirect to CustomerLayout
-      }
-      return next('/'); // Redirect to a 'Not Authorized' page or fallback for other roles
-    }
-
-    if (!hasRequiredRole) {
-      // Redirect customers to the CustomerLayout route if they don't have access to the current route
-      if (userRoles.includes('manager')) {
-        return next('/manager'); // Redirect to CustomerLayout
-      }
-      return next('/'); // Redirect to a 'Not Authorized' page or fallback for other roles
+      // Redirect based on user's primary role
+      const primaryRole = userRoles[0];
+      const redirectPath = roleRedirects[primaryRole] || '/';
+      return next(redirectPath);
     }
   }
 
   // If everything is fine, allow navigation
   next();
 });
-
-const login = async (fd, cb = null) => {
-  loading.value = true
-  const { data } = await api.post('login', fd);
-  loading.value = false
-  if (data.success) {
-      localStorage.setItem('auth_token', data.token)
-      user.value = data.user
-      roles.value = user.value.roles.map((item) => item.name)
-      
-      switch (user.value.roles[0].name) {
-          case 'customer':
-          case 'manager':
-              // Redirect to external Flutter web app using window.location
-              window.location.href = import.meta.env.VITE_FRONTEND_URL;
-              return; // Exit early to prevent further execution
-          case 'superadmin':
-              router.push('/admin');
-              break;
-          case 'owner':
-              router.push('/parking-zone');
-              break;
-          default:
-              router.push('/');
-              break;
-      }
-      
-      cb && cb(data)
-  } else {
-      cb && cb(data)
-      return data.message
-  }
-}
 
 export default router;

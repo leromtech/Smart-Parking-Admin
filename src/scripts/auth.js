@@ -6,10 +6,11 @@ import { data } from "autoprefixer";
 
 const user = ref(null)
 const roles = ref(null)
-const parking_zone_id = ref(null)
+const parkingZoneId = ref(null) // Changed from parking_zone_id to parkingZoneId
 const loading = ref(false)
+
 const loggedIn = () => {
-    const token = localStorage.getItem('auth_token')
+    const token = localStorage.getItem('authToken') // Changed from auth_token to authToken
     if (!token) {
         return false
     }
@@ -22,23 +23,23 @@ const fetchUser = async () => {
             const { data } = await api.get('user')
             user.value = data
             roles.value = user.value.roles.map((item) => item.name)
-            if (data.parking_zone_owned) {
-                parking_zone_id.value = data.parking_zone_owned.id
-            } else if (data.parking_zone_managed) {
-                parking_zone_id.value = data.parking_zone_managed.id
+            if (data.parkingZoneOwned) { // Changed from parking_zone_owned to parkingZoneOwned
+                parkingZoneId.value = data.parkingZoneOwned.id
+            } else if (data.parkingZoneManaged) { // Changed from parking_zone_managed to parkingZoneManaged
+                parkingZoneId.value = data.parkingZoneManaged.id
             }
         } catch (e) {
-            localStorage.removeItem('auth_token')
+            localStorage.removeItem('authToken')
         }
     }
 }
 
-const login = async (fd, cb = null) => {
+const login = async (formData, callback = null) => { // Changed fd to formData, cb to callback
     loading.value = true
-    const { data } = await api.post('login', fd);
+    const { data } = await api.post('login', formData);
     loading.value = false
     if (data.success) {
-        localStorage.setItem('auth_token', data.token)
+        localStorage.setItem('authToken', data.token)
         user.value = data.user
         roles.value = user.value.roles.map((item) => item.name)
         
@@ -59,9 +60,9 @@ const login = async (fd, cb = null) => {
                 break;
         }
         
-        cb && cb(data)
+        callback && callback(data)
     } else {
-        cb && cb(data)
+        callback && callback(data)
         return data.message
     }
 }
@@ -69,7 +70,7 @@ const login = async (fd, cb = null) => {
 const logout = async () => {
     const { data } = await api.post('logout')
     if (data.success) {
-        localStorage.removeItem('auth_token')
+        localStorage.removeItem('authToken')
         user.value = null
         roles.value = null
         router.replace('/')
@@ -78,11 +79,11 @@ const logout = async () => {
     }
 }
 
-const register = async (fd, cb = null) => {
+const register = async (formData, callback = null) => { // Changed fd to formData, cb to callback
     loading.value = true
-    const { data } = await api.post('register', fd)
+    const { data } = await api.post('register', formData)
     loading.value = false
-    cb && cb(data)
+    callback && callback(data)
     return data
 }
 
@@ -90,7 +91,7 @@ export default function useAuth() {
     return {
         user,
         roles,
-        parking_zone_id,
+        parkingZoneId, // Updated export name
         loading,
         login,
         logout,

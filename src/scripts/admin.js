@@ -9,14 +9,23 @@ const pagination = ref({
     page: 0
 })
 
-const getParkingZones = async (pageParams = null) => {
+const getParkingZones = async (pageParams = null, searchTerm = '') => {
     if (pageParams) {
         pagination.value = {
             per_page: pageParams.rows,
             page: pageParams.page + 1,
         }
     }
-    const { data } = await api.get('parking-zones', { params: { pagination: pagination.value } })
+
+    const params = {
+        pagination: pagination.value,
+        filters: {}
+    }
+    if (searchTerm) {
+        params.filters.search = searchTerm
+    }
+
+    const { data } = await api.get('parking-zones', { params })
     parking_zones.value = data.parking_zones
     console.log(data)
     pagination.value = {

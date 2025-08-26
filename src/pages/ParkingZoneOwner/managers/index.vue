@@ -1,8 +1,7 @@
 <template>
     <div>
         <DataTable :value="rows" tableStyle="min-width: 50rem" paginator :rows="pagination.per_page" :lazy="true"
-            :totalRecords="pagination.total" :rowsPerPageOptions="[5, 10, 15, 30]"
-            @page="() => console.log(pagination)">
+            :totalRecords="pagination.total" :rowsPerPageOptions="[5, 10, 15, 30]" @page="(e) => getManagers(e)">
             <template #empty>
                 <div class="flex items-center justify-center text-neutral-400 py-2">
                     No managers found
@@ -10,7 +9,7 @@
             </template>
             <template #header>
                 <div class="flex flex-row justify-between">
-                    <InputText icon="pi pi-search" />
+                    <InputText icon="pi pi-search" placeholder="Search managers..." v-model="search" />
                     <Button icon="pi pi-plus" @click="createOpen = true"></Button>
                 </div>
             </template>
@@ -62,16 +61,53 @@ import create from './create.vue'
 import api from '../../../boot/api';
 import { faL } from '@fortawesome/free-solid-svg-icons';
 import { useToast } from "primevue/usetoast";
+import { debounce } from '../../../scripts/utils';
 const toast = useToast();
 
 const { parking_zone, removeManager, pagination, getParkingZone } = useParkingZone();
 const createOpen = ref(false)
 const openDelete = ref(false)
+const search = ref('')
 
 const rows = ref([]);
 
 const toDelete = ref(null)
 const deleteName = ref()
+
+// Debounced search function
+const debouncedSearch = debounce(() => {
+    getManagers()
+}, 300)
+
+// Watch for search changes
+watch(search, debouncedSearch)
+
+const getManagers = async (pageParams = null) => {
+    if (pageParams) {
+        pagination.value = {
+            per_page: pageParams.rows,
+            page: pageParams.page + 1,
+        }
+    }
+
+    const params = {
+        pagination: pagination.value,
+        search: search.value
+    }
+
+    try {
+        const { data } = await api.get(`parking-zone/${parking_zone.value.id}/managers`, { params })
+        rows.value = data.data || []
+        pagination.value = {
+            per_page: data.per_page,
+            total: data.total,
+            page: data.current_page
+        }
+    } catch (error) {
+        console.error('Error fetching managers:', error)
+        rows.value = []
+    }
+}
 
 const initiateDelete = (id) => {
     toDelete.value = id
@@ -83,17 +119,12 @@ const initiateDelete = (id) => {
 const confirmDelete = async () => {
     const data = await removeManager(toDelete.value)
     openDelete.value = false
-
+    await getManagers() // Refresh the managers list
     toast.add({ severity: 'success', summary: 'Success', detail: data.message, life: 3000 });
-
 }
 
-watch(parking_zone, () => {
-    rows.value = parking_zone.value.managers;
-});
-
 onMounted(() => {
-    getParkingZone()
+    getManagers()
 });
 
 </script>

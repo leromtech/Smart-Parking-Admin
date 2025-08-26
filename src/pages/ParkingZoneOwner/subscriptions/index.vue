@@ -31,7 +31,8 @@
             <Column header="From - To">
                 <template #body="slotProps">
                     <div class="flex flex-col">
-                        {{ slotProps.data.start_date }} - {{ slotProps.data.end_date }}
+                        {{ normalizeTimestamp(slotProps.data.start_date) }} - {{
+                            normalizeTimestamp(slotProps.data.end_date) }}
                     </div>
                 </template>
             </Column>
@@ -67,6 +68,7 @@ import { onMounted, ref } from 'vue';
 import api from '../../../boot/api';
 import create from './create.vue';
 import useAuth from '../../../scripts/auth';
+import { normalizeTimestamp } from '../../../scripts/utils';
 
 const { user } = useAuth()
 

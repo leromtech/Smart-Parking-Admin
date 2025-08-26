@@ -9,9 +9,9 @@
             </template>
         </Panel>
 
-        <DataTable v-if="parking_zone?.rates?.length > 0" :value="parking_zone.rates" tableStyle="min-width: 50rem"
+        <DataTable v-if="parking_zone?.rates?.length > 0" :value="parking_zone?.rates" tableStyle="min-width: 50rem"
             :expandedRows="expandedRows" v-model:expandedRows="expandedRows" dataKey="id">
-            <Column expander style="width: 5rem" header="Enxpand" />
+            <Column expander style="width: 5rem" header="Expand" />
 
             <Column header="Name" style="width: 20%">
                 <template #body="slotProps">

@@ -1,8 +1,7 @@
 <template>
     <form @submit.prevent="submit" class="flex flex-col gap-8">
-            <Select v-model="form.userId" filter
-            @filter="(e) => searchUser(e)" :options="filteredUser" fluid placeholder="Select a User" optionLabel="label"
-            optionValue="value"></Select>
+        <Select v-model="form.userId" filter @filter="(e) => searchUser(e)" :options="filteredUser" fluid
+            placeholder="Select a User" optionLabel="label" optionValue="value"></Select>
 
         <Select v-model="form.vehicleId" optionValue="value" optionLabel="label" :options="filteredVehicles"
             placeholder="Select Vehicle" fluid :disabled="form.userId === null" />
@@ -14,8 +13,8 @@
 
         <DatePicker v-model="form.startDate" dateFormat="dd/mm/yy" placeholder="Select start date" showIcon disabled />
 
-        <DatePicker v-model="computedEndDate" dateFormat="dd/mm/yy" placeholder="End date (auto-calculated)" showIcon
-            disabled />
+        <!-- <DatePicker v-model="computedEndDate" dateFormat="dd/mm/yy" placeholder="End date (auto-calculated)" showIcon
+            disabled /> -->
 
         <Button type="submit" icon="pi pi-save" label="SAVE" />
     </form>

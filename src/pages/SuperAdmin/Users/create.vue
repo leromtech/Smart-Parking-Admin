@@ -75,6 +75,7 @@ const reset = () => {
     form.value.phone = ''
     form.value.password = ''
     form.value.role = ''
+    form.value.parkingZone = ''
 }
 
 const submit = async () => {
@@ -94,6 +95,9 @@ const submit = async () => {
             fd.append('password', 'password')
         }
         fd.append('role', form.value.role)
+        if (form.value.role) {
+            fd.append('parking_zone_id', form.value.parkingZone)
+        }
         await api.post(`/users/${form.value.id ?? ''}`, fd)
         reset()
         await getUsers()
