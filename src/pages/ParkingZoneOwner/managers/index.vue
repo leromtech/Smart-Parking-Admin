@@ -96,7 +96,7 @@ const getManagers = async (pageParams = null) => {
     }
 
     try {
-        const { data } = await api.get(`parking-zone/${parking_zone.value.id}/managers`, { params })
+        const { data } = await api.get(`managers`, { params })
         rows.value = data.data || []
         pagination.value = {
             per_page: data.per_page,
