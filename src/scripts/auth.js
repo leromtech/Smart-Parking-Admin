@@ -36,13 +36,13 @@ const fetchUser = async () => {
 
 const login = async (formData, callback = null) => { // Changed fd to formData, cb to callback
     loading.value = true
-    const { data } = await api.post('login', formData);
+    const { data } = await api.post('admin-login', formData);
     loading.value = false
     if (data.success) {
         localStorage.setItem('authToken', data.token)
         user.value = data.user
         roles.value = user.value.roles.map((item) => item.name)
-        
+
         switch (user.value.roles[0].name) {
             case 'customer':
             case 'manager':
@@ -59,7 +59,7 @@ const login = async (formData, callback = null) => { // Changed fd to formData, 
                 router.push('/');
                 break;
         }
-        
+
         callback && callback(data)
     } else {
         callback && callback(data)
