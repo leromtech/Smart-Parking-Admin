@@ -8,10 +8,10 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { far } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import dTable from './components/d-table.vue'
+import dTable from './components/common/d-table.vue'
 import clickOutside from './directives/clickOutside'
 import api from './boot/api'
-import Modal from './components/Modal.vue'
+import Modal from './components/common/Modal.vue'
 
 library.add(fas)
 library.add(far)
@@ -23,7 +23,7 @@ const app = createApp(App)
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 import PrimeVue from 'primevue/config'
-import Material from '@primevue/themes/aura'
+import { Noir } from './assets/myPreset'
 import useMap from './scripts/map';
 import Tooltip from 'primevue/tooltip';
 
@@ -50,7 +50,7 @@ app.config.globalProperties.$api = api;
 app.use(router)
 app.use(PrimeVue, {
     theme: {
-        preset: Material,
+        preset: Noir,
         options: {
             darkModeSelector: '.my-app-dark'
         }
