@@ -138,7 +138,7 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue';
-import useAuth from '../scripts/auth';
+import useAuth from '../../scripts/auth';
 
 const { loggedIn, user, logout } = useAuth()
 

@@ -41,13 +41,13 @@
                         </div>
                     </template>
                     <template #content>
-                        <form @submit.prevent="() => login(form, cb)" class="w-full h-full mt-4 bg-white">
+                        <form @submit.prevent="submit" class="w-full h-full mt-4 bg-white">
                             <IftaLabel>
                                 <InputMask id="phone" v-model="form.phone" class="" mask="9999999999" fluid />
                                 <label for="phone">Phone</label>
                             </IftaLabel>
                             <IftaLabel class="mt-5">
-                                <Password v-model="value" inputId="password" variant="filled" />
+                                <Password v-model="form.password" inputId="password" variant="filled" />
                                 <label for="password">Password</label>
                             </IftaLabel>
                             <p class="text-red-500 mt-2">{{ message }}</p>
@@ -79,7 +79,19 @@ const form = ref({
     password: ''
 })
 
+const submit = async () => {
+    const fd = new FormData()
+    fd.append('phone', form.value.phone)
+    fd.append('password', form.value.password)
+    const error = await login(fd, cb)
+    if (error) {
+        message.value = error
+    }
+}
+
 const cb = (data) => {
-    message.value = data.message
+    if (data && data.message) {
+        message.value = data.message
+    }
 }
 </script>

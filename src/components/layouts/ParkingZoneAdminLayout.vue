@@ -35,8 +35,8 @@
 
 <script setup>
 import { ref } from 'vue';
-import useAuth from '../scripts/auth';
-import { useParkingZone } from '../scripts/parkingZone';
+import useAuth from '../../scripts/auth';
+import { useParkingZone } from '../../scripts/parkingZone';
 
 const { parking_zone } = useParkingZone()
 const { logout } = useAuth()
@@ -99,6 +99,11 @@ const menuItems = ref([
                 label: 'Free Parking Lists',
                 route: '/parking-zone/free-parking-lists',
                 icon: 'pi pi-user-plus'
+            },
+            {
+                label: 'Floors',
+                route: '/parking-zone/floors',
+                icon: 'pi pi-building'
             },
         ]
     }

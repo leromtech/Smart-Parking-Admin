@@ -197,7 +197,7 @@
 
 <script setup>
 import { onMounted, ref } from 'vue';
-import CreatePolicy from './createPolicy.vue';
+import CreatePolicy from './RatesCreate.vue';
 import { useParkingZone } from '../../../scripts/parkingZone';
 import { Fieldset, InputNumber, useToast } from 'primevue';
 import useCreateRate from '../../../scripts/parkingZoneOwner/rate';

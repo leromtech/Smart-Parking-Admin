@@ -24,7 +24,7 @@
 
 <script setup>
 import { onMounted, ref, watch } from 'vue';
-import dInput from '../../../components/d-input.vue';
+import dInput from '../../../components/common/d-input.vue';
 import api from '../../../boot/api';
 const message = ref()
 

@@ -39,7 +39,7 @@
 <script setup>
 import 'primeicons/primeicons.css'
 import { ref } from 'vue';
-import useAuth from '../scripts/auth';
+import useAuth from '../../scripts/auth';
 
 const { logout } = useAuth()
 

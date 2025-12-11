@@ -26,7 +26,7 @@
                         <div class="flex flex-row items-center gap-2">
                             <Button icon="pi pi-angle-double-left" @click="pagination.page = 1"></Button>
                             <span>Page {{ pagination.page }} of {{ Math.ceil(pagination.total / pagination.per_page)
-                            }}</span>
+                                }}</span>
                             <Button icon="pi pi-angle-double-right"
                                 @click="pagination.page = Math.ceil(pagination.total / pagination.per_page)"></Button>
                         </div>
@@ -60,7 +60,7 @@
 </template>
 
 <script setup>
-import create from './create.vue'
+import create from './FreeParkingCreate.vue'
 import { useToast } from 'primevue'
 import { onMounted, ref, watch } from 'vue'
 import api from '../../../boot/api'

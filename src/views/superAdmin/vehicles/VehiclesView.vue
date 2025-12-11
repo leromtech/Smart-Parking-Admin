@@ -69,7 +69,7 @@
 
 <script setup>
 import { onMounted, ref } from 'vue';
-import Create from './create.vue';
+import Create from './VehiclesCreate.vue';
 import api from '../../../boot/api';
 import useVehicles from '../../../scripts/admin/vehicles';
 import { useToast } from 'primevue';

@@ -66,7 +66,7 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import api from '../../../boot/api';
-import create from './create.vue';
+import create from './SubscriptionCreate.vue';
 import useAuth from '../../../scripts/auth';
 import { normalizeTimestamp } from '../../../scripts/utils';
 

@@ -16,16 +16,16 @@ import Modal from './components/common/Modal.vue'
 library.add(fas)
 library.add(far)
 
-const { googleMapInit } = useMap()
-googleMapInit()
-const app = createApp(App)
-
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 import PrimeVue from 'primevue/config'
 import { Noir } from './assets/myPreset'
 import useMap from './scripts/map';
 import Tooltip from 'primevue/tooltip';
+
+const { googleMapInit } = useMap()
+googleMapInit()
+const app = createApp(App)
 
 window.Pusher = Pusher;
 

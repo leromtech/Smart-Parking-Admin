@@ -79,7 +79,7 @@
 import { GoogleMap, Marker } from 'vue3-google-map';
 import useMap from '../../../scripts/map';
 import useAdmin from '../../../scripts/admin';
-import create from './create.vue'
+import create from './ParkingZonesCreate.vue'
 import { onMounted, ref, watch } from 'vue';
 import api from '../../../boot/api';
 import { debounce } from '../../../scripts/utils';

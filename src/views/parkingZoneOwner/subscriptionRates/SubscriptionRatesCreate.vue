@@ -86,7 +86,7 @@
 <script setup>
 import { onMounted, ref, watch, computed } from 'vue';
 import api from '../../../boot/api';
-import create from './create.vue';
+import create from './SubscriptionRatesView.vue';
 import useAuth from '../../../scripts/auth';
 import { normalizeTimestamp, humanizeString, debounce } from '../../../scripts/utils';
 import { useToast } from 'primevue';

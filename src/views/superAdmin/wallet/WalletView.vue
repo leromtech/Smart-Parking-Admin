@@ -90,7 +90,7 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue';
 import useNotification from '../../../scripts/notification';
-import create from './create.vue';
+import create from './WalletCreate.vue';
 import useRechargeAmounts from '../../../scripts/admin/wallet';
 import { InputNumber, useToast } from 'primevue';
 import api from '../../../boot/api';

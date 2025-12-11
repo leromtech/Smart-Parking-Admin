@@ -36,8 +36,8 @@
 
 <script setup>
 import { onMounted, ref, watch } from 'vue';
-import dInput from '../../../components/d-input.vue';
-import dSelect from '../../../components/d-select.vue';
+import dInput from '../../../components/common/d-input.vue';
+import dSelect from '../../../components/common/d-select.vue';
 import api from '../../../boot/api';
 import { GoogleMap, Marker } from 'vue3-google-map';
 import useMap from '../../../scripts/map';

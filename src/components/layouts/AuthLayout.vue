@@ -79,7 +79,7 @@
 
 <script setup>
 import { onMounted, ref, watch } from 'vue';
-import useAuth from '../scripts/auth';
+import useAuth from '../../scripts/auth';
 import { useRoute } from 'vue-router';
 
 const { user, logout, roles } = useAuth()

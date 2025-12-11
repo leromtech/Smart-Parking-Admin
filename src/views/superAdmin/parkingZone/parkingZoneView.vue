@@ -254,11 +254,11 @@
 import { onMounted, ref } from 'vue';
 import api from '../../../boot/api';
 import useAuth from '../../../scripts/auth';
-import Modal from '../../../components/Modal.vue';
-import create_rate from './create_rate.vue';
+import Modal from '../../../components/common/Modal.vue';
+import create_rate from './ParkingZoneRateCreate.vue';
 import dInput from '../../../components/common/d-input.vue';
 import useNotification from '../../../scripts/notification';
-import Create_manager from './create_manager.vue';
+import Create_manager from './ParkingZoneManagerCreate.vue';
 
 const { parking_zone_id } = useAuth()
 

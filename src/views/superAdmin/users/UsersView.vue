@@ -20,15 +20,18 @@
                     <div class="flex flex-col gap-1">
                         <!-- Show all roles -->
                         <div v-for="role in slotProps.data.roles" :key="role.id" class="flex items-center gap-1">
-                            <span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">{{ role.name.toUpperCase() }}</span>
+                            <span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">{{ role.name.toUpperCase()
+                                }}</span>
                         </div>
                         <!-- Show owned parking zone -->
                         <div v-if="slotProps.data.parking_zone_owned" class="mt-1">
                             <span class="text-xs text-gray-600">Owns:</span>
-                            <span class="text-xs font-semibold text-green-600">{{ slotProps.data.parking_zone_owned.name }}</span>
+                            <span class="text-xs font-semibold text-green-600">{{ slotProps.data.parking_zone_owned.name
+                                }}</span>
                         </div>
                         <!-- Show all managed parking zones -->
-                        <div v-if="slotProps.data.parking_zone_managed && slotProps.data.parking_zone_managed.length > 0" class="mt-1">
+                        <div v-if="slotProps.data.parking_zone_managed && slotProps.data.parking_zone_managed.length > 0"
+                            class="mt-1">
                             <span class="text-xs text-gray-600">Manages:</span>
                             <div v-for="zone in slotProps.data.parking_zone_managed" :key="zone.id" class="ml-2">
                                 <span class="text-xs font-semibold text-orange-600">{{ zone.name }}</span>
@@ -82,7 +85,7 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import useUsers from '../../../scripts/admin/users';
-import Create from './create.vue';
+import Create from './UsersCreate.vue';
 import api from '../../../boot/api';
 
 const { users, pagination, filter, deleteItem, editItem, getUsers } = useUsers()

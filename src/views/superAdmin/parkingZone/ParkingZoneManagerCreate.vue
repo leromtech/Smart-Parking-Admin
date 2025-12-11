@@ -25,7 +25,7 @@
 </template>
 
 <script setup>
-import dSelect from '../../../components/d-select.vue';
+import dSelect from '../../../components/common/d-select.vue';
 import { onMounted, ref, watch } from 'vue';
 import api from '../../../boot/api';
 import useNotification from '../../../scripts/notification';
