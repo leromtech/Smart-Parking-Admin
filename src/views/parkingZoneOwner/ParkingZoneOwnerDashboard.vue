@@ -40,7 +40,7 @@
                     <div class="flex flex-col">
                         <span class="text-gray-500 text-sm font-medium mb-1">Reserved Space</span>
                         <span class="text-3xl font-bold text-gray-800">{{ parking_zone?.declared_for_app ?? '0'
-                        }}</span>
+                            }}</span>
                         <span class="text-xs text-gray-400 mt-1">For app users</span>
                     </div>
                 </div>
@@ -75,7 +75,7 @@
                     <div class="flex flex-col">
                         <span class="text-gray-500 text-sm font-medium mb-1">Managers</span>
                         <span class="text-3xl font-bold text-gray-800">{{ parking_zone?.managers?.length ?? '0'
-                        }}</span>
+                            }}</span>
                         <span class="text-xs text-gray-400 mt-1">Total managers</span>
                     </div>
                 </div>
