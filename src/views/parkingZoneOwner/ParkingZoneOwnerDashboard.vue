@@ -57,7 +57,7 @@
                     </div>
                     <div class="flex flex-col">
                         <span class="text-gray-500 text-sm font-medium mb-1">Currently Occupied</span>
-                        <span class="text-3xl font-bold text-gray-800">{{ availability ?? "..." }}</span>
+                        <span class="text-3xl font-bold text-gray-800">{{ displayAvailability }}</span>
                         <span class="text-xs text-gray-400 mt-1">Active parking</span>
                     </div>
                 </div>
@@ -116,7 +116,7 @@
 </template>
 
 <script setup>
-import { onMounted, onBeforeUnmount, ref, watch } from 'vue';
+import { onMounted, onBeforeUnmount, ref, watch, computed } from 'vue';
 import useAuth from '../../scripts/auth';
 import ParkingRecordChart from '../../components/OwnerDashboard/ParkingRecordChart.vue';
 import TotalVehicleMonthChart from '../../components/OwnerDashboard/TotalVehicleMonthChart.vue';
@@ -125,9 +125,24 @@ import api from '../../boot/api';
 
 const { user } = useAuth()
 const { parking_zone, getParkingZone } = useParkingZone()
-const availability = ref(null)
+const availability = ref(0)
 const yearFilter = ref(new Date())
 let echoChannel = null
+
+// Computed property to ensure we always display a number, never an object
+const displayAvailability = computed(() => {
+    const value = availability.value;
+    if (typeof value === 'number') {
+        return value;
+    } else if (typeof value === 'object' && value !== null && 'occupied' in value) {
+        return Number(value.occupied) || 0;
+    } else if (value === null || value === undefined) {
+        return '...';
+    }
+    // Fallback: try to convert to number
+    const num = Number(value);
+    return isNaN(num) ? '...' : num;
+})
 
 const parkingRecords = ref([])
 const vehicleRecords = ref(null)
@@ -149,25 +164,58 @@ const setupRealTimeAvailability = async () => {
         // Subscribe to real-time updates
         echoChannel = window.Echo.channel('parking-zones')
             .listen('.ParkingAvailabilityUpdated', (e) => {
-                console.log('Availability data received:', e);
+                console.log('Availability data received from Echo:', e);
                 // Handle different possible response structures
                 // API returns object with 'occupied' field
-                if (typeof e === 'object' && e !== null) {
-                    availability.value = e.occupied ?? e.real_time_availability ?? e.data?.occupied ?? e.data?.real_time_availability ?? 0;
-                } else {
-                    availability.value = 0;
+                let occupiedCount = 0;
+
+                if (e && typeof e === 'object' && !Array.isArray(e)) {
+                    // Check if e has 'occupied' property directly
+                    if ('occupied' in e) {
+                        occupiedCount = Number(e.occupied) || 0;
+                    } else if ('real_time_availability' in e) {
+                        occupiedCount = Number(e.real_time_availability) || 0;
+                    } else if (e.data && typeof e.data === 'object' && 'occupied' in e.data) {
+                        occupiedCount = Number(e.data.occupied) || 0;
+                    } else if (e.data?.real_time_availability !== undefined) {
+                        occupiedCount = Number(e.data.real_time_availability) || 0;
+                    } else {
+                        console.warn('Could not find occupied field in Echo event:', e);
+                        occupiedCount = 0;
+                    }
                 }
+
+                // Always ensure we set a number, never an object
+                availability.value = typeof occupiedCount === 'number' ? occupiedCount : 0;
             });
 
         // Fetch initial availability data
         const { data } = await api.get(`availability/${parking_zone.value.id}`);
+        console.log('Availability API response:', data);
+
         // Handle different possible response structures
         // API returns object: { total_capacity, available, occupied, by_vehicle_type }
-        if (typeof data === 'object' && data !== null) {
-            availability.value = data.occupied ?? data.real_time_availability ?? data.currently_occupied_spaces ?? data.data?.occupied ?? 0;
-        } else {
-            availability.value = 0;
+        let occupiedCount = 0;
+
+        if (data && typeof data === 'object' && !Array.isArray(data)) {
+            // Check if data has 'occupied' property directly
+            if ('occupied' in data) {
+                occupiedCount = Number(data.occupied) || 0;
+            } else if ('real_time_availability' in data) {
+                occupiedCount = Number(data.real_time_availability) || 0;
+            } else if ('currently_occupied_spaces' in data) {
+                occupiedCount = Number(data.currently_occupied_spaces) || 0;
+            } else if (data.data && typeof data.data === 'object' && 'occupied' in data.data) {
+                occupiedCount = Number(data.data.occupied) || 0;
+            } else {
+                // If we got an object but can't find occupied, default to 0
+                console.warn('Could not find occupied field in availability response:', data);
+                occupiedCount = 0;
+            }
         }
+
+        // Always ensure we set a number, never an object
+        availability.value = typeof occupiedCount === 'number' ? occupiedCount : 0;
 
     } catch (error) {
         console.error('Error setting up real-time availability:', error);
