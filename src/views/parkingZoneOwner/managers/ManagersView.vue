@@ -35,7 +35,8 @@
                 <div class="pr-6">Confirm Delete</div>
             </template>
             <div class="flex flex-col items-center justify-center">
-                <span>Do you want to remove {{ deleteName.toUpperCase() }} from managers?</span>
+                <span>Do you want to remove {{ deleteName ? deleteName.toUpperCase() : 'this manager' }} from
+                    managers?</span>
                 <div class="flex flex-row items-center justify-end w-full mt-6 gap-3">
                     <Button icon="pi pi-times" severity="info" outlined label="Cancel"
                         @click="openDelete = false"></Button>
@@ -49,7 +50,7 @@
             <template #header>
                 <span class="font-semibold">Add a manager</span>
             </template>
-            <create />
+            <create @save="handleManagerSave" />
         </Dialog>
     </div>
 </template>
@@ -72,7 +73,7 @@ const search = ref('')
 const rows = ref([]);
 
 const toDelete = ref(null)
-const deleteName = ref()
+const deleteName = ref('')
 
 // Debounced search function
 const debouncedSearch = debounce(() => {
@@ -111,16 +112,27 @@ const getManagers = async (pageParams = null) => {
 
 const initiateDelete = (id) => {
     toDelete.value = id
+    const manager = rows.value.find(item => item.id === id)
+    deleteName.value = manager?.name || ''
     openDelete.value = true
-    deleteName.value = parking_zone.value.managers.find(item => item.id === toDelete.value).name
-
 }
 
 const confirmDelete = async () => {
-    const data = await removeManager(toDelete.value)
-    openDelete.value = false
+    try {
+        const data = await removeManager(toDelete.value)
+        openDelete.value = false
+        toDelete.value = null
+        deleteName.value = ''
+        await getManagers() // Refresh the managers list
+        toast.add({ severity: 'success', summary: 'Success', detail: data.message, life: 3000 });
+    } catch (error) {
+        toast.add({ severity: 'error', summary: 'Error', detail: error.response?.data?.message || 'Failed to delete manager', life: 3000 });
+    }
+}
+
+const handleManagerSave = async () => {
+    createOpen.value = false // Close the dialog
     await getManagers() // Refresh the managers list
-    toast.add({ severity: 'success', summary: 'Success', detail: data.message, life: 3000 });
 }
 
 onMounted(() => {
