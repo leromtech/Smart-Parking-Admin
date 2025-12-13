@@ -151,13 +151,23 @@ const setupRealTimeAvailability = async () => {
             .listen('.ParkingAvailabilityUpdated', (e) => {
                 console.log('Availability data received:', e);
                 // Handle different possible response structures
-                availability.value = e.real_time_availability || e.data?.real_time_availability || 0;
+                // API returns object with 'occupied' field
+                if (typeof e === 'object' && e !== null) {
+                    availability.value = e.occupied ?? e.real_time_availability ?? e.data?.occupied ?? e.data?.real_time_availability ?? 0;
+                } else {
+                    availability.value = 0;
+                }
             });
 
         // Fetch initial availability data
         const { data } = await api.get(`availability/${parking_zone.value.id}`);
         // Handle different possible response structures
-        availability.value = data.real_time_availability || data.currently_occupied_spaces || data.data?.real_time_availability || 0;
+        // API returns object: { total_capacity, available, occupied, by_vehicle_type }
+        if (typeof data === 'object' && data !== null) {
+            availability.value = data.occupied ?? data.real_time_availability ?? data.currently_occupied_spaces ?? data.data?.occupied ?? 0;
+        } else {
+            availability.value = 0;
+        }
 
     } catch (error) {
         console.error('Error setting up real-time availability:', error);
