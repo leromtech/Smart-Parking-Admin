@@ -77,7 +77,7 @@ import { useParkingZone } from '../../../scripts/parkingZone';
 import { useToast } from 'primevue';
 import useAuth from '../../../scripts/auth';
 
-const { addManager, refresh, getParkingZone } = useParkingZone()
+const { addManager: addManagerToZone, refresh, getParkingZone } = useParkingZone()
 const { user } = useAuth()
 
 const toast = useToast()
@@ -92,6 +92,8 @@ const form = ref({
     email: ''
 })
 
+const emit = defineEmits(['save'])
+
 const submit = async () => {
     try {
         const fd = new FormData()
@@ -103,10 +105,30 @@ const submit = async () => {
 
         if (data.success) {
             toast.add({ severity: 'success', summary: 'Success', detail: 'Manager added successfully', life: 3000 })
+            // Reset form
+            form.value = {
+                name: '',
+                phone: '',
+                email: ''
+            }
+            refresh()
+            // Emit event to parent to refresh the list
+            emit('save')
         }
-        refresh()
     } catch (error) {
-        toast.add({ severity: 'error', summary: 'Error', detail: error, life: 3000 })
+        toast.add({ severity: 'error', summary: 'Error', detail: error.response?.data?.message || 'Failed to add manager', life: 3000 })
+    }
+}
+
+const addManager = async (userId) => {
+    try {
+        const data = await addManagerToZone(userId)
+        toast.add({ severity: 'success', summary: 'Success', detail: data.message || 'Manager added successfully', life: 3000 })
+        refresh()
+        // Emit event to parent to refresh the list
+        emit('save')
+    } catch (error) {
+        toast.add({ severity: 'error', summary: 'Error', detail: error.response?.data?.message || 'Failed to add manager', life: 3000 })
     }
 }
 

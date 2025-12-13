@@ -14,6 +14,7 @@ const routes = [
             { name: 'Admin Bookings', path: 'bookings', component: () => import('../views/superAdmin/BookingsView.vue') },
             { name: 'Admin Settlement', path: 'settlement', component: () => import('../views/superAdmin/SettlementView.vue') },
             { name: 'Admin Comission Rate', path: 'commission-rate', component: () => import('../views/superAdmin/ComissionView.vue') },
+            { name: 'Settings', path: 'settings', component: () => import('../views/superAdmin/SettingsView.vue') },
         ]
     },
     {
