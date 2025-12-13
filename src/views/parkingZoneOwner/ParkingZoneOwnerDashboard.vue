@@ -82,61 +82,6 @@
             </div>
         </div>
 
-        <!-- Booking Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Total Bookings Card -->
-            <div
-                class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-100">
-                <div class="p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-md">
-                            <font-awesome-icon :icon="['fas', 'calendar-check']"
-                                class="text-white text-2xl"></font-awesome-icon>
-                        </div>
-                    </div>
-                    <div class="flex flex-col">
-                        <span class="text-gray-500 text-sm font-medium mb-1">Total Bookings</span>
-                        <span class="text-3xl font-bold text-gray-800">{{ bookingStats?.total_bookings ?? '0' }}</span>
-                        <span class="text-xs text-gray-400 mt-1">All time</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Today's Bookings Card -->
-            <div
-                class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-100">
-                <div class="p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="p-3 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl shadow-md">
-                            <font-awesome-icon :icon="['fas', 'calendar-day']"
-                                class="text-white text-2xl"></font-awesome-icon>
-                        </div>
-                    </div>
-                    <div class="flex flex-col">
-                        <span class="text-gray-500 text-sm font-medium mb-1">Today's Bookings</span>
-                        <span class="text-3xl font-bold text-gray-800">{{ bookingStats?.today_bookings ?? '0' }}</span>
-                        <span class="text-xs text-gray-400 mt-1">Today</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Active Bookings Card -->
-            <div
-                class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-100">
-                <div class="p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="p-3 bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl shadow-md">
-                            <font-awesome-icon :icon="['fas', 'clock']" class="text-white text-2xl"></font-awesome-icon>
-                        </div>
-                    </div>
-                    <div class="flex flex-col">
-                        <span class="text-gray-500 text-sm font-medium mb-1">Active Bookings</span>
-                        <span class="text-3xl font-bold text-gray-800">{{ bookingStats?.active_bookings ?? '0' }}</span>
-                        <span class="text-xs text-gray-400 mt-1">Currently active</span>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- Analytics Section -->
         <div class="flex flex-col gap-6">
@@ -166,17 +111,6 @@
                 </div>
             </div>
 
-            <!-- Booking Analytics -->
-            <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
-                <div class="flex flex-row items-center justify-between mb-6">
-                    <h2 class="text-xl font-semibold text-gray-800">Booking Analytics</h2>
-                </div>
-
-                <div class="w-full">
-                    <BookingChart :title="`Monthly Bookings - ${yearFilter.getFullYear()}`" :data="bookingRecords || []"
-                        :year="yearFilter.getFullYear()" />
-                </div>
-            </div>
         </div>
     </div>
 </template>
@@ -185,7 +119,6 @@
 import { onMounted, onBeforeUnmount, ref, watch } from 'vue';
 import useAuth from '../../scripts/auth';
 import ParkingRecordChart from '../../components/OwnerDashboard/ParkingRecordChart.vue';
-import BookingChart from '../../components/OwnerDashboard/BookingChart.vue';
 import TotalVehicleMonthChart from '../../components/OwnerDashboard/TotalVehicleMonthChart.vue';
 import { useParkingZone } from '../../scripts/parkingZone';
 import api from '../../boot/api';
@@ -198,12 +131,6 @@ let echoChannel = null
 
 const parkingRecords = ref([])
 const vehicleRecords = ref(null)
-const bookingRecords = ref([])
-const bookingStats = ref({
-    total_bookings: 0,
-    today_bookings: 0,
-    active_bookings: 0
-})
 
 const hasRun = ref(false); // Track if it’s already executed
 
@@ -259,36 +186,28 @@ const getAnalytics = async () => {
             parkingRecords.value = [];
         }
 
-        // Vehicle records
-        if (data && data.unique_vehicle_by_type && data.unique_vehicle_by_type.length > 0) {
-            vehicleRecords.value = data.unique_vehicle_by_type.map((item) => {
-                return { [item.type || item.name]: item.count || item.total }
-            });
+        // Vehicle records - API returns object {type: count}, convert to array format
+        if (data && data.unique_vehicles_by_type) {
+            const vehicleData = data.unique_vehicles_by_type;
+            if (typeof vehicleData === 'object' && !Array.isArray(vehicleData)) {
+                // Convert object to array format expected by chart
+                vehicleRecords.value = Object.entries(vehicleData).map(([type, count]) => {
+                    return { [type]: count || 0 };
+                }).filter(item => Object.values(item)[0] > 0); // Only include types with count > 0
+            } else if (Array.isArray(vehicleData)) {
+                // Handle array format if API changes
+                vehicleRecords.value = vehicleData.map((item) => {
+                    return { [item.type || item.name]: item.count || item.total || 0 };
+                });
+            } else {
+                vehicleRecords.value = [];
+            }
         } else {
             vehicleRecords.value = [];
-        }
-
-        // Booking records
-        if (data && data.monthly_booking_records && data.monthly_booking_records.length > 0) {
-            bookingRecords.value = data.monthly_booking_records.map((item) => {
-                return { [item.month]: item.count }
-            });
-        } else {
-            bookingRecords.value = [];
-        }
-
-        // Booking stats
-        if (data && data.booking_stats) {
-            bookingStats.value = {
-                total_bookings: data.booking_stats.total_bookings || 0,
-                today_bookings: data.booking_stats.today_bookings || 0,
-                active_bookings: data.booking_stats.active_bookings || 0
-            };
         }
     } catch (error) {
         console.error('Error fetching analytics:', error);
         parkingRecords.value = [];
-        bookingRecords.value = [];
         vehicleRecords.value = [];
     }
 };
