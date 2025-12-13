@@ -3,12 +3,11 @@
         <div v-if="hasData" :ref="chartRef" :id="chartId" class="w-full"></div>
         <div v-else class="flex flex-col items-center justify-center py-16 px-4">
             <div class="bg-gray-100 rounded-full p-6 mb-4">
-                <font-awesome-icon :icon="['fas', 'chart-line']" class="text-gray-400 text-4xl"></font-awesome-icon>
+                <font-awesome-icon :icon="['fas', 'calendar-check']" class="text-gray-400 text-4xl"></font-awesome-icon>
             </div>
-            <h3 class="text-lg font-semibold text-gray-700 mb-2">No Data Available</h3>
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">No Booking Data Available</h3>
             <p class="text-gray-500 text-sm text-center max-w-md">
-                There are no parking records for {{ year }} yet. Data will appear here once parking activities are
-                recorded.
+                There are no booking records for {{ year }} yet. Data will appear here once bookings are created.
             </p>
         </div>
     </div>
@@ -32,7 +31,7 @@ const props = defineProps({
 
 const chart = ref(null)
 const chartRef = ref(null)
-const chartId = ref(`chart-${Math.random().toString(36).substr(2, 9)}`)
+const chartId = ref(`booking-chart-${Math.random().toString(36).substr(2, 9)}`)
 
 const hasData = computed(() => {
     return props.data && props.data.length > 0 && props.data.some(item => {
@@ -43,17 +42,17 @@ const hasData = computed(() => {
 
 const options = ref({
     chart: {
-        type: 'line',
+        type: 'bar',
         height: 350,
         toolbar: {
             show: true
         },
         zoom: {
-            enabled: true
+            enabled: false
         }
     },
     series: [{
-        name: 'Parking Records',
+        name: 'Bookings',
         data: []
     }],
     xaxis: {
@@ -64,7 +63,7 @@ const options = ref({
     },
     yaxis: {
         title: {
-            text: 'Number of Records'
+            text: 'Number of Bookings'
         },
         min: 0
     },
@@ -77,15 +76,24 @@ const options = ref({
             color: '#1f2937'
         }
     },
-    colors: ['#3b82f6'],
-    stroke: {
-        curve: 'smooth',
-        width: 3
+    colors: ['#10b981'],
+    plotOptions: {
+        bar: {
+            borderRadius: 6,
+            dataLabels: {
+                position: 'top'
+            }
+        }
     },
-    markers: {
-        size: 5,
-        hover: {
-            size: 7
+    dataLabels: {
+        enabled: true,
+        formatter: function (val) {
+            return val
+        },
+        offsetY: -20,
+        style: {
+            fontSize: '12px',
+            colors: ['#6b7280']
         }
     },
     grid: {
@@ -96,12 +104,9 @@ const options = ref({
         theme: 'light',
         y: {
             formatter: function (val) {
-                return val + " records"
+                return val + " bookings"
             }
         }
-    },
-    dataLabels: {
-        enabled: false
     }
 })
 
@@ -127,7 +132,7 @@ const renderChart = () => {
         options.value.xaxis.categories.push(month)
     })
 
-    options.value.title.text = props.title || 'Parking Records'
+    options.value.title.text = props.title || 'Booking Records'
 
     // Use nextTick to ensure DOM is ready
     setTimeout(() => {
@@ -145,7 +150,7 @@ watch(() => props.data, () => {
 
 watch(() => props.title, () => {
     if (hasData.value && chart.value) {
-        options.value.title.text = props.title || 'Parking Records'
+        options.value.title.text = props.title || 'Booking Records'
         chart.value.updateOptions(options.value)
     }
 })
