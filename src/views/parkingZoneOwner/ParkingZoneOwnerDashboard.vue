@@ -3,7 +3,7 @@
         <!-- Header -->
         <div class="flex flex-col gap-2">
             <h1 class="text-3xl font-bold text-gray-800">
-                {{ user.parking_zone_owned.name }}
+                {{ user?.parking_zone_owned?.name || parking_zone?.name || 'Parking Zone Dashboard' }}
             </h1>
             <p class="text-gray-500 text-sm">Dashboard Overview</p>
         </div>
@@ -40,7 +40,7 @@
                     <div class="flex flex-col">
                         <span class="text-gray-500 text-sm font-medium mb-1">Reserved Space</span>
                         <span class="text-3xl font-bold text-gray-800">{{ parking_zone?.declared_for_app ?? '0'
-                        }}</span>
+                            }}</span>
                         <span class="text-xs text-gray-400 mt-1">For app users</span>
                     </div>
                 </div>
@@ -57,7 +57,7 @@
                     </div>
                     <div class="flex flex-col">
                         <span class="text-gray-500 text-sm font-medium mb-1">Currently Occupied</span>
-                        <span class="text-3xl font-bold text-gray-800">{{ availabiltiy ?? "..." }}</span>
+                        <span class="text-3xl font-bold text-gray-800">{{ availability ?? "..." }}</span>
                         <span class="text-xs text-gray-400 mt-1">Active parking</span>
                     </div>
                 </div>
@@ -75,7 +75,7 @@
                     <div class="flex flex-col">
                         <span class="text-gray-500 text-sm font-medium mb-1">Managers</span>
                         <span class="text-3xl font-bold text-gray-800">{{ parking_zone?.managers?.length ?? '0'
-                        }}</span>
+                            }}</span>
                         <span class="text-xs text-gray-400 mt-1">Total managers</span>
                     </div>
                 </div>
@@ -182,7 +182,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, onBeforeUnmount, ref, watch } from 'vue';
 import useAuth from '../../scripts/auth';
 import ParkingRecordChart from '../../components/OwnerDashboard/ParkingRecordChart.vue';
 import BookingChart from '../../components/OwnerDashboard/BookingChart.vue';
@@ -191,10 +191,10 @@ import { useParkingZone } from '../../scripts/parkingZone';
 import api from '../../boot/api';
 
 const { user } = useAuth()
-const chart = ref(null)
 const { parking_zone, getParkingZone } = useParkingZone()
-const availabiltiy = ref(null)
+const availability = ref(null)
 const yearFilter = ref(new Date())
+let echoChannel = null
 
 const parkingRecords = ref([])
 const vehicleRecords = ref(null)
@@ -208,28 +208,47 @@ const bookingStats = ref({
 const hasRun = ref(false); // Track if it’s already executed
 
 const setupRealTimeAvailability = async () => {
+    if (!parking_zone.value?.id) {
+        console.warn('Parking zone not loaded yet');
+        return;
+    }
+
     try {
-        Echo.channel('parking-zones')
-            .listen('ParkingAvailabilityUpdated', (e) => { // Add the dot prefix
-                console.log('Data received:', e);
-                availabiltiy.value = e.real_time_availability;
+        // Clean up existing channel subscription if any
+        if (echoChannel) {
+            window.Echo.leave('parking-zones');
+        }
+
+        // Subscribe to real-time updates
+        echoChannel = window.Echo.channel('parking-zones')
+            .listen('.ParkingAvailabilityUpdated', (e) => {
+                console.log('Availability data received:', e);
+                // Handle different possible response structures
+                availability.value = e.real_time_availability || e.data?.real_time_availability || 0;
             });
 
-        // Then make the API call to trigger initial data
+        // Fetch initial availability data
         const { data } = await api.get(`availability/${parking_zone.value.id}`);
-        availabiltiy.value = data.currently_occupied_spaces
+        // Handle different possible response structures
+        availability.value = data.real_time_availability || data.currently_occupied_spaces || data.data?.real_time_availability || 0;
 
     } catch (error) {
         console.error('Error setting up real-time availability:', error);
+        availability.value = 0;
     }
 };
 
 
 const getAnalytics = async () => {
+    if (!parking_zone.value?.id) {
+        console.warn('Parking zone not loaded yet');
+        return;
+    }
+
     try {
-        const year = yearFilter.value.toLocaleDateString('en-GB', { year: 'numeric' }).replace('/', '-');
+        const year = yearFilter.value.getFullYear();
         const { data } = await api.get('analytics/parking-zone', { params: { parking_zone_id: parking_zone.value.id, year } });
-        console.log(data)
+        console.log('Analytics data:', data)
 
         // Parking records
         if (data && data.monthly_parking_records && data.monthly_parking_records.length > 0) {
@@ -277,11 +296,12 @@ const getAnalytics = async () => {
 watch(
     parking_zone,
     async (newVal) => {
-        if (newVal && !hasRun.value) {
+        if (newVal?.id && !hasRun.value) {
             hasRun.value = true; // Prevent future runs
-            await getAnalytics()
-            await setupRealTimeAvailability(parking_zone.value.id)
-            await getBookingStats()
+            await Promise.all([
+                getAnalytics(),
+                setupRealTimeAvailability()
+            ]);
         }
     },
     { immediate: true }
@@ -291,30 +311,19 @@ watch(
 watch(
     yearFilter,
     async () => {
-        if (parking_zone.value && hasRun.value) {
+        if (parking_zone.value?.id && hasRun.value) {
             await getAnalytics()
         }
     }
 );
 
-// Fetch booking statistics (not year-dependent)
-const getBookingStats = async () => {
-    try {
-        const { data } = await api.get('analytics/parking-zone/bookings', {
-            params: { parking_zone_id: parking_zone.value.id }
-        });
-
-        if (data) {
-            bookingStats.value = {
-                total_bookings: data.total_bookings || 0,
-                today_bookings: data.today_bookings || 0,
-                active_bookings: data.active_bookings || 0
-            };
-        }
-    } catch (error) {
-        console.error('Error fetching booking stats:', error);
+// Cleanup Echo channel on unmount
+onBeforeUnmount(() => {
+    if (echoChannel) {
+        window.Echo.leave('parking-zones');
+        echoChannel = null;
     }
-};
+});
 
 onMounted(async () => {
     await getParkingZone()
