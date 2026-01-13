@@ -144,6 +144,21 @@
               :data="vehicleRecords || []" />
           </div>
         </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2">
+            <BookingChart
+              :title="`Monthly Bookings - ${yearFilter.getFullYear()}`"
+              :data="bookingRecords"
+              :year="yearFilter.getFullYear()" />
+          </div>
+
+          <div class="lg:col-span-1">
+            <TotalVehicleMonthChart
+              title="Vehicle Types"
+              :data="vehicleRecords || []" />
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -156,6 +171,7 @@ import ParkingRecordChart from "../../components/OwnerDashboard/ParkingRecordCha
 import TotalVehicleMonthChart from "../../components/OwnerDashboard/TotalVehicleMonthChart.vue";
 import { useParkingZone } from "../../scripts/parkingZone";
 import api from "../../boot/api";
+import BookingChart from "../../components/OwnerDashboard/BookingChart.vue";
 
 const { user } = useAuth();
 const { parking_zone, getParkingZone } = useParkingZone();
@@ -183,6 +199,8 @@ const displayAvailability = computed(() => {
 });
 
 const parkingRecords = ref([]);
+const bookingRecords = ref([]);
+
 const vehicleRecords = ref(null);
 
 const hasRun = ref(false); // Track if it's already executed
@@ -299,6 +317,15 @@ const getAnalytics = async () => {
       });
     } else {
       parkingRecords.value = [];
+    }
+
+    // Booking records
+    if (data?.monthly_bookings) {
+      bookingRecords.value = data.monthly_bookings.map((m) => ({
+        [m.month]: Number(m.count) || 0,
+      }));
+    } else {
+      bookingRecords.value = [];
     }
 
     // Vehicle records - API returns object {type: count}, convert to array format
