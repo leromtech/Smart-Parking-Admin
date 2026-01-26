@@ -19,11 +19,6 @@
         </div>
 
         <div class="flex flex-col gap-2">
-          <label>Reserved for Booking</label>
-          <InputNumber v-model="reserved_space" @blur="onReservedBlur" />
-        </div>
-
-        <div class="flex flex-col gap-2">
           <label>Reserved for Subscription</label>
           <InputNumber
             v-model="reserved_for_subscription"
@@ -73,7 +68,7 @@ const validateAggregate = () => {
 
   if (total > capacity_total.value) {
     return fail(
-      `Total reserved (${total}) exceeds capacity (${capacity_total.value})`
+      `Total reserved (${total}) exceeds capacity (${capacity_total.value})`,
     );
   }
 
@@ -116,7 +111,7 @@ const onSubscriptionBlur = () => {
 /* ===== Real-time Enforcement ===== */
 watch(
   [capacity_total, declared_for_app, reserved_space, reserved_for_subscription],
-  validateAggregate
+  validateAggregate,
 );
 
 /* ===== Submit ===== */
