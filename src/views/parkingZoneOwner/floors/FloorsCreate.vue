@@ -48,18 +48,26 @@
       </div>
 
       <div class="flex flex-col gap-2">
-        <label for="reserved-for-app" class="font-semibold"
-          >Reserved for app</label
-        >
+        <label for="reserved-for-app" class="font-semibold">
+          Reserved for app
+        </label>
+
         <InputNumber
           id="reserved-for-app"
           v-model="form.reserved_for_app"
           :min="0"
+          :max="form.total_capacity"
           placeholder="Enter capacity"
-          class="w-full" />
-        <small class="text-gray-500"
-          >Total number of parking spaces on reserved for the app</small
-        >
+          class="w-full"
+          :class="{ 'p-invalid': reservedExceedsCapacity }" />
+
+        <small v-if="reservedExceedsCapacity" class="p-error">
+          Reserved capacity cannot exceed total capacity
+        </small>
+
+        <small v-else class="text-gray-500">
+          Total number of parking spaces reserved for the app
+        </small>
       </div>
 
       <div class="flex flex-col gap-2">
@@ -94,14 +102,15 @@
         <Button
           type="submit"
           :label="form.id ? 'Update' : 'Create'"
-          :loading="loading" />
+          :loading="loading"
+          :disabled="reservedExceedsCapacity" />
       </div>
     </form>
   </div>
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import useFloors from "../../../scripts/floors";
 import { useToast } from "primevue";
 
@@ -175,6 +184,12 @@ const loadVehicleTypes = async () => {
 
 const submit = async () => {
   try {
+    if (reservedExceedsCapacity.value) {
+      errors.value.reserved_for_app =
+        "Reserved capacity cannot exceed total capacity";
+      return;
+    }
+
     errors.value = {};
     message.value = "";
 
@@ -242,6 +257,13 @@ const submit = async () => {
     });
   }
 };
+
+const reservedExceedsCapacity = computed(() => {
+  const total = Number(form.value.total_capacity ?? 0);
+  const reserved = Number(form.value.reserved_for_app ?? 0);
+
+  return reserved > total;
+});
 
 onMounted(async () => {
   await loadVehicleTypes();

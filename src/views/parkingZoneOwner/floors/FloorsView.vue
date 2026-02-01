@@ -1,6 +1,30 @@
 <template>
-  <div>
-    <Panel>
+  <div class="flex flex-col items-center w-full">
+    <Panel class="w-full mb-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+        <div class="p-4 rounded bg-blue-50">
+          <div class="text-sm text-gray-500">Total Capacity</div>
+          <div class="text-2xl font-semibold text-blue-700">
+            {{ totalCapacity }}
+          </div>
+        </div>
+
+        <div class="p-4 rounded bg-yellow-50">
+          <div class="text-sm text-gray-500">Reserved for App</div>
+          <div class="text-2xl font-semibold text-yellow-700">
+            {{ totalReservedForApp }}
+          </div>
+        </div>
+
+        <div class="p-4 rounded bg-green-50">
+          <div class="text-sm text-gray-500">Available Slots</div>
+          <div class="text-2xl font-semibold text-green-700">
+            {{ totalAvailable }}
+          </div>
+        </div>
+      </div>
+    </Panel>
+    <Panel class="w-full">
       <template #header>
         <div class="flex flex-row justify-between items-center w-full">
           <h2 class="text-xl font-semibold">Floors Management</h2>
@@ -131,7 +155,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch, computed } from "vue";
 import { useParkingZone } from "../../../scripts/parkingZone";
 import useFloors from "../../../scripts/floors";
 import FloorsCreate from "./FloorsCreate.vue";
@@ -154,6 +178,7 @@ onMounted(async () => {
     parkingZoneId.value = parking_zone.value.id;
     await refresh();
   }
+  console.log(floors.value);
 });
 
 // Watch for parking zone changes
@@ -179,6 +204,22 @@ const deleteRow = (floor) => {
   deleteItem.value = floor;
   deleteOpen.value = true;
 };
+
+const totalCapacity = computed(() => {
+  return floors.value.reduce((sum, floor) => {
+    return sum + Number(floor.total_capacity ?? 0);
+  }, 0);
+});
+
+const totalReservedForApp = computed(() => {
+  return floors.value.reduce((sum, floor) => {
+    return sum + Number(floor.reserved_for_app ?? 0);
+  }, 0);
+});
+
+const totalAvailable = computed(() => {
+  return totalCapacity.value - totalReservedForApp.value;
+});
 
 const confirmDelete = async () => {
   try {
