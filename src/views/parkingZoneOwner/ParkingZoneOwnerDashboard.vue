@@ -28,10 +28,10 @@
           </div>
           <div class="flex flex-col">
             <span class="text-gray-500 text-sm font-medium mb-1"
-              >Parking Space</span
+              >Total Parking Space</span
             >
             <span class="text-3xl font-bold text-gray-800">{{
-              parking_zone?.capacity_total ?? "0"
+              totalCapacity ?? "0"
             }}</span>
             <span class="text-xs text-gray-400 mt-1">Total capacity</span>
           </div>
@@ -52,10 +52,10 @@
           </div>
           <div class="flex flex-col">
             <span class="text-gray-500 text-sm font-medium mb-1"
-              >Reserved Space</span
+              >Reserved Space for App</span
             >
             <span class="text-3xl font-bold text-gray-800">{{
-              parking_zone?.declared_for_app ?? "0"
+              totalReservedForApp ?? "0"
             }}</span>
             <span class="text-xs text-gray-400 mt-1">For app users</span>
           </div>
@@ -79,7 +79,7 @@
               >Currently Occupied</span
             >
             <span class="text-3xl font-bold text-gray-800">{{
-              displayAvailability
+              totalAvailable
             }}</span>
             <span class="text-xs text-gray-400 mt-1">Active parking</span>
           </div>
@@ -172,9 +172,12 @@ import TotalVehicleMonthChart from "../../components/OwnerDashboard/TotalVehicle
 import { useParkingZone } from "../../scripts/parkingZone";
 import api from "../../boot/api";
 import BookingChart from "../../components/OwnerDashboard/BookingChart.vue";
+import useFloors from "../../scripts/floors";
 
 const { user } = useAuth();
 const { parking_zone, getParkingZone } = useParkingZone();
+const { floors, loading, editItem, deleteItem, getFloors, deleteFloor } =
+  useFloors();
 const availability = ref(0);
 const yearFilter = ref(new Date());
 let echoChannel = null;
@@ -279,7 +282,7 @@ const setupRealTimeAvailability = async () => {
       } else {
         console.warn(
           "⚠️ Could not find occupied field in availability response:",
-          data
+          data,
         );
         occupiedCount = 0;
       }
@@ -363,7 +366,7 @@ watch(
       await Promise.all([getAnalytics(), setupRealTimeAvailability()]);
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 // Watch for year filter changes
@@ -381,6 +384,22 @@ onBeforeUnmount(() => {
     window.Echo.leave(channelName);
     echoChannel = null;
   }
+});
+
+const totalCapacity = computed(() => {
+  return floors.value.reduce((sum, floor) => {
+    return sum + Number(floor.total_capacity ?? 0);
+  }, 0);
+});
+
+const totalReservedForApp = computed(() => {
+  return floors.value.reduce((sum, floor) => {
+    return sum + Number(floor.reserved_for_app ?? 0);
+  }, 0);
+});
+
+const totalAvailable = computed(() => {
+  return totalCapacity.value - totalReservedForApp.value;
 });
 
 onMounted(async () => {
