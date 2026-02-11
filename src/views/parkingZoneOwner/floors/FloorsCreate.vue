@@ -35,10 +35,10 @@
       </div>
 
       <div class="flex flex-col gap-2">
-        <label for="capacity" class="font-semibold">Capacity</label>
+        <label for="capacity" class="font-semibold">Total Capacity</label>
         <InputNumber
           id="capacity"
-          v-model="form.capacity"
+          v-model="form.total_capacity"
           :min="0"
           placeholder="Enter capacity"
           class="w-full" />
@@ -48,32 +48,25 @@
       </div>
 
       <div class="flex flex-col gap-2">
-        <label for="reserved_for_app" class="font-semibold">
-          Reserved For App
+        <label for="reserved-for-app" class="font-semibold">
+          Reserved for app
         </label>
+
         <InputNumber
-          id="reserved_for_app"
+          id="reserved-for-app"
           v-model="form.reserved_for_app"
           :min="0"
-          placeholder="Enter app reserved slots"
-          class="w-full" />
-        <small class="text-gray-500">
-          Slots reserved exclusively for app users
-        </small>
-      </div>
+          :max="form.total_capacity"
+          placeholder="Enter capacity"
+          class="w-full"
+          :class="{ 'p-invalid': reservedExceedsCapacity }" />
 
-      <div class="flex flex-col gap-2">
-        <label for="reserved_for_booking" class="font-semibold">
-          Reserved For Booking
-        </label>
-        <InputNumber
-          id="reserved_for_booking"
-          v-model="form.reserved_for_booking"
-          :min="0"
-          placeholder="Enter reserved booking slots"
-          class="w-full" />
-        <small class="text-gray-500">
-          Slots reserved exclusively for advance bookings
+        <small v-if="reservedExceedsCapacity" class="p-error">
+          Reserved capacity cannot exceed total capacity
+        </small>
+
+        <small v-else class="text-gray-500">
+          Total number of parking spaces reserved for the app
         </small>
       </div>
 
@@ -109,14 +102,15 @@
         <Button
           type="submit"
           :label="form.id ? 'Update' : 'Create'"
-          :loading="loading" />
+          :loading="loading"
+          :disabled="reservedExceedsCapacity" />
       </div>
     </form>
   </div>
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import useFloors from "../../../scripts/floors";
 import { useToast } from "primevue";
 
@@ -146,8 +140,7 @@ const form = ref({
   id: null,
   name: "",
   floor_number: null,
-  capacity: 0,
-  reserved_for_booking: 0,
+  total_capacity: 0,
   reserved_for_app: 0,
   vehicle_type_ids: [],
 });
@@ -164,7 +157,6 @@ const reset = () => {
     name: "",
     floor_number: null,
     capacity: 0,
-    reserved_for_booking: 0,
     reserved_for_app: 0,
     vehicle_type_ids: [],
   };
@@ -192,6 +184,12 @@ const loadVehicleTypes = async () => {
 
 const submit = async () => {
   try {
+    if (reservedExceedsCapacity.value) {
+      errors.value.reserved_for_app =
+        "Reserved capacity cannot exceed total capacity";
+      return;
+    }
+
     errors.value = {};
     message.value = "";
 
@@ -212,8 +210,7 @@ const submit = async () => {
     const floorData = {
       name: form.value.name.trim(),
       floor_number: form.value.floor_number,
-      capacity: form.value.capacity || 0,
-      reserved_for_booking: form.value.reserved_for_booking || 0,
+      total_capacity: form.value.total_capacity || 0,
       reserved_for_app: form.value.reserved_for_app || 0,
       vehicle_type_ids: form.value.vehicle_type_ids || [],
     };
@@ -261,6 +258,13 @@ const submit = async () => {
   }
 };
 
+const reservedExceedsCapacity = computed(() => {
+  const total = Number(form.value.total_capacity ?? 0);
+  const reserved = Number(form.value.reserved_for_app ?? 0);
+
+  return reserved > total;
+});
+
 onMounted(async () => {
   await loadVehicleTypes();
 
@@ -269,8 +273,7 @@ onMounted(async () => {
       id: props.floor.id || null,
       name: props.floor.name || "",
       floor_number: props.floor.floor_number || null,
-      capacity: props.floor.capacity || 0,
-      reserved_for_booking: props.floor.reserved_for_booking || 0,
+      total_capacity: props.floor.total_capacity || 0,
       reserved_for_app: props.floor.reserved_for_app || 0,
       vehicle_type_ids: props.floor.vehicle_types
         ? props.floor.vehicle_types.map((vt) => vt.id)
