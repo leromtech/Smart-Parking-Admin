@@ -363,7 +363,12 @@ watch(
     if (newVal?.id && !hasRun.value) {
       console.log("🚀 Parking zone loaded, initializing...");
       hasRun.value = true;
-      await Promise.all([getAnalytics(), setupRealTimeAvailability()]);
+
+      await Promise.all([
+        getAnalytics(),
+        setupRealTimeAvailability(),
+        getFloors(newVal.id), // ✅ THIS WAS MISSING
+      ]);
     }
   },
   { immediate: true },
@@ -399,7 +404,8 @@ const totalReservedForApp = computed(() => {
 });
 
 const totalAvailable = computed(() => {
-  return totalCapacity.value - totalReservedForApp.value;
+  const occupied = Number(availability.value ?? 0);
+  return Math.max(totalReservedForApp.value - occupied, 0);
 });
 
 onMounted(async () => {
