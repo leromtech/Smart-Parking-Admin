@@ -83,6 +83,7 @@ const updateFloor = async (parkingZoneId, floorId, floorData) => {
     fd.append("reserved_for_app", floorData.reserved_for_app || 0);
     fd.append("declared_for_booking", floorData.declared_for_booking || 0);
 
+    console.log(fd);
     // Append vehicle type IDs as array
     if (
       floorData.vehicle_type_ids &&

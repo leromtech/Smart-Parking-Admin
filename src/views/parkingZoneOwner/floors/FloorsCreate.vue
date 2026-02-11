@@ -239,7 +239,7 @@ const submit = async () => {
       declared_for_booking: form.value.declared_for_booking || 0,
       vehicle_type_ids: form.value.vehicle_type_ids || [],
     };
-    console.log(floorData);
+    
     let data;
     if (form.value.id) {
       // Update existing floor
