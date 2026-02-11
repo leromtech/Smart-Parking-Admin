@@ -79,7 +79,6 @@
           id="reserved-for-booking"
           v-model="form.declared_for_booking"
           :min="0"
-          :max="form.declared_for_booking"
           placeholder="Enter capacity reserved for booking"
           class="w-full"
           :class="{ 'p-invalid': reservedExceedsCapacity }" />
@@ -240,7 +239,7 @@ const submit = async () => {
       declared_for_booking: form.value.declared_for_booking || 0,
       vehicle_type_ids: form.value.vehicle_type_ids || [],
     };
-
+    console.log(floorData);
     let data;
     if (form.value.id) {
       // Update existing floor
