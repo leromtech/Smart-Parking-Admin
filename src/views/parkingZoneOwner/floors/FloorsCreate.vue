@@ -237,7 +237,7 @@ const submit = async () => {
       floor_number: form.value.floor_number,
       total_capacity: form.value.total_capacity || 0,
       reserved_for_app: form.value.reserved_for_app || 0,
-      reserved_for_booking: form.value.reserved_for_booking || 0,
+      declared_for_booking: form.value.reserved_for_booking || 0,
       vehicle_type_ids: form.value.vehicle_type_ids || [],
     };
 
