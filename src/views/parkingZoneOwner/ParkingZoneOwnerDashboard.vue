@@ -79,7 +79,7 @@
               >Currently Occupied</span
             >
             <span class="text-3xl font-bold text-gray-800">{{
-              totalAvailable
+              occupiedSpace
             }}</span>
             <span class="text-xs text-gray-400 mt-1">Active parking</span>
           </div>
@@ -406,6 +406,10 @@ const totalReservedForApp = computed(() => {
 const totalAvailable = computed(() => {
   const occupied = Number(availability.value ?? 0);
   return Math.max(totalReservedForApp.value - occupied, 0);
+});
+
+const occupiedSpace = computed(() => {
+  return Number(availability.value ?? 0);
 });
 
 onMounted(async () => {
