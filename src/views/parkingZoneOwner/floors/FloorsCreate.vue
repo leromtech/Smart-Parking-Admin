@@ -71,6 +71,29 @@
       </div>
 
       <div class="flex flex-col gap-2">
+        <label for="reserved-for-app" class="font-semibold">
+          Reserved for app
+        </label>
+
+        <InputNumber
+          id="reserved-for-app"
+          v-model="form.reserved_for_booking"
+          :min="0"
+          :max="form.reserved_for_booking"
+          placeholder="Enter capacity reserved for booking"
+          class="w-full"
+          :class="{ 'p-invalid': reservedExceedsCapacity }" />
+
+        <small v-if="reservedExceedsCapacity" class="p-error">
+          Reserved capacity cannot exceed total capacity
+        </small>
+
+        <small v-else class="text-gray-500">
+          Total number of booking reserved for the app
+        </small>
+      </div>
+
+      <div class="flex flex-col gap-2">
         <label for="vehicle_types" class="font-semibold">Vehicle Types</label>
         <MultiSelect
           v-model="form.vehicle_type_ids"
@@ -142,6 +165,7 @@ const form = ref({
   floor_number: null,
   total_capacity: 0,
   reserved_for_app: 0,
+  reserved_for_booking: 0,
   vehicle_type_ids: [],
 });
 
@@ -158,6 +182,7 @@ const reset = () => {
     floor_number: null,
     capacity: 0,
     reserved_for_app: 0,
+    reserved_for_booking: 0,
     vehicle_type_ids: [],
   };
   errors.value = {};
@@ -212,6 +237,7 @@ const submit = async () => {
       floor_number: form.value.floor_number,
       total_capacity: form.value.total_capacity || 0,
       reserved_for_app: form.value.reserved_for_app || 0,
+      reserved_for_booking: form.value.reserved_for_booking || 0,
       vehicle_type_ids: form.value.vehicle_type_ids || [],
     };
 
@@ -275,6 +301,7 @@ onMounted(async () => {
       floor_number: props.floor.floor_number || null,
       total_capacity: props.floor.total_capacity || 0,
       reserved_for_app: props.floor.reserved_for_app || 0,
+      reserved_for_booking: props.floor.reserved_for_booking || 0,
       vehicle_type_ids: props.floor.vehicle_types
         ? props.floor.vehicle_types.map((vt) => vt.id)
         : [],
