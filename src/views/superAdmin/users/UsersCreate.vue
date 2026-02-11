@@ -154,6 +154,9 @@ const getParkingZone = async () => {
     const { data } = await api.get("parking-zones", {
       params: { filters: { all: 1 } },
     });
+
+    console.log(data);
+
     parkingZones.value = data.data.map((item) => ({
       label: item.name,
       value: item.id,
