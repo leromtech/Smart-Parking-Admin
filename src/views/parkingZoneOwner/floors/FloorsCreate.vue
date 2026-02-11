@@ -77,9 +77,9 @@
 
         <InputNumber
           id="reserved-for-booking"
-          v-model="form.reserved_for_booking"
+          v-model="form.declared_for_booking"
           :min="0"
-          :max="form.reserved_for_booking"
+          :max="form.declared_for_booking"
           placeholder="Enter capacity reserved for booking"
           class="w-full"
           :class="{ 'p-invalid': reservedExceedsCapacity }" />
@@ -165,7 +165,7 @@ const form = ref({
   floor_number: null,
   total_capacity: 0,
   reserved_for_app: 0,
-  reserved_for_booking: 0,
+  declared_for_booking: 0,
   vehicle_type_ids: [],
 });
 
@@ -182,7 +182,7 @@ const reset = () => {
     floor_number: null,
     capacity: 0,
     reserved_for_app: 0,
-    reserved_for_booking: 0,
+    declared_for_booking: 0,
     vehicle_type_ids: [],
   };
   errors.value = {};
@@ -237,7 +237,7 @@ const submit = async () => {
       floor_number: form.value.floor_number,
       total_capacity: form.value.total_capacity || 0,
       reserved_for_app: form.value.reserved_for_app || 0,
-      declared_for_booking: form.value.reserved_for_booking || 0,
+      declared_for_booking: form.value.declared_for_booking || 0,
       vehicle_type_ids: form.value.vehicle_type_ids || [],
     };
 
@@ -301,7 +301,7 @@ onMounted(async () => {
       floor_number: props.floor.floor_number || null,
       total_capacity: props.floor.total_capacity || 0,
       reserved_for_app: props.floor.reserved_for_app || 0,
-      reserved_for_booking: props.floor.reserved_for_booking || 0,
+      declared_for_booking: props.floor.declared_for_booking || 0,
       vehicle_type_ids: props.floor.vehicle_types
         ? props.floor.vehicle_types.map((vt) => vt.id)
         : [],
