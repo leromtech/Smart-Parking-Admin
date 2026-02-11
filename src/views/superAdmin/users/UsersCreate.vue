@@ -155,7 +155,7 @@ const getParkingZone = async () => {
       params: { filters: { all: 1 } },
     });
 
-    console.log(data);
+    console.log(data.parking_zones);
 
     parkingZones.value = data.data.map((item) => ({
       label: item.name,
