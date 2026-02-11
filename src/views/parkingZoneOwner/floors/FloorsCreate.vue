@@ -72,11 +72,11 @@
 
       <div class="flex flex-col gap-2">
         <label for="reserved-for-app" class="font-semibold">
-          Reserved for app
+          Reserved for booking
         </label>
 
         <InputNumber
-          id="reserved-for-app"
+          id="reserved-for-booking"
           v-model="form.reserved_for_booking"
           :min="0"
           :max="form.reserved_for_booking"
