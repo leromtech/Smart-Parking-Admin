@@ -144,6 +144,9 @@ const fetchHistory = async () => {
       per_page: pagination.value.per_page,
     });
 
+    console.log("response");
+    console.log(response);
+
     history.value = response.data;
   } catch (e) {
     historyError.value = e?.response?.data?.message || "Failed to load history";
