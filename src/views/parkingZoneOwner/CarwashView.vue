@@ -1,5 +1,5 @@
 <template>
-  <div class="card flex flex-row w-full gap-4">
+  <div class="card flex flex-col w-full gap-4">
     <Panel header="CARWASH" class="w-[80%]">
       <div
         class="flex flex-row gap-2 border border-neutral-200 p-2 rounded-md mb-2">
@@ -12,7 +12,7 @@
         <InputNumber v-model="carwash_capacity" />
       </div>
 
-      <Button @click="submit" :disabled="!!error">Save</Button>
+      <Button @click="submit">Save</Button>
 
       <Message v-if="error" severity="error" variant="simple">{{
         error
