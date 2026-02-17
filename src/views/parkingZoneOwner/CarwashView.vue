@@ -14,9 +14,13 @@
 
       <Button @click="submit">Save</Button>
 
-      <Message v-if="error" severity="error" variant="simple">{{
-        error
-      }}</Message>
+      <Message
+        v-if="submitError"
+        severity="error"
+        variant="simple"
+        class="mt-2">
+        {{ submitError }}
+      </Message>
     </Panel>
 
     <Panel header="CARWASH HISTORY" class="w-[90%]">
@@ -35,6 +39,14 @@
         <Button label="Apply" size="small" @click="fetchHistory" />
       </div>
 
+      <Message
+        v-if="historyError"
+        severity="error"
+        variant="simple"
+        class="mx-1">
+        {{ historyError }}
+      </Message>
+
       <DataTable
         :value="history.data"
         :loading="loading"
@@ -42,7 +54,8 @@
         :rows="pagination.per_page"
         :totalRecords="history.total"
         @page="onPage"
-        class="text-sm">
+        class="text-sm"
+        emptyMessage="No history yet">
         <Column field="vehicle.registration_no" header="Vehicle" />
         <Column field="user.name" header="User" />
         <Column field="status" header="Status" />
@@ -87,7 +100,8 @@ const filters = ref({
   date: null,
 });
 
-const error = ref(null);
+const submitError = ref(null);
+const historyError = ref(null);
 
 const submit = async () => {
   error.value = null;
@@ -104,7 +118,7 @@ const submit = async () => {
       life: 3000,
     });
   } catch (e) {
-    error.value = e?.response?.data?.message || "Update failed";
+    submitError.value = e?.response?.data?.message || "Update failed";
   }
 };
 
@@ -121,16 +135,19 @@ const getCarwashHistory = async (params) => {
 
 const fetchHistory = async () => {
   loading.value = true;
+  historyError.value = null;
 
   try {
     const response = await getCarwashHistory({
       ...filters.value,
-      pagination: pagination.value,
+      page: pagination.value.page,
+      per_page: pagination.value.per_page,
     });
 
     history.value = response.data.car_washes;
   } catch (e) {
-    error.value = e?.response?.data?.message || "Failed to load history";
+    historyError.value = e?.response?.data?.message || "Failed to load history";
+    history.value = { data: [], total: 0 };
   } finally {
     loading.value = false;
   }
