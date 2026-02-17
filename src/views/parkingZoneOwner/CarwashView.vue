@@ -79,7 +79,7 @@ const toast = useToast();
 
 const statusOptions = [
   { label: "Completed", value: "completed" },
-  { label: "Ended", value: "ended" },
+  { label: "Active", value: "active" },
 ];
 
 const carwash_capacity = ref(0);
@@ -160,7 +160,7 @@ const fetchHistory = async () => {
   } finally {
     loading.value = false;
   }
-}; 
+};
 
 const onPage = (event) => {
   pagination.value.page = event.page + 1;
