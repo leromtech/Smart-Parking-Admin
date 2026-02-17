@@ -51,6 +51,7 @@
         :value="history.data"
         :loading="loading"
         paginator
+        lazy
         :rows="pagination.per_page"
         :totalRecords="history.total"
         @page="onPage"
@@ -104,7 +105,7 @@ const submitError = ref(null);
 const historyError = ref(null);
 
 const submit = async () => {
-  error.value = null;
+  submitError.value = null;
 
   try {
     const response = await updateParkingZone({
@@ -144,17 +145,22 @@ const fetchHistory = async () => {
       per_page: pagination.value.per_page,
     });
 
-    console.log("response");
-    console.log(response);
+    history.value = response;
 
-    history.value = response.data;
+    // sync with backend
+    pagination.value.page = response.current_page;
+    pagination.value.per_page = response.per_page;
   } catch (e) {
     historyError.value = e?.response?.data?.message || "Failed to load history";
-    history.value = { data: [], total: 0 };
+
+    history.value = {
+      data: [],
+      total: 0,
+    };
   } finally {
     loading.value = false;
   }
-};
+}; 
 
 const onPage = (event) => {
   pagination.value.page = event.page + 1;
