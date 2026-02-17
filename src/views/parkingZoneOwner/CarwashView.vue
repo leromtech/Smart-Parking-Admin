@@ -114,7 +114,9 @@ const populateCarwashCapacity = () => {
 };
 
 const getCarwashHistory = (params) => {
-  return api.get("/car-washes/history", { params });
+  const { data } = api.get("/car-washes/history", { params });
+  console.log(data);
+  return data.car_washes;
 };
 
 const fetchHistory = async () => {
