@@ -80,6 +80,11 @@ const routes = [
       },
       // { name: 'Parking Zone Capacity', path: 'capacity', component: () => import('../views/parkingZoneOwner/CapacityView.vue') },
       {
+        name: "Parking Zone Carwash",
+        path: "carwash",
+        component: () => import("../views/parkingZoneOwner/CarwashView.vue"),
+      },
+      {
         name: "Parking Zone Managers",
         path: "managers",
         component: () =>
