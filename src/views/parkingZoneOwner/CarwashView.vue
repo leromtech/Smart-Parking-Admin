@@ -130,6 +130,7 @@ const populateCarwashCapacity = () => {
 
 const getCarwashHistory = async (params) => {
   const { data } = await api.get("/car-washes/history", { params });
+  console.log(data);
   return data.car_washes;
 };
 
