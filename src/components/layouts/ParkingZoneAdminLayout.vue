@@ -170,6 +170,11 @@ const menuItems = ref([
       //     icon: 'pi pi-th-large'
       // },
       {
+        label: "Carwash",
+        route: "/parking-zone/carwash",
+        icon: "pi pi-th-large",
+      },
+      {
         label: "Managers",
         route: "/parking-zone/managers",
         icon: "pi pi-users",
