@@ -57,6 +57,7 @@ import { onMounted, ref } from "vue";
 import { useParkingZone } from "../../scripts/parkingZone";
 import useVehicleTypes from "../../scripts/admin/vehicleTypes";
 import { useToast } from "primevue";
+import api from "../../boot/api";
 
 const { updateParkingZone, getParkingZone, parking_zone } = useParkingZone();
 const { getVehicleTypes } = useVehicleTypes();
@@ -113,9 +114,8 @@ const populateCarwashCapacity = () => {
   }
 };
 
-const getCarwashHistory = (params) => {
-  const { data } = api.get("/car-washes/history", { params });
-  console.log(data);
+const getCarwashHistory = async (params) => {
+  const { data } = await api.get("/car-washes/history", { params });
   return data.car_washes;
 };
 
