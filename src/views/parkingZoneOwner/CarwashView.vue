@@ -130,7 +130,6 @@ const populateCarwashCapacity = () => {
 
 const getCarwashHistory = async (params) => {
   const { data } = await api.get("/car-washes/history", { params });
-  console.log(data);
   return data.car_washes;
 };
 
@@ -145,7 +144,7 @@ const fetchHistory = async () => {
       per_page: pagination.value.per_page,
     });
 
-    history.value = response.data.car_washes;
+    history.value = response.data;
   } catch (e) {
     historyError.value = e?.response?.data?.message || "Failed to load history";
     history.value = { data: [], total: 0 };
