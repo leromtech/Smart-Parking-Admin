@@ -107,6 +107,13 @@
                         </template>
                     </Column>
                     <Column field="status" header="Status"></Column>
+                    <Column header="Vehicle Type">
+                        <template #body="slotProps">
+                            <div class="capitalize">
+                                {{ slotProps.data.payable?.vehicle_type?.name || slotProps.data.payable?.vehicleType?.name || slotProps.data.payable?.vehicle?.vehicle_type?.name || slotProps.data.payable?.vehicle?.vehicleType?.name || "--NA--" }}
+                            </div>
+                        </template>
+                    </Column>
                     <Column header="Amount">
                         <template #body="slotProps">
                             <div class="text-end">
