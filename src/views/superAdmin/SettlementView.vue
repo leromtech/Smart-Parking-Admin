@@ -122,17 +122,17 @@
                             </div>
                         </template>
                     </Column>
-                    <Column header="Platform Share">
+                    <Column header="Commission Share">
                         <template #body="slotProps">
                             <div class="text-end">
-                                ₹ {{ ((slotProps.data.amount || 0) * (platformFeeRate / 100)).toFixed(2) }} ({{ platformFeeRate }}%)
+                                ₹ {{ ((slotProps.data.amount || 0) * commissionRate).toFixed(2) }} ({{ commissionRate * 100 }}%)
                             </div>
                         </template>
                     </Column>
                     <Column header="Parking Zone Share">
                         <template #body="slotProps">
                             <div class="text-end">
-                                ₹ {{ ((slotProps.data.amount || 0) * (1 - platformFeeRate / 100)).toFixed(2) }}
+                                ₹ {{ ((slotProps.data.amount || 0) * (1 - commissionRate)).toFixed(2) }}
                             </div>
                         </template>
                     </Column>
@@ -143,12 +143,12 @@
                             <span class="text-end">₹ {{ totals?.[entry[0]] }}</span>
                         </div>
                         <div class="flex justify-between p-2 font-bold text-sm text-neutral-500">
-                            <span>Platform Share: </span>
-                            <span class="text-end">₹ {{ ((totals?.[entry[0]] || 0) * (platformFeeRate / 100)).toFixed(2) }}</span>
+                            <span>Commission Share: </span>
+                            <span class="text-end">₹ {{ ((totals?.[entry[0]] || 0) * commissionRate).toFixed(2) }}</span>
                         </div>
                         <div class="flex justify-between p-2 font-bold text-sm text-neutral-500">
                             <span>Parking Zone Share: </span>
-                            <span class="text-end">₹ {{ ((totals?.[entry[0]] || 0) * (1 - platformFeeRate / 100)).toFixed(2) }}</span>
+                            <span class="text-end">₹ {{ ((totals?.[entry[0]] || 0) * (1 - commissionRate)).toFixed(2) }}</span>
                         </div>
                     </template>
 
@@ -197,7 +197,7 @@ const payments = ref({})
 const status = ref('')
 
 const totals = ref(null)
-const platformFeeRate = ref(0)
+const commissionRate = ref(0)
 
 const selectedParkingZone = ref(null)
 const vehicleTypeOptions = ref([])
@@ -356,7 +356,7 @@ const getEarnings = async () => {
         payments.value = data.payments;
         totals.value = data.totals
         status.value = data.status
-        platformFeeRate.value = data.platform_fee_rate || 0
+        commissionRate.value = data.commission_rate || 0
         loading.value = false
     } catch (error) {
         console.error('Error fetching earnings:', error);

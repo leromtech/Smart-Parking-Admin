@@ -99,22 +99,22 @@
                             ₹ {{ slotProps.data.amount ?? "0.00" }}
                         </template>
                     </Column>
-                    <Column header="Platform Share">
+                    <Column header="Commission Share">
                         <template #body="slotProps">
-                            ₹ {{ ((slotProps.data.amount || 0) * (platformFeeRate / 100)).toFixed(2) }} ({{ platformFeeRate }}%)
+                            ₹ {{ ((slotProps.data.amount || 0) * commissionRate).toFixed(2) }} ({{ commissionRate * 100 }}%)
                         </template>
                     </Column>
                     <Column header="Your Share">
                         <template #body="slotProps">
-                            ₹ {{ ((slotProps.data.amount || 0) * (1 - platformFeeRate / 100)).toFixed(2) }}
+                            ₹ {{ ((slotProps.data.amount || 0) * (1 - commissionRate)).toFixed(2) }}
                         </template>
                     </Column>
                     <template #footer>
                         <div class="flex justify-end p-2 font-bold gap-4">
                             <span class="text-end text-sm text-neutral-500">Total</span>
                             <span class="text-end text-sm text-neutral-500">₹ {{ panel.total || '0.00' }}</span>
-                            <span class="text-end text-sm text-neutral-500">Platform: ₹ {{ ((panel.total || 0) * (platformFeeRate / 100)).toFixed(2) }}</span>
-                            <span class="text-end text-sm text-neutral-500">Your Share: ₹ {{ ((panel.total || 0) * (1 - platformFeeRate / 100)).toFixed(2) }}</span>
+                            <span class="text-end text-sm text-neutral-500">Commission: ₹ {{ ((panel.total || 0) * commissionRate).toFixed(2) }}</span>
+                            <span class="text-end text-sm text-neutral-500">Your Share: ₹ {{ ((panel.total || 0) * (1 - commissionRate)).toFixed(2) }}</span>
                         </div>
                     </template>
                     <template #empty>
@@ -149,7 +149,7 @@ const filters = ref({
 })
 
 const totals = ref()
-const platformFeeRate = ref(0)
+const commissionRate = ref(0)
 
 const toast = useToast()
 
@@ -353,7 +353,7 @@ const getEarnings = async () => {
         }
 
         status.value = data.status || 'Unsettled';
-        platformFeeRate.value = data.platform_fee_rate || 0;
+        commissionRate.value = data.commission_rate || 0;
 
         // API returns totals as object with booking, parking, and grand_total
         // Match the order of payments array
