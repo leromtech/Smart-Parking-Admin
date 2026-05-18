@@ -86,6 +86,11 @@ const toggleDarkMode = () => {
 
 const menuItems = ref([
     {
+        label: 'Dashboard',
+        route: '/admin/dashboard',
+        icon: 'pi pi-home'
+    },
+    {
         label: 'Users',
         route: '/admin/users',
         icon: 'pi pi-users'

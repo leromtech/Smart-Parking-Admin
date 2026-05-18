@@ -62,6 +62,11 @@
         <div v-if="activeFilterChips.length > 0" class="flex flex-wrap gap-2">
             <Tag v-for="chip in activeFilterChips" :key="chip.key" :value="chip.label" />
         </div>
+
+        <Panel header="Earnings Trend" class="w-full">
+            <div ref="earningsChart" class="w-full min-h-[350px]"></div>
+        </Panel>
+
         <div class="flex flex-col items-start justify-start gap-4 text-neutral-500 text-sm">
             <Panel v-for="panel in visiblePaymentPanels" :key="panel.key" class="w-full">
                 <template #header>
@@ -133,6 +138,7 @@ import { computed, onMounted, ref, watch } from 'vue';
 import api from '../../boot/api';
 import { useToast } from 'primevue';
 import { useParkingZone } from '../../scripts/parkingZone';
+import ApexCharts from 'apexcharts';
 
 const { parking_zone, getParkingZone } = useParkingZone()
 const filters = ref({
@@ -163,6 +169,9 @@ const payments = ref([])
 const paymentTypes = ref([])
 const vehicleTypeOptions = ref([])
 const showAdvancedFilters = ref(false)
+
+const earningsChart = ref(null);
+let chartInstance = null;
 
 const status = ref('')
 
@@ -398,6 +407,120 @@ const clearFilters = async () => {
 watch(monthFilter, async (newVal) => {
     await getEarnings()
 }, { deep: true })
+
+const updateChart = () => {
+    if (!earningsChart.value) return;
+
+    // Process data to group by date
+    const dailyEarnings = {};
+    
+    payments.value.forEach(paymentGroup => {
+        if (!Array.isArray(paymentGroup)) return;
+        paymentGroup.forEach(item => {
+            if (!item.created_at || !item.amount) return;
+            
+            let dateKey = '';
+            let timestamp = 0;
+            const dateStr = String(item.created_at);
+            
+            // Parse date
+            let d = new Date(dateStr);
+            if (!isNaN(d.getTime())) {
+                dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                // Normalizing timestamp to start of day for grouping
+                timestamp = new Date(dateKey).getTime();
+            } else {
+                const parts = dateStr.split(' ')[0].split('-');
+                if (parts.length === 3) {
+                    if (parts[0].length === 2 && parts[2].length === 4) { // DD-MM-YYYY
+                        dateKey = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                    } else if (parts[0].length === 4) { // YYYY-MM-DD
+                        dateKey = `${parts[0]}-${parts[1]}-${parts[2]}`;
+                    } else {
+                        dateKey = dateStr.split(' ')[0].split('T')[0];
+                    }
+                } else {
+                    dateKey = dateStr.split(' ')[0].split('T')[0];
+                }
+                d = new Date(dateKey);
+                timestamp = !isNaN(d.getTime()) ? d.getTime() : 0;
+            }
+            
+            if (!dailyEarnings[dateKey]) {
+                dailyEarnings[dateKey] = {
+                    date: dateKey,
+                    timestamp: timestamp,
+                    total: 0,
+                    commission: 0,
+                    yourShare: 0
+                };
+            }
+            
+            const amount = parseFloat(item.amount) || 0;
+            dailyEarnings[dateKey].total += amount;
+            dailyEarnings[dateKey].commission += amount * commissionRate.value;
+            dailyEarnings[dateKey].yourShare += amount * (1 - commissionRate.value);
+        });
+    });
+    
+    const sortedData = Object.values(dailyEarnings).sort((a, b) => a.timestamp - b.timestamp);
+    
+    const seriesYourShare = sortedData.map(d => [d.timestamp, parseFloat(d.yourShare.toFixed(2))]);
+    const seriesCommission = sortedData.map(d => [d.timestamp, parseFloat(d.commission.toFixed(2))]);
+    
+    const options = {
+        chart: {
+            type: 'area',
+            height: 350,
+            toolbar: { show: true },
+            fontFamily: 'inherit'
+        },
+        series: [
+            { name: 'Your Share', data: seriesYourShare },
+            { name: 'Commission', data: seriesCommission }
+        ],
+        xaxis: {
+            type: 'datetime',
+            labels: {
+                datetimeUTC: false,
+                datetimeFormatter: {
+                    year: 'yyyy',
+                    month: 'MMM \'yy',
+                    day: 'dd MMM',
+                    hour: 'HH:mm'
+                }
+            }
+        },
+        colors: ['#10b981', '#f59e0b'],
+        dataLabels: { enabled: false },
+        stroke: { curve: 'smooth', width: 2 },
+        fill: {
+            type: 'gradient',
+            gradient: { shadeIntensity: 1, opacityFrom: 0.7, opacityTo: 0.1, stops: [0, 90, 100] }
+        },
+        tooltip: {
+            y: { formatter: function (val) { return "₹ " + val } },
+            x: { format: 'dd MMM yyyy' }
+        },
+        noData: {
+            text: 'No data available',
+            align: 'center',
+            verticalAlign: 'middle',
+            style: { color: '#888', fontSize: '14px' }
+        }
+    };
+    
+    if (chartInstance) {
+        chartInstance.destroy();
+    }
+    
+    chartInstance = new ApexCharts(earningsChart.value, options);
+    chartInstance.render();
+};
+
+watch(payments, () => {
+    updateChart();
+}, { deep: true });
 
 watch(parking_zone, async () => {
     await getEarnings()

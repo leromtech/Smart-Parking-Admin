@@ -12,6 +12,11 @@ const routes = [
     component: () => import("../components/layouts/SuperAdminLayout.vue"),
     children: [
       {
+        name: "Admin Dashboard",
+        path: "dashboard",
+        component: () => import("../views/superAdmin/Dashboard.vue"),
+      },
+      {
         name: "Users",
         path: "users",
         component: () => import("../views/superAdmin/users/UsersView.vue"),
