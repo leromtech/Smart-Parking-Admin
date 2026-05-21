@@ -382,9 +382,15 @@ const clearFilters = async () => {
 }
 
 const settle = async () => {
-    const month = monthFilter.value.toLocaleDateString('en-GB', { month: 'numeric', year: 'numeric' }).replace('/', '-');
-    const { data } = await api.post('settlement/initiate', { parkingZoneId: selectedParkingZone.value.id, month })
-    toast.add({ severity: 'error', summary: 'Error', detail: data.message, life: 3000 });
+    if (!monthFilter.value?.[0]) return;
+    const month = monthFilter.value[0].toLocaleDateString('en-GB', { month: 'numeric', year: 'numeric' }).replace('/', '-');
+    try {
+        const { data } = await api.post('settlement/initiate', { parkingZoneId: selectedParkingZone.value.id, month })
+        toast.add({ severity: 'success', summary: 'Success', detail: data.message || 'Settlement initiated successfully', life: 3000 });
+    } catch (error) {
+        const message = error.response?.data?.message || 'An error occurred during settlement';
+        toast.add({ severity: 'error', summary: 'Error', detail: message, life: 3000 });
+    }
 }
 
 watch(selectedParkingZone, async (newVal) => {
