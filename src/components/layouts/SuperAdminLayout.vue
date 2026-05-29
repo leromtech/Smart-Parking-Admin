@@ -111,7 +111,7 @@ const menuItems = ref([
         icon: 'pi pi-tags'
     },
     {
-        label: 'Comission Rate',
+        label: 'Zone Commission Rates',
         route: '/admin/commission-rate',
         icon: 'pi pi-percentage'
     },

@@ -33,6 +33,14 @@
                 </Column>
                 <Column field="address" header="Address"></Column>
                 <Column field="owner.name" header="Owner"></Column>
+                <Column header="Commission Rate">
+                    <template #body="slotProps">
+                        <span v-if="slotProps.data.commission_rate != null">
+                            {{ (slotProps.data.commission_rate * 100).toFixed(0) }}%
+                        </span>
+                        <span v-else class="text-gray-400">—</span>
+                    </template>
+                </Column>
                 <Column header="">
                     <template #body="slotProps">
                         <div class="flex flex-row items-center gap-2">

@@ -28,6 +28,17 @@
                     </Select>
                 </div>
 
+                <div class="flex flex-col w-full gap-2 mt-8">
+                    <label for="commission_rate" class="font-semibold">Commission Rate</label>
+                    <InputGroup class="w-[400px]">
+                        <InputNumber v-model="form.commission_rate" v-keyfilter.int :min="0" :max="100" />
+                        <InputGroupAddon>
+                            <span>%</span>
+                        </InputGroupAddon>
+                    </InputGroup>
+                    <span class="text-sm text-gray-500">Percentage charged as commission for this parking zone.</span>
+                </div>
+
                 <div class="flex flex-row items-center justify-between mt-4">
                     <div class="flex flex-col gap-2">
                         <label for="latitude" class="font-semibold">Latitude</label>
@@ -93,6 +104,7 @@ const form = ref({
     address: '',
     description: '',
     owner_id: '',
+    commission_rate: null,
     latitude: 0,
     longitude: 0
 })
@@ -103,6 +115,7 @@ const reset = () => {
     form.value.address = ''
     form.value.description = ''
     form.value.owner_id = ''
+    form.value.commission_rate = null
     form.value.latitude = 0
     form.value.longitude = 0
 }
@@ -133,6 +146,15 @@ const fetchUsers = async () => {
 
 const submit = async () => {
     try {
+        if (form.value.commission_rate == null || form.value.commission_rate <= 0) {
+            message.value = 'Please enter a valid commission rate'
+            return
+        }
+        if (form.value.commission_rate > 100) {
+            message.value = 'Commission rate cannot be more than 100%'
+            return
+        }
+
         const fd = new FormData()
 
         if (form.value.id) {
@@ -143,6 +165,7 @@ const submit = async () => {
         fd.append('address', form.value.address)
         fd.append('description', form.value.description)
         fd.append('owner_id', form.value.owner_id)
+        fd.append('commission_rate', form.value.commission_rate / 100)
         fd.append('latitude', form.value.latitude)
         fd.append('longitude', form.value.longitude)
 
@@ -165,6 +188,9 @@ onMounted(async () => {
             address: parking_zone_edit.value.address || '',
             description: parking_zone_edit.value.description || '',
             owner_id: parking_zone_edit.value.owner_id || '',
+            commission_rate: parking_zone_edit.value.commission_rate != null
+                ? parking_zone_edit.value.commission_rate * 100
+                : null,
             latitude: parking_zone_edit.value.latitude || '',
             longitude: parking_zone_edit.value.longitude || '',
         };

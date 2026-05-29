@@ -57,7 +57,8 @@ const routes = [
       {
         name: "Admin Comission Rate",
         path: "commission-rate",
-        component: () => import("../views/superAdmin/ComissionView.vue"),
+        component: () =>
+          import("../views/superAdmin/ParkingZoneCommissionView.vue"),
       },
       {
         name: "Settings",

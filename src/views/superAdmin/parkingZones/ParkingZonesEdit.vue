@@ -27,6 +27,16 @@
                             options-value="id" v-model="form.owner_id" />
                     </div>
 
+                    <div class="flex flex-col w-full gap-2 mt-8">
+                        <label for="commission_rate" class="font-semibold">Commission Rate</label>
+                        <InputGroup class="w-[400px]">
+                            <InputNumber v-model="form.commission_rate" v-keyfilter.int :min="0" :max="100" />
+                            <InputGroupAddon>
+                                <span>%</span>
+                            </InputGroupAddon>
+                        </InputGroup>
+                    </div>
+
                     <div class="flex flex-row items-center justify-between mt-4">
                         <div class="flex flex-col gap-2">
                             <label for="latitude" class="font-semibold">Latitude</label>
@@ -88,6 +98,9 @@ onMounted(async () => {
     form.value.address = props.item.address
     form.value.description = props.item.description
     form.value.owner_id = props.item.owner.id
+    form.value.commission_rate = props.item.commission_rate != null
+        ? props.item.commission_rate * 100
+        : null
     form.value.latitude = props.item.latitude
     form.value.longitude = props.item.longitude
 })
@@ -97,6 +110,7 @@ const form = ref({
     address: '',
     description: '',
     owner_id: '',
+    commission_rate: null,
     latitude: 0,
     longitude: 0
 })
@@ -106,6 +120,7 @@ const reset = () => {
     form.value.address = ''
     form.value.description = ''
     form.value.owner_id = ''
+    form.value.commission_rate = null
     form.value.latitude = 0
     form.value.longitude = 0
 }
@@ -136,11 +151,21 @@ const fetchUsers = async () => {
 
 const submit = async () => {
     try {
+        if (form.value.commission_rate == null || form.value.commission_rate <= 0) {
+            message.value = 'Please enter a valid commission rate'
+            return
+        }
+        if (form.value.commission_rate > 100) {
+            message.value = 'Commission rate cannot be more than 100%'
+            return
+        }
+
         const fd = new FormData()
         fd.append('name', form.value.name)
         fd.append('address', form.value.address)
         fd.append('description', form.value.description)
         fd.append('owner_id', form.value.owner_id)
+        fd.append('commission_rate', form.value.commission_rate / 100)
         fd.append('latitude', form.value.latitude)
         fd.append('longitude', form.value.longitude)
         fd.append('_method', 'PATCH')
