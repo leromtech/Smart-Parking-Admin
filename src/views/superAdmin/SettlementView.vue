@@ -11,17 +11,21 @@
             </template>
 
             <div class="flex flex-col gap-4">
-                <div class="flex flex-row gap-4 w-full flex-wrap">
+                <div class="flex flex-row gap-4 w-full flex-wrap items-end">
                     <IftaLabel>
                         <DatePicker
-                            v-model="monthFilter"
-                            selectionMode="range"
+                            v-model="selectedMonth"
+                            view="month"
+                            dateFormat="MM yy"
                             :manualInput="false"
-                            class="w-full md:w-56"
-                            dateFormat="MM yy dd"
+                            class="w-full md:w-48"
+                            @update:model-value="onMonthChange"
                         />
-                        <label for="date">Date filter</label>
+                        <label for="settlement-month">Month</label>
                     </IftaLabel>
+                    <span v-if="monthLabel" class="text-sm text-gray-600 pb-2">
+                        Period: {{ monthLabel }}
+                    </span>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -112,6 +116,12 @@
         </div>
 
         <Panel>
+            <template #header>
+                <span class="font-semibold">
+                    Parking zones
+                    <span v-if="monthLabel" class="text-gray-500 font-normal">— {{ monthLabel }}</span>
+                </span>
+            </template>
             <DataTable
                 :value="zoneSummaries"
                 :loading="loadingSummaries"
@@ -126,6 +136,12 @@
                             <span class="font-medium">{{ data.name }}</span>
                             <span class="text-sm text-gray-500">{{ data.address }}</span>
                         </div>
+                    </template>
+                </Column>
+
+                <Column header="Month" style="width: 9rem">
+                    <template #body="{ data }">
+                        <span class="text-sm font-medium text-sky-800">{{ data.monthLabel }}</span>
                     </template>
                 </Column>
 
@@ -209,12 +225,13 @@
             modal
             maximizable
             class="w-full max-w-6xl"
-            :header="selectedZone ? `Settlement — ${selectedZone.name}` : 'Settlement details'"
+            :header="detailsDialogTitle"
         >
             <SettlementBreakdown
                 v-if="selectedZone && detailEarnings"
                 :zone-name="selectedZone.name"
                 :zone-address="selectedZone.address"
+                :month-label="selectedZone.monthLabel || monthLabel"
                 :payments="detailEarnings.payments"
                 :totals="detailEarnings.totals"
                 :commission-rate="detailEarnings.commission_rate || 0"
@@ -262,7 +279,7 @@ const filters = ref({
     max_amount: null,
 });
 
-const monthFilter = ref([new Date()]);
+const selectedMonth = ref(startOfMonth(new Date()));
 const parkingZones = ref([]);
 const zoneSummaries = ref([]);
 const earningsCache = ref({});
@@ -315,6 +332,37 @@ const paymentMethodOptions = [
 const showParkingStatusFilter = computed(() => filters.value.payable_type !== 'booking');
 const showBookingStatusFilter = computed(() => filters.value.payable_type !== 'parking');
 
+function startOfMonth(date) {
+    const d = new Date(date);
+    return new Date(d.getFullYear(), d.getMonth(), 1);
+}
+
+const monthLabel = computed(() => {
+    if (!selectedMonth.value) return '';
+    return selectedMonth.value.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+});
+
+const settlementMonthKey = computed(() => formatSettlementMonth(selectedMonth.value));
+
+const detailsDialogTitle = computed(() => {
+    if (!selectedZone.value) return 'Settlement details';
+    const month = selectedZone.value.monthLabel || monthLabel.value;
+    return month ? `Settlement — ${selectedZone.value.name} (${month})` : `Settlement — ${selectedZone.value.name}`;
+});
+
+function formatSettlementMonth(date) {
+    if (!date) return '';
+    const d = startOfMonth(date);
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    return `${month}-${d.getFullYear()}`;
+}
+
+const onMonthChange = (value) => {
+    if (value) {
+        selectedMonth.value = startOfMonth(value);
+    }
+};
+
 const formatMoney = (value) =>
     (Number(value) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -344,6 +392,9 @@ const sanitizeFilters = () => {
 
 const activeFilterChips = computed(() => {
     const chips = [];
+    if (monthLabel.value) {
+        chips.push({ key: 'month', label: `month: ${monthLabel.value}` });
+    }
     const cleaned = sanitizeFilters();
     Object.entries(cleaned).forEach(([key, value]) => {
         chips.push({
@@ -383,21 +434,21 @@ const validateFilters = (sanitized) => {
     return true;
 };
 
-const buildDateFilter = () => {
-    const dateFilter = { start: null, end: null };
-    if (!monthFilter.value?.[0]) return null;
-
-    dateFilter.start = monthFilter.value[0]
-        .toLocaleDateString('en-GB', { month: 'numeric', year: 'numeric', day: 'numeric' })
+const formatApiDate = (date) =>
+    date
+        .toLocaleDateString('en-GB', { day: 'numeric', month: 'numeric', year: 'numeric' })
         .replaceAll('/', '-');
 
-    if (monthFilter.value[1]) {
-        dateFilter.end = monthFilter.value[1]
-            .toLocaleDateString('en-GB', { month: 'numeric', year: 'numeric', day: 'numeric' })
-            .replaceAll('/', '-');
-    }
+const buildDateFilter = () => {
+    if (!selectedMonth.value) return null;
 
-    return dateFilter;
+    const start = startOfMonth(selectedMonth.value);
+    const end = new Date(start.getFullYear(), start.getMonth() + 1, 0);
+
+    return {
+        start: formatApiDate(start),
+        end: formatApiDate(end),
+    };
 };
 
 const buildEarningsParams = (zoneId) => {
@@ -420,6 +471,8 @@ const mapEarningsToSummary = (zone, data) => {
         id: zone.id,
         name: zone.name,
         address: zone.address,
+        monthLabel: monthLabel.value,
+        settlementMonth: settlementMonthKey.value,
         status: data.status,
         commissionRate,
         totals: data.totals,
@@ -438,8 +491,8 @@ const fetchZoneEarnings = async (zone) => {
 };
 
 const loadSummaries = async () => {
-    if (!monthFilter.value?.[0]) {
-        toast.add({ severity: 'warn', summary: 'Date required', detail: 'Select a date range first', life: 3000 });
+    if (!selectedMonth.value) {
+        toast.add({ severity: 'warn', summary: 'Month required', detail: 'Select a month first', life: 3000 });
         return;
     }
 
@@ -470,6 +523,8 @@ const openDetails = async (row) => {
         id: row.id,
         name: row.name,
         address: row.address,
+        monthLabel: row.monthLabel,
+        settlementMonth: row.settlementMonth,
     };
     detailsOpen.value = true;
 
@@ -498,11 +553,8 @@ const openDetails = async (row) => {
 };
 
 const settle = async (row) => {
-    if (!monthFilter.value?.[0]) return;
-
-    const month = monthFilter.value[0]
-        .toLocaleDateString('en-GB', { month: 'numeric', year: 'numeric' })
-        .replace('/', '-');
+    const month = row.settlementMonth || settlementMonthKey.value;
+    if (!month) return;
 
     settlingId.value = row.id;
     try {
@@ -546,6 +598,7 @@ const clearFilters = async () => {
         max_amount: null,
     };
     showAdvancedFilters.value = false;
+    selectedMonth.value = startOfMonth(new Date());
     await loadSummaries();
 };
 

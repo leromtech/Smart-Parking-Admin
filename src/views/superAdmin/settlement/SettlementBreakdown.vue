@@ -4,6 +4,7 @@
             <div>
                 <h3 class="font-semibold text-lg m-0">{{ zoneName }}</h3>
                 <p v-if="zoneAddress" class="text-sm text-gray-500 m-0">{{ zoneAddress }}</p>
+                <p v-if="monthLabel" class="text-sm text-sky-700 font-medium m-0 mt-1">{{ monthLabel }}</p>
             </div>
             <div class="flex flex-col text-sm">
                 <span>
@@ -141,6 +142,7 @@ import { computed } from 'vue';
 const props = defineProps({
     zoneName: { type: String, default: '' },
     zoneAddress: { type: String, default: '' },
+    monthLabel: { type: String, default: '' },
     payments: { type: Object, default: () => ({}) },
     totals: { type: Object, default: null },
     commissionRate: { type: Number, default: 0 },
