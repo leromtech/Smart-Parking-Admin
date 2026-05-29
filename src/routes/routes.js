@@ -45,6 +45,12 @@ const routes = [
         component: () => import("../views/superAdmin/wallet/WalletView.vue"),
       },
       {
+        name: "Wallet Recharge Promotions",
+        path: "wallet-promotions",
+        component: () =>
+          import("../views/superAdmin/wallet/WalletRechargePromotionsView.vue"),
+      },
+      {
         name: "Admin Bookings",
         path: "bookings",
         component: () => import("../views/superAdmin/BookingsView.vue"),

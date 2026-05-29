@@ -27,7 +27,10 @@
                         <Button icon="pi pi-check" rounded outlined v-else @click="saveCoinsToMoneyRate"></Button>
                     </div>
                 </div>
-                <div>
+                <div class="flex flex-row gap-2">
+                    <router-link to="/admin/wallet-promotions">
+                        <Button icon="pi pi-gift" label="Promotions" outlined severity="info" />
+                    </router-link>
                     <Button icon="pi pi-plus" rounded @click="openCreate = true"></Button>
                 </div>
             </div>

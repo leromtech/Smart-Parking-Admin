@@ -121,6 +121,11 @@ const menuItems = ref([
         icon: 'pi pi-wallet'
     },
     {
+        label: 'Wallet Promotions',
+        route: '/admin/wallet-promotions',
+        icon: 'pi pi-gift'
+    },
+    {
         label: 'Bookings',
         route: '/admin/bookings',
         icon: 'pi pi-calendar'
