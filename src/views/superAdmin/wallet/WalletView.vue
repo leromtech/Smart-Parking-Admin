@@ -53,17 +53,54 @@
                 <div class="grid grid-cols-3">
                     <div class="flex flex-col flex-1 items-center justify-center">
                         <span class="font font-semibold">Cost</span>
-                        {{ rechargeAmount.amount }}
+                        <span v-if="hasDiscountedPayable(rechargeAmount)" class="text-gray-400 line-through text-sm">
+                            ₹{{ rechargeAmount.amount }}
+                        </span>
+                        <span :class="{ 'text-green-700 font-semibold': hasDiscountedPayable(rechargeAmount) }">
+                            ₹{{ displayPayable(rechargeAmount) }}
+                        </span>
                     </div>
                     <div class="flex flex-col flex-1 items-center justify-center">
                         <span class="font font-semibold">Coins</span>
-                        {{ rechargeAmount.coins }}
+                        <span>{{ rechargeAmount.coins }}</span>
+                        <span
+                            v-if="rechargeAmount.bonus_coins > 0 || displayTotalCoins(rechargeAmount) > rechargeAmount.coins"
+                            class="text-sm text-green-700 font-medium"
+                        >
+                            +{{ rechargeAmount.bonus_coins ?? (displayTotalCoins(rechargeAmount) - rechargeAmount.coins) }} bonus
+                            <template v-if="displayTotalCoins(rechargeAmount) > rechargeAmount.coins">
+                                ({{ displayTotalCoins(rechargeAmount) }} total)
+                            </template>
+                        </span>
                     </div>
                     <div class="flex flex-col flex-1 items-center justify-center">
                         <span class="font font-semibold">Active</span>
                         <i
                             :class="[Boolean(rechargeAmount.active) ? 'pi pi-check text-green-600' : 'pi pi-times text-red-600']"></i>
                     </div>
+                </div>
+                <div
+                    v-if="getAppliedPromotion(rechargeAmount)"
+                    class="mt-3 pt-3 border-t border-sky-100 flex flex-col gap-2"
+                >
+                    <div class="flex flex-row items-center gap-2 flex-wrap">
+                        <Tag severity="success" icon="pi pi-gift" :value="getAppliedPromotion(rechargeAmount).name" />
+                        <span class="text-sm text-sky-800 font-medium">
+                            {{ formatPromotionEffect(getAppliedPromotion(rechargeAmount)) }}
+                        </span>
+                    </div>
+                    <p
+                        v-if="promotionExtraDetail(rechargeAmount)"
+                        class="text-xs text-gray-600 m-0"
+                    >
+                        {{ promotionExtraDetail(rechargeAmount) }}
+                    </p>
+                </div>
+                <div
+                    v-else-if="rechargeAmount.active"
+                    class="mt-3 pt-3 border-t border-neutral-200 text-xs text-gray-400"
+                >
+                    No promotion currently applies
                 </div>
             </Panel>
         </div>
@@ -91,10 +128,14 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import useNotification from '../../../scripts/notification';
 import create from './WalletCreate.vue';
 import useRechargeAmounts from '../../../scripts/admin/wallet';
+import {
+    formatPromotionEffect,
+    getAppliedPromotion,
+} from '../../../scripts/admin/walletRechargePromotions';
 import { InputNumber, useToast } from 'primevue';
 import api from '../../../boot/api';
 
@@ -105,6 +146,28 @@ const { editItem, deleteItem, walletRechargeAmounts, form, confirmDelete, coinsM
 const { notify } = useNotification()
 
 const editing = ref(false)
+
+const displayPayable = (pack) => pack.payable_amount ?? pack.amount
+
+const displayTotalCoins = (pack) =>
+    pack.total_coins ?? pack.coins + (Number(pack.bonus_coins) || 0)
+
+const hasDiscountedPayable = (pack) => {
+    const payable = pack.payable_amount
+    return payable != null && Number(payable) < Number(pack.amount)
+}
+
+const promotionExtraDetail = (pack) => {
+    const parts = []
+    if (hasDiscountedPayable(pack)) {
+        parts.push(`User pays ₹${pack.payable_amount} instead of ₹${pack.amount}`)
+    }
+    const bonus = Number(pack.bonus_coins) || 0
+    if (bonus > 0) {
+        parts.push(`+${bonus} bonus coins on recharge`)
+    }
+    return parts.length ? parts.join(' · ') : null
+}
 
 const coinsForm = ref({
     coins: 1,

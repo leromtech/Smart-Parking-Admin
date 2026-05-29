@@ -17,9 +17,11 @@ const form = ref({
     active: true
 })
 
-const getWalletRechargeAmounts = async () => {
-    const { data } = await api.get('wallet-recharge-amount')
-    walletRechargeAmounts.value = data
+const getWalletRechargeAmounts = async (withPromotions = true) => {
+    const { data } = await api.get('wallet-recharge-amount', {
+        params: withPromotions ? { with_promotions: 1 } : undefined,
+    })
+    walletRechargeAmounts.value = Array.isArray(data) ? data : data?.data ?? data
 }
 
 const confirmDelete = async (cb = null) => {

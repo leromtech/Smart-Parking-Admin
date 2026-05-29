@@ -53,6 +53,57 @@ export const formatDiscountValue = (promo) => {
   }
 };
 
+/** Best / applied promotion on a recharge pack from with_promotions=1 */
+export const getAppliedPromotion = (pack) => {
+  if (!pack) return null;
+  return (
+    pack.applied_promotion ??
+    pack.promotion ??
+    pack.best_promotion ??
+    (Array.isArray(pack.promotions) ? pack.promotions[0] : null) ??
+    null
+  );
+};
+
+export const formatPromotionEffect = (promo) => {
+  if (!promo) return null;
+  const v = formatDiscountValue(promo);
+  switch (promo.discount_type) {
+    case "percent_off":
+      return `${v} off payable`;
+    case "fixed_off":
+      return `${v} off payable`;
+    case "bonus_coins_percent":
+      return `${v} bonus coins`;
+    case "bonus_coins_fixed":
+      return `${v} bonus coins`;
+    default:
+      return v;
+  }
+};
+
+export const formatPackPromotionLine = (pack) => {
+  const promo = getAppliedPromotion(pack);
+  if (!promo) return null;
+
+  const parts = [];
+  if (promo.name) parts.push(promo.name);
+  const effect = formatPromotionEffect(promo);
+  if (effect) parts.push(effect);
+
+  if (pack.payable_amount != null && pack.amount != null && Number(pack.payable_amount) < Number(pack.amount)) {
+    parts.push(`Pay ₹${pack.payable_amount}`);
+  }
+  if (pack.bonus_coins != null && Number(pack.bonus_coins) > 0) {
+    parts.push(`+${pack.bonus_coins} bonus coins`);
+  }
+  if (pack.total_coins != null && pack.coins != null && Number(pack.total_coins) > Number(pack.coins)) {
+    parts.push(`${pack.total_coins} coins total`);
+  }
+
+  return parts.length ? parts.join(" · ") : effect;
+};
+
 const getPromotions = async () => {
   loading.value = true;
   try {
