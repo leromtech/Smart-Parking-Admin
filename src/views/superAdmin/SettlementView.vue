@@ -1,44 +1,62 @@
 <template>
     <div class="flex flex-col gap-4">
         <Panel>
-            <div class="flex flex-col gap-4">
-                <div class="flex flex-row gap-4 w-full">
-                    <Select v-model="selectedParkingZone" :options="parkingZones" filter optionLabel="name"
-                        placeholder="Select a Parking Zone" class="w-full md:w-80">
-                        <template #value="slotProps">
-                            <div v-if="slotProps.value" class="flex items-center">
-                                <div>{{ `${slotProps.value.name} (${slotProps.value.address})` }}</div>
-                            </div>
-                            <span v-else>
-                                Select a Parking zone
-                            </span>
-                        </template>
-                        <template #option="slotProps">
-                            <div class="flex items-center">
-                                <div>{{ `${slotProps.option.name} (${slotProps.option.address})` }}</div>
-                            </div>
-                        </template>
-                    </Select>
+            <template #header>
+                <div class="flex flex-col gap-1">
+                    <span class="font-semibold text-lg">Settlement</span>
+                    <span class="text-sm text-gray-500 font-normal">
+                        Summary by parking zone. Open details for the full payment breakdown.
+                    </span>
+                </div>
+            </template>
 
+            <div class="flex flex-col gap-4">
+                <div class="flex flex-row gap-4 w-full flex-wrap">
                     <IftaLabel>
-                        <DatePicker v-model="monthFilter" selectionMode="range" :manualInput="false"
-                            class="w-full md:w-40" dateFormat="MM yy dd" />
+                        <DatePicker
+                            v-model="monthFilter"
+                            selectionMode="range"
+                            :manualInput="false"
+                            class="w-full md:w-56"
+                            dateFormat="MM yy dd"
+                        />
                         <label for="date">Date filter</label>
                     </IftaLabel>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <Select v-model="filters.payable_type" class="w-full" placeholder="Payable Type"
-                        :options="payableTypeOptions" optionLabel="label" optionValue="value" />
-
-                    <Select v-model="filters.status" class="w-full" placeholder="General Status" :options="statusOptions"
-                        optionLabel="label" optionValue="value" />
-
-                    <Select v-model="filters.payment_status" class="w-full" placeholder="Payment Status"
-                        :options="paymentStatusOptions" optionLabel="label" optionValue="value" />
-
-                    <Select v-model="filters.payment_method" class="w-full" placeholder="Payment Method"
-                        :options="paymentMethodOptions" optionLabel="label" optionValue="value" />
+                    <Select
+                        v-model="filters.payable_type"
+                        class="w-full"
+                        placeholder="Payable Type"
+                        :options="payableTypeOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                    />
+                    <Select
+                        v-model="filters.status"
+                        class="w-full"
+                        placeholder="General Status"
+                        :options="statusOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                    />
+                    <Select
+                        v-model="filters.payment_status"
+                        class="w-full"
+                        placeholder="Payment Status"
+                        :options="paymentStatusOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                    />
+                    <Select
+                        v-model="filters.payment_method"
+                        class="w-full"
+                        placeholder="Payment Method"
+                        :options="paymentMethodOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                    />
                 </div>
 
                 <div class="flex items-center justify-between">
@@ -51,123 +69,185 @@
                 </div>
 
                 <div v-if="showAdvancedFilters" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <Select v-if="showParkingStatusFilter" v-model="filters.parking_status" class="w-full"
-                        placeholder="Parking Status" :options="parkingStatusOptions" optionLabel="label"
-                        optionValue="value" />
-
-                    <Select v-if="showBookingStatusFilter" v-model="filters.booking_status" class="w-full"
-                        placeholder="Booking Status" :options="bookingStatusOptions" optionLabel="label"
-                        optionValue="value" />
-
-                    <Select v-model="filters.vehicle_type" class="w-full" placeholder="Vehicle Type"
-                        :options="vehicleTypeOptions" optionLabel="label" optionValue="value" />
-
+                    <Select
+                        v-if="showParkingStatusFilter"
+                        v-model="filters.parking_status"
+                        class="w-full"
+                        placeholder="Parking Status"
+                        :options="parkingStatusOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                    />
+                    <Select
+                        v-if="showBookingStatusFilter"
+                        v-model="filters.booking_status"
+                        class="w-full"
+                        placeholder="Booking Status"
+                        :options="bookingStatusOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                    />
+                    <Select
+                        v-model="filters.vehicle_type"
+                        class="w-full"
+                        placeholder="Vehicle Type"
+                        :options="vehicleTypeOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                    />
                     <InputText v-model="filters.user_id" class="w-full" placeholder="User ID" />
-
                     <InputNumber v-model="filters.min_amount" class="w-full" :min="0" placeholder="Min Amount" />
                     <InputNumber v-model="filters.max_amount" class="w-full" :min="0" placeholder="Max Amount" />
                 </div>
 
-                <div class="flex flex-row items-center justify-between w-full">
-                    <div class="flex flex-col items-start">
-                        <span class="font-semibold">Settlement Status</span>
-                        <span>{{ status }}</span>
-                    </div>
-                    <div class="flex gap-2">
-                        <Button label="Apply Filters" severity="info" @click="getEarnings" />
-                        <Button label="Clear Filters" severity="secondary" outlined @click="clearFilters" />
-                        <Button @click="settle">Settle</Button>
-                    </div>
+                <div class="flex flex-row gap-2 justify-end">
+                    <Button label="Apply Filters" severity="info" :loading="loadingSummaries" @click="loadSummaries" />
+                    <Button label="Clear Filters" severity="secondary" outlined @click="clearFilters" />
                 </div>
             </div>
         </Panel>
+
         <div v-if="activeFilterChips.length > 0" class="flex flex-wrap gap-2">
             <Tag v-for="chip in activeFilterChips" :key="chip.key" :value="chip.label" />
         </div>
 
-        <div class="flex flex-col gap-2">
-            <Panel :header="entry[0].toUpperCase()" v-for="entry in visiblePaymentEntries" :key="entry[0]">
-                <DataTable :value="entry[1]" scrollable scrollHeight="400px" tableStyle="min-width: 50rem" :loading="loading"
-                    lazy>
-                    <Column header="Receipt No.">
-                        <template #body="slotProps">
-                            {{ slotProps.data.receipt_number ?? '--' }}
-                        </template>
-                    </Column>
-                    <Column header="Payment Method">
-                        <template #body="slotProps">
-                            {{ slotProps.data.payment_method ?? '--' }}
-                        </template>
-                    </Column>
-                    <Column header="Created at">
-                        <template #body="slotProps">
-                            <div class="text-end">
-                                {{ slotProps.data.created_at }}
-                            </div>
-                        </template>
-                    </Column>
-                    <Column field="status" header="Status"></Column>
-                    <Column header="Vehicle Type">
-                        <template #body="slotProps">
-                            <div class="capitalize">
-                                {{ slotProps.data.payable?.vehicle_type?.name || slotProps.data.payable?.vehicleType?.name || slotProps.data.payable?.vehicle?.vehicle_type?.name || slotProps.data.payable?.vehicle?.vehicleType?.name || "--NA--" }}
-                            </div>
-                        </template>
-                    </Column>
-                    <Column header="Amount">
-                        <template #body="slotProps">
-                            <div class="text-end">
-                                {{ (Number(slotProps.data.amount) || 0) !== 0 ?
-                                    (Number(slotProps.data.amount) || 0).toLocaleString('en-IN') : '-' }}
-                            </div>
-                        </template>
-                    </Column>
-                    <Column header="Commission Share">
-                        <template #body="slotProps">
-                            <div class="text-end">
-                                ₹ {{ ((slotProps.data.amount || 0) * commissionRate).toFixed(2) }} ({{ commissionRate * 100 }}%)
-                            </div>
-                        </template>
-                    </Column>
-                    <Column header="Parking Zone Share">
-                        <template #body="slotProps">
-                            <div class="text-end">
-                                ₹ {{ ((slotProps.data.amount || 0) * (1 - commissionRate)).toFixed(2) }}
-                            </div>
-                        </template>
-                    </Column>
-
-                    <template #footer>
-                        <div class="flex justify-between p-2 font-bold">
-                            <span>Total: </span>
-                            <span class="text-end">₹ {{ totals?.[entry[0]] }}</span>
-                        </div>
-                        <div class="flex justify-between p-2 font-bold text-sm text-neutral-500">
-                            <span>Commission Share: </span>
-                            <span class="text-end">₹ {{ ((totals?.[entry[0]] || 0) * commissionRate).toFixed(2) }}</span>
-                        </div>
-                        <div class="flex justify-between p-2 font-bold text-sm text-neutral-500">
-                            <span>Parking Zone Share: </span>
-                            <span class="text-end">₹ {{ ((totals?.[entry[0]] || 0) * (1 - commissionRate)).toFixed(2) }}</span>
+        <Panel>
+            <DataTable
+                :value="zoneSummaries"
+                :loading="loadingSummaries"
+                tableStyle="min-width: 60rem"
+                paginator
+                :rows="15"
+                :rowsPerPageOptions="[10, 15, 25, 50]"
+            >
+                <Column header="Parking Zone" style="min-width: 14rem">
+                    <template #body="{ data }">
+                        <div class="flex flex-col">
+                            <span class="font-medium">{{ data.name }}</span>
+                            <span class="text-sm text-gray-500">{{ data.address }}</span>
                         </div>
                     </template>
+                </Column>
 
-                    <template #empty>
-                        <div class="text-center p-4 text-gray-500">
-                            No records found.
+                <Column header="Status" style="width: 8rem">
+                    <template #body="{ data }">
+                        <Tag
+                            :severity="data.status === 'Settled' ? 'success' : 'warn'"
+                            :value="data.status || 'Unsettled'"
+                        />
+                    </template>
+                </Column>
+
+                <Column header="Parking" style="width: 8rem">
+                    <template #body="{ data }">
+                        <div class="text-end">₹ {{ formatMoney(data.totals?.parking) }}</div>
+                    </template>
+                </Column>
+
+                <Column header="Booking" style="width: 8rem">
+                    <template #body="{ data }">
+                        <div class="text-end">₹ {{ formatMoney(data.totals?.booking) }}</div>
+                    </template>
+                </Column>
+
+                <Column header="Grand Total" style="width: 9rem">
+                    <template #body="{ data }">
+                        <div class="text-end font-semibold">₹ {{ formatMoney(data.grandTotal) }}</div>
+                    </template>
+                </Column>
+
+                <Column header="Commission" style="width: 9rem">
+                    <template #body="{ data }">
+                        <div class="text-end text-sm">
+                            ₹ {{ formatMoney(data.commissionShare) }}
+                            <span class="text-gray-500">({{ (data.commissionRate * 100).toFixed(1) }}%)</span>
                         </div>
                     </template>
-                </DataTable>
-            </Panel>
-        </div>
+                </Column>
 
+                <Column header="Zone Share" style="width: 9rem">
+                    <template #body="{ data }">
+                        <div class="text-end text-green-700 font-medium">
+                            ₹ {{ formatMoney(data.zoneShare) }}
+                        </div>
+                    </template>
+                </Column>
+
+                <Column header="" style="width: 11rem">
+                    <template #body="{ data }">
+                        <div class="flex flex-row gap-2">
+                            <Button
+                                label="Details"
+                                icon="pi pi-eye"
+                                size="small"
+                                outlined
+                                @click="openDetails(data)"
+                            />
+                            <Button
+                                icon="pi pi-check"
+                                size="small"
+                                severity="success"
+                                outlined
+                                v-tooltip.top="'Settle'"
+                                :loading="settlingId === data.id"
+                                @click="settle(data)"
+                            />
+                        </div>
+                    </template>
+                </Column>
+
+                <template #empty>
+                    <div class="text-center py-8 text-gray-500">
+                        {{ loadingSummaries ? 'Loading…' : 'No parking zones found. Adjust filters and apply.' }}
+                    </div>
+                </template>
+            </DataTable>
+        </Panel>
+
+        <Dialog
+            v-model:visible="detailsOpen"
+            modal
+            maximizable
+            class="w-full max-w-6xl"
+            :header="selectedZone ? `Settlement — ${selectedZone.name}` : 'Settlement details'"
+        >
+            <SettlementBreakdown
+                v-if="selectedZone && detailEarnings"
+                :zone-name="selectedZone.name"
+                :zone-address="selectedZone.address"
+                :payments="detailEarnings.payments"
+                :totals="detailEarnings.totals"
+                :commission-rate="detailEarnings.commission_rate || 0"
+                :status="detailEarnings.status"
+                :loading="loadingDetails"
+                :payable-type-filter="filters.payable_type"
+                :active-filter-chips="activeFilterChips"
+            />
+            <div v-else-if="loadingDetails" class="py-12 text-center text-gray-500">Loading breakdown…</div>
+
+            <template #footer>
+                <div class="flex flex-row justify-between w-full">
+                    <Button label="Close" severity="secondary" outlined @click="detailsOpen = false" />
+                    <Button
+                        v-if="selectedZone"
+                        label="Settle"
+                        icon="pi pi-check"
+                        :loading="settlingId === selectedZone.id"
+                        @click="settle(selectedZone)"
+                    />
+                </div>
+            </template>
+        </Dialog>
     </div>
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref } from 'vue';
+import { useToast } from 'primevue/usetoast';
 import api from '../../boot/api';
-import { useToast } from 'primevue';
+import SettlementBreakdown from './settlement/SettlementBreakdown.vue';
+
+const toast = useToast();
 
 const filters = ref({
     status: '',
@@ -180,187 +260,275 @@ const filters = ref({
     payable_type: '',
     min_amount: null,
     max_amount: null,
-})
+});
 
-const toast = useToast()
+const monthFilter = ref([new Date()]);
+const parkingZones = ref([]);
+const zoneSummaries = ref([]);
+const earningsCache = ref({});
+const loadingSummaries = ref(false);
+const loadingDetails = ref(false);
+const detailsOpen = ref(false);
+const selectedZone = ref(null);
+const detailEarnings = ref(null);
+const settlingId = ref(null);
+const vehicleTypeOptions = ref([]);
+const showAdvancedFilters = ref(false);
 
-const loading = ref(false)
-
-const monthFilter = ref([
-    new Date(),
-])
-
-const parkingZones = ref([])
-
-const payments = ref({})
-
-const status = ref('')
-
-const totals = ref(null)
-const commissionRate = ref(0)
-
-const selectedParkingZone = ref(null)
-const vehicleTypeOptions = ref([])
-const showAdvancedFilters = ref(false)
-
-const statusOptions = ref([
+const statusOptions = [
     { label: 'All', value: '' },
     { label: 'Paid', value: 'paid' },
-    { label: 'Pending', value: 'pending' }
-])
-const payableTypeOptions = ref([
+    { label: 'Pending', value: 'pending' },
+];
+const payableTypeOptions = [
     { label: 'All Types', value: '' },
     { label: 'Parking', value: 'parking' },
     { label: 'Booking', value: 'booking' },
-])
-const parkingStatusOptions = ref([
+];
+const parkingStatusOptions = [
     { label: 'All Parking Statuses', value: '' },
     { label: 'Ongoing', value: 'ongoing' },
     { label: 'Completed', value: 'completed' },
-])
-const bookingStatusOptions = ref([
+];
+const bookingStatusOptions = [
     { label: 'All Booking Statuses', value: '' },
     { label: 'Ongoing', value: 'ongoing' },
     { label: 'Completed', value: 'completed' },
     { label: 'Cancelled', value: 'cancelled' },
-])
-const paymentStatusOptions = ref([
+];
+const paymentStatusOptions = [
     { label: 'All Payment Statuses', value: '' },
     { label: 'Paid', value: 'paid' },
     { label: 'Pending', value: 'pending' },
     { label: 'Cancelled', value: 'cancelled' },
     { label: 'Failed', value: 'failed' },
-])
-const paymentMethodOptions = ref([
+];
+const paymentMethodOptions = [
     { label: 'All Methods', value: '' },
     { label: 'Wallet', value: 'wallet' },
     { label: 'UPI', value: 'upi' },
     { label: 'Cash', value: 'cash' },
     { label: 'Card', value: 'card' },
     { label: 'Razorpay', value: 'razorpay' },
-])
+];
 
-const showParkingStatusFilter = computed(() => filters.value.payable_type !== 'booking')
-const showBookingStatusFilter = computed(() => filters.value.payable_type !== 'parking')
-const visiblePaymentEntries = computed(() => {
-    const allEntries = Object.entries(payments.value || {})
-    if (filters.value.payable_type === 'parking') return allEntries.filter(([key]) => key === 'parking')
-    if (filters.value.payable_type === 'booking') return allEntries.filter(([key]) => key === 'booking')
-    return allEntries
-})
+const showParkingStatusFilter = computed(() => filters.value.payable_type !== 'booking');
+const showBookingStatusFilter = computed(() => filters.value.payable_type !== 'parking');
+
+const formatMoney = (value) =>
+    (Number(value) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+const isBlank = (value) => value === '' || value === null || value === undefined;
+
+const sanitizeFilters = () => {
+    const next = {};
+    const source = filters.value;
+
+    if (!isBlank(source.status)) next.status = source.status;
+    if (!isBlank(source.parking_status) && source.payable_type !== 'booking') {
+        next.parking_status = source.parking_status;
+    }
+    if (!isBlank(source.booking_status) && source.payable_type !== 'parking') {
+        next.booking_status = source.booking_status;
+    }
+    if (!isBlank(source.payment_status)) next.payment_status = source.payment_status;
+    if (!isBlank(source.payment_method)) next.payment_method = source.payment_method;
+    if (!isBlank(source.vehicle_type)) next.vehicle_type = source.vehicle_type;
+    if (!isBlank(source.user_id)) next.user_id = source.user_id;
+    if (!isBlank(source.payable_type)) next.payable_type = source.payable_type;
+    if (!isBlank(source.min_amount)) next.min_amount = Number(source.min_amount);
+    if (!isBlank(source.max_amount)) next.max_amount = Number(source.max_amount);
+
+    return next;
+};
+
 const activeFilterChips = computed(() => {
-    const chips = []
-    const cleaned = sanitizeFilters()
+    const chips = [];
+    const cleaned = sanitizeFilters();
     Object.entries(cleaned).forEach(([key, value]) => {
         chips.push({
             key,
             label: `${key.replaceAll('_', ' ')}: ${value}`,
-        })
-    })
-    return chips
-})
-
-const getParkingZonesData = async () => {
-    const { data } = await api.get('parking-zones')
-    parkingZones.value = data.parking_zones.data
-}
-
-const getVehicleTypes = async () => {
-    try {
-        const { data } = await api.get('vehicle-types')
-        const items = data?.vehicle_types?.data || []
-        vehicleTypeOptions.value = [
-            { label: 'All Vehicle Types', value: null },
-            ...items.map((item) => ({ label: item.name, value: item.id })),
-        ]
-    } catch (error) {
-        vehicleTypeOptions.value = [{ label: 'All Vehicle Types', value: null }]
-    }
-}
-
-const isBlank = (value) => value === '' || value === null || value === undefined
-
-const sanitizeFilters = () => {
-    const next = {}
-    const source = filters.value
-
-    if (!isBlank(source.status)) next.status = source.status
-    if (!isBlank(source.parking_status) && source.payable_type !== 'booking') next.parking_status = source.parking_status
-    if (!isBlank(source.booking_status) && source.payable_type !== 'parking') next.booking_status = source.booking_status
-    if (!isBlank(source.payment_status)) next.payment_status = source.payment_status
-    if (!isBlank(source.payment_method)) next.payment_method = source.payment_method
-    if (!isBlank(source.vehicle_type)) next.vehicle_type = source.vehicle_type
-    if (!isBlank(source.user_id)) next.user_id = source.user_id
-    if (!isBlank(source.payable_type)) next.payable_type = source.payable_type
-    if (!isBlank(source.min_amount)) next.min_amount = Number(source.min_amount)
-    if (!isBlank(source.max_amount)) next.max_amount = Number(source.max_amount)
-
-    return next
-}
+        });
+    });
+    return chips;
+});
 
 const validateFilters = (sanitized) => {
     if (sanitized.payable_type && !['parking', 'booking'].includes(sanitized.payable_type)) {
-        toast.add({ severity: 'error', summary: 'Validation', detail: 'Invalid payable type', life: 3000 })
-        return false
+        toast.add({ severity: 'error', summary: 'Validation', detail: 'Invalid payable type', life: 3000 });
+        return false;
     }
-
     if (sanitized.min_amount !== undefined && Number.isNaN(Number(sanitized.min_amount))) {
-        toast.add({ severity: 'error', summary: 'Validation', detail: 'Minimum amount must be numeric', life: 3000 })
-        return false
+        toast.add({ severity: 'error', summary: 'Validation', detail: 'Minimum amount must be numeric', life: 3000 });
+        return false;
     }
-
     if (sanitized.max_amount !== undefined && Number.isNaN(Number(sanitized.max_amount))) {
-        toast.add({ severity: 'error', summary: 'Validation', detail: 'Maximum amount must be numeric', life: 3000 })
-        return false
+        toast.add({ severity: 'error', summary: 'Validation', detail: 'Maximum amount must be numeric', life: 3000 });
+        return false;
+    }
+    if (
+        sanitized.min_amount !== undefined &&
+        sanitized.max_amount !== undefined &&
+        Number(sanitized.max_amount) < Number(sanitized.min_amount)
+    ) {
+        toast.add({
+            severity: 'error',
+            summary: 'Validation',
+            detail: 'Maximum amount must be greater than or equal to minimum amount',
+            life: 3000,
+        });
+        return false;
+    }
+    return true;
+};
+
+const buildDateFilter = () => {
+    const dateFilter = { start: null, end: null };
+    if (!monthFilter.value?.[0]) return null;
+
+    dateFilter.start = monthFilter.value[0]
+        .toLocaleDateString('en-GB', { month: 'numeric', year: 'numeric', day: 'numeric' })
+        .replaceAll('/', '-');
+
+    if (monthFilter.value[1]) {
+        dateFilter.end = monthFilter.value[1]
+            .toLocaleDateString('en-GB', { month: 'numeric', year: 'numeric', day: 'numeric' })
+            .replaceAll('/', '-');
     }
 
-    if (sanitized.min_amount !== undefined && sanitized.max_amount !== undefined && Number(sanitized.max_amount) < Number(sanitized.min_amount)) {
-        toast.add({ severity: 'error', summary: 'Validation', detail: 'Maximum amount must be greater than or equal to minimum amount', life: 3000 })
-        return false
+    return dateFilter;
+};
+
+const buildEarningsParams = (zoneId) => {
+    const sanitizedFilters = sanitizeFilters();
+    const params = {
+        parking_zone_id: zoneId,
+        dateFilter: buildDateFilter(),
+    };
+    if (Object.keys(sanitizedFilters).length > 0) {
+        params.filters = sanitizedFilters;
+    }
+    return params;
+};
+
+const mapEarningsToSummary = (zone, data) => {
+    const commissionRate = Number(data.commission_rate) || 0;
+    const grandTotal = Number(data.totals?.grand_total) || 0;
+
+    return {
+        id: zone.id,
+        name: zone.name,
+        address: zone.address,
+        status: data.status,
+        commissionRate,
+        totals: data.totals,
+        grandTotal,
+        commissionShare: grandTotal * commissionRate,
+        zoneShare: grandTotal * (1 - commissionRate),
+        parkingCount: data.payments?.parking?.length ?? 0,
+        bookingCount: data.payments?.booking?.length ?? 0,
+    };
+};
+
+const fetchZoneEarnings = async (zone) => {
+    const { data } = await api.get('earnings', { params: buildEarningsParams(zone.id) });
+    earningsCache.value[zone.id] = data;
+    return mapEarningsToSummary(zone, data);
+};
+
+const loadSummaries = async () => {
+    if (!monthFilter.value?.[0]) {
+        toast.add({ severity: 'warn', summary: 'Date required', detail: 'Select a date range first', life: 3000 });
+        return;
     }
 
-    return true
-}
+    const sanitizedFilters = sanitizeFilters();
+    if (!validateFilters(sanitizedFilters)) return;
 
-const getEarnings = async () => {
-    if (!selectedParkingZone.value?.id || !monthFilter.value?.[0]) {
-        return
-    }
+    loadingSummaries.value = true;
+    earningsCache.value = {};
 
-    loading.value = true
     try {
-        let dateFilter = {
-            start: null,
-            end: null
-        }
-        if (monthFilter.value[1]) {
-            dateFilter.end = monthFilter.value[1].toLocaleDateString('en-GB', { month: 'numeric', year: 'numeric', day: 'numeric' }).replaceAll('/', '-');
-        }
-        dateFilter.start = monthFilter.value[0].toLocaleDateString('en-GB', { month: 'numeric', year: 'numeric', day: "numeric" }).replaceAll('/', '-');
-        const sanitizedFilters = sanitizeFilters()
-        if (!validateFilters(sanitizedFilters)) {
-            loading.value = false
-            return
-        }
-
-        const params = {
-            parking_zone_id: selectedParkingZone.value.id,
-            dateFilter,
-        }
-
-        if (Object.keys(sanitizedFilters).length > 0) {
-            params.filters = sanitizedFilters
-        }
-
-        const { data } = await api.get('earnings', { params });
-        payments.value = data.payments;
-        totals.value = data.totals
-        status.value = data.status
-        commissionRate.value = data.commission_rate || 0
-        loading.value = false
+        const results = await Promise.all(parkingZones.value.map((zone) => fetchZoneEarnings(zone)));
+        zoneSummaries.value = results.sort((a, b) => b.grandTotal - a.grandTotal);
     } catch (error) {
-        console.error('Error fetching earnings:', error);
-        loading.value = false
+        console.error('Error loading settlement summaries:', error);
+        toast.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error.response?.data?.message || 'Failed to load settlement summaries',
+            life: 3000,
+        });
+    } finally {
+        loadingSummaries.value = false;
+    }
+};
+
+const openDetails = async (row) => {
+    selectedZone.value = {
+        id: row.id,
+        name: row.name,
+        address: row.address,
+    };
+    detailsOpen.value = true;
+
+    const cached = earningsCache.value[row.id];
+    if (cached) {
+        detailEarnings.value = cached;
+        return;
+    }
+
+    loadingDetails.value = true;
+    try {
+        const { data } = await api.get('earnings', { params: buildEarningsParams(row.id) });
+        earningsCache.value[row.id] = data;
+        detailEarnings.value = data;
+    } catch (error) {
+        toast.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error.response?.data?.message || 'Failed to load settlement details',
+            life: 3000,
+        });
+        detailsOpen.value = false;
+    } finally {
+        loadingDetails.value = false;
+    }
+};
+
+const settle = async (row) => {
+    if (!monthFilter.value?.[0]) return;
+
+    const month = monthFilter.value[0]
+        .toLocaleDateString('en-GB', { month: 'numeric', year: 'numeric' })
+        .replace('/', '-');
+
+    settlingId.value = row.id;
+    try {
+        const { data } = await api.post('settlement/initiate', {
+            parkingZoneId: row.id,
+            month,
+        });
+        toast.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: data.message || 'Settlement initiated successfully',
+            life: 3000,
+        });
+        await loadSummaries();
+        if (detailsOpen.value && selectedZone.value?.id === row.id) {
+            detailEarnings.value = earningsCache.value[row.id] ?? detailEarnings.value;
+        }
+    } catch (error) {
+        toast.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error.response?.data?.message || 'An error occurred during settlement',
+            life: 3000,
+        });
+    } finally {
+        settlingId.value = null;
     }
 };
 
@@ -376,39 +544,32 @@ const clearFilters = async () => {
         payable_type: '',
         min_amount: null,
         max_amount: null,
-    }
-    showAdvancedFilters.value = false
-    await getEarnings()
-}
+    };
+    showAdvancedFilters.value = false;
+    await loadSummaries();
+};
 
-const settle = async () => {
-    if (!monthFilter.value?.[0]) return;
-    const month = monthFilter.value[0].toLocaleDateString('en-GB', { month: 'numeric', year: 'numeric' }).replace('/', '-');
+const getParkingZonesData = async () => {
+    const { data } = await api.get('parking-zones');
+    parkingZones.value = data.parking_zones?.data ?? data?.data ?? [];
+};
+
+const getVehicleTypes = async () => {
     try {
-        const { data } = await api.post('settlement/initiate', { parkingZoneId: selectedParkingZone.value.id, month })
-        toast.add({ severity: 'success', summary: 'Success', detail: data.message || 'Settlement initiated successfully', life: 3000 });
-    } catch (error) {
-        const message = error.response?.data?.message || 'An error occurred during settlement';
-        toast.add({ severity: 'error', summary: 'Error', detail: message, life: 3000 });
+        const { data } = await api.get('vehicle-types');
+        const items = data?.vehicle_types?.data || [];
+        vehicleTypeOptions.value = [
+            { label: 'All Vehicle Types', value: null },
+            ...items.map((item) => ({ label: item.name, value: item.id })),
+        ];
+    } catch {
+        vehicleTypeOptions.value = [{ label: 'All Vehicle Types', value: null }];
     }
-}
-
-watch(selectedParkingZone, async (newVal) => {
-    await getEarnings()
-})
-
-watch(monthFilter, async (newVal) => {
-    if (!newVal[0]) {
-        return
-    }
-    await getEarnings()
-})
+};
 
 onMounted(async () => {
-    await getParkingZonesData()
-    await getVehicleTypes()
-    if (parkingZones.value.length > 0) {
-        selectedParkingZone.value = parkingZones.value[0]
-    }
-})
+    await getParkingZonesData();
+    await getVehicleTypes();
+    await loadSummaries();
+});
 </script>
