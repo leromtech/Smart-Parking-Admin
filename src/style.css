@@ -1,3 +1,116 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    /* Brand colors */
+    --color-primary-50: #f0f9ff;
+    --color-primary-100: #e0f2fe;
+    --color-primary-200: #bae6fd;
+    --color-primary-300: #7dd3fc;
+    --color-primary-400: #38bdf8;
+    --color-primary-500: #0ea5e9;
+    --color-primary-600: #0284c7;
+    --color-primary-700: #0369a1;
+    --color-primary-800: #075985;
+    --color-primary-900: #0c4a6e;
+
+    /* Surface / neutral */
+    --color-surface-50: #f8fafc;
+    --color-surface-100: #f1f5f9;
+    --color-surface-200: #e2e8f0;
+    --color-surface-300: #cbd5e1;
+    --color-surface-400: #94a3b8;
+    --color-surface-500: #64748b;
+    --color-surface-600: #475569;
+    --color-surface-700: #334155;
+    --color-surface-800: #1e293b;
+    --color-surface-900: #0f172a;
+
+    /* Gradients */
+    --gradient-header: linear-gradient(135deg, #0c4a6e 0%, #0284c7 100%);
+    --gradient-sidebar-active: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%);
+
+    /* Semantic colors */
+    --color-success: #10b981;
+    --color-success-bg: #ecfdf5;
+    --color-warning: #f59e0b;
+    --color-warning-bg: #fffbeb;
+    --color-danger: #ef4444;
+    --color-danger-bg: #fef2f2;
+    --color-info: #3b82f6;
+    --color-info-bg: #eff6ff;
+
+    /* Spacing / sizing */
+    --sidebar-width: 16rem;
+    --header-height: 4rem;
+
+    /* Shadows */
+    --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.04), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+    --shadow-card-hover: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
+    --shadow-sidebar: 1px 0 3px 0 rgb(0 0 0 / 0.04);
+
+    /* Border radius */
+    --radius-card: 0.75rem;
+    --radius-btn: 0.5rem;
+    --radius-input: 0.5rem;
+
+    /* Transitions */
+    --transition-fast: 150ms ease;
+    --transition-base: 250ms ease;
+    --transition-slow: 350ms ease;
+  }
+
+  /* Dark mode overrides */
+  .my-app-dark {
+    --color-surface-50: #0f172a;
+    --color-surface-100: #1e293b;
+    --color-surface-200: #334155;
+    --color-surface-300: #475569;
+    --color-surface-400: #64748b;
+    --color-surface-500: #94a3b8;
+    --color-surface-600: #cbd5e1;
+    --color-surface-700: #e2e8f0;
+    --color-surface-800: #f1f5f9;
+    --color-surface-900: #f8fafc;
+
+    --gradient-header: linear-gradient(135deg, #020617 0%, #0c4a6e 100%);
+    --gradient-sidebar-active: linear-gradient(135deg, #0369a1 0%, #0284c7 100%);
+
+    --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.2), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+    --shadow-card-hover: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.2);
+  }
+}
+
+@layer components {
+  /* Page transition */
+  .page-enter-active {
+    animation: fade-in 0.2s ease-out;
+  }
+
+  .page-leave-active {
+    animation: fade-in 0.15s ease-in reverse;
+  }
+
+  /* Skeleton loading */
+  .skeleton {
+    @apply animate-pulse rounded bg-surface-200;
+  }
+
+  /* Card base */
+  .card {
+    @apply bg-white rounded-card shadow-card border border-surface-100;
+  }
+
+  .my-app-dark .card {
+    @apply bg-surface-800 border-surface-700;
+  }
+
+  /* Gradient header bar */
+  .header-bar {
+    background: var(--gradient-header);
+  }
+}

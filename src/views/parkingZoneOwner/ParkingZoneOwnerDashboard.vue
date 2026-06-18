@@ -3,110 +3,17 @@
     <!-- Header -->
     <div class="flex flex-col gap-2">
       <h1 class="text-3xl font-bold text-gray-800">
-        {{
-          user?.parking_zone_owned?.name ||
-          parking_zone?.name ||
-          "Parking Zone Dashboard"
-        }}
+        {{ user?.parking_zone_owned?.name || parking_zone?.name || "Parking Zone Dashboard" }}
       </h1>
       <p class="text-gray-500 text-sm">Dashboard Overview</p>
     </div>
 
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <!-- Parking Space Card -->
-      <div
-        class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-100">
-        <div class="p-6">
-          <div class="flex items-center justify-between mb-4">
-            <div
-              class="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-md">
-              <font-awesome-icon
-                :icon="['fas', 'square']"
-                class="text-white text-2xl"></font-awesome-icon>
-            </div>
-          </div>
-          <div class="flex flex-col">
-            <span class="text-gray-500 text-sm font-medium mb-1"
-              >Total Parking Space</span
-            >
-            <span class="text-3xl font-bold text-gray-800">{{
-              totalCapacity ?? "0"
-            }}</span>
-            <span class="text-xs text-gray-400 mt-1">Total capacity</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Reserved Space Card -->
-      <div
-        class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-100">
-        <div class="p-6">
-          <div class="flex items-center justify-between mb-4">
-            <div
-              class="p-3 bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-md">
-              <font-awesome-icon
-                :icon="['fas', 'lock']"
-                class="text-white text-2xl"></font-awesome-icon>
-            </div>
-          </div>
-          <div class="flex flex-col">
-            <span class="text-gray-500 text-sm font-medium mb-1"
-              >Reserved Space for App</span
-            >
-            <span class="text-3xl font-bold text-gray-800">{{
-              totalReservedForApp ?? "0"
-            }}</span>
-            <span class="text-xs text-gray-400 mt-1">For app users</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Currently Occupied Card -->
-      <div
-        class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-100">
-        <div class="p-6">
-          <div class="flex items-center justify-between mb-4">
-            <div
-              class="p-3 bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-md">
-              <font-awesome-icon
-                :icon="['fas', 'car']"
-                class="text-white text-2xl"></font-awesome-icon>
-            </div>
-          </div>
-          <div class="flex flex-col">
-            <span class="text-gray-500 text-sm font-medium mb-1"
-              >Currently Occupied</span
-            >
-            <span class="text-3xl font-bold text-gray-800">{{
-              occupiedSpace
-            }}</span>
-            <span class="text-xs text-gray-400 mt-1">Active parking</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Managers Card -->
-      <div
-        class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-100">
-        <div class="p-6">
-          <div class="flex items-center justify-between mb-4">
-            <div
-              class="p-3 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl shadow-md">
-              <font-awesome-icon
-                :icon="['fas', 'users']"
-                class="text-white text-2xl"></font-awesome-icon>
-            </div>
-          </div>
-          <div class="flex flex-col">
-            <span class="text-gray-500 text-sm font-medium mb-1">Managers</span>
-            <span class="text-3xl font-bold text-gray-800">{{
-              parking_zone?.managers?.length ?? "0"
-            }}</span>
-            <span class="text-xs text-gray-400 mt-1">Total managers</span>
-          </div>
-        </div>
-      </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <StatCard label="Total Parking Space" :value="totalCapacity ?? '0'" icon="pi pi-th-large" variant="primary" subtitle="Total capacity" />
+      <StatCard label="Reserved for App" :value="totalReservedForApp ?? '0'" icon="pi pi-lock" variant="danger" subtitle="For app users" />
+      <StatCard label="Currently Occupied" :value="occupiedSpace" icon="pi pi-car" variant="success" subtitle="Active parking" />
+      <StatCard label="Managers" :value="parking_zone?.managers?.length ?? '0'" icon="pi pi-users" variant="warning" subtitle="Total managers" />
     </div>
 
     <!-- Analytics Section -->
@@ -117,13 +24,7 @@
           <h2 class="text-xl font-semibold text-gray-800">Parking Analytics</h2>
           <div class="w-64">
             <IftaLabel>
-              <DatePicker
-                v-model="yearFilter"
-                showIcon
-                fluid
-                iconDisplay="input"
-                view="year"
-                dateFormat="yy" />
+              <DatePicker v-model="yearFilter" showIcon fluid iconDisplay="input" view="year" dateFormat="yy" />
               <label for="date">Select Year</label>
             </IftaLabel>
           </div>
@@ -135,28 +36,22 @@
             <ParkingRecordChart
               :title="`Parking Records - ${yearFilter.getFullYear()}`"
               :data="parkingRecords || []"
-              :year="yearFilter.getFullYear()" />
+              :year="yearFilter.getFullYear()"
+            />
           </div>
           <!-- Vehicle Type Distribution -->
           <div class="lg:col-span-1">
-            <TotalVehicleMonthChart
-              title="Vehicle Types"
-              :data="vehicleRecords || []" />
+            <TotalVehicleMonthChart title="Vehicle Types" :data="vehicleRecords || []" />
           </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div class="lg:col-span-2">
-            <BookingChart
-              :title="`Monthly Bookings - ${yearFilter.getFullYear()}`"
-              :data="bookingRecords"
-              :year="yearFilter.getFullYear()" />
+            <BookingChart :title="`Monthly Bookings - ${yearFilter.getFullYear()}`" :data="bookingRecords" :year="yearFilter.getFullYear()" />
           </div>
 
           <div class="lg:col-span-1">
-            <TotalVehicleMonthChart
-              title="Vehicle Types"
-              :data="vehicleRecords || []" />
+            <TotalVehicleMonthChart title="Vehicle Types" :data="vehicleRecords || []" />
           </div>
         </div>
       </div>
@@ -173,11 +68,11 @@ import { useParkingZone } from "../../scripts/parkingZone";
 import api from "../../boot/api";
 import BookingChart from "../../components/OwnerDashboard/BookingChart.vue";
 import useFloors from "../../scripts/floors";
+import StatCard from "../../components/common/StatCard.vue";
 
 const { user } = useAuth();
 const { parking_zone, getParkingZone } = useParkingZone();
-const { floors, loading, editItem, deleteItem, getFloors, deleteFloor } =
-  useFloors();
+const { floors, loading, editItem, deleteItem, getFloors, deleteFloor } = useFloors();
 const availability = ref(0);
 const yearFilter = ref(new Date());
 let echoChannel = null;
@@ -187,11 +82,7 @@ const displayAvailability = computed(() => {
   const value = availability.value;
   if (typeof value === "number") {
     return value;
-  } else if (
-    typeof value === "object" &&
-    value !== null &&
-    "occupied" in value
-  ) {
+  } else if (typeof value === "object" && value !== null && "occupied" in value) {
     return Number(value.occupied) || 0;
   } else if (value === null || value === undefined) {
     return "...";
@@ -273,17 +164,10 @@ const setupRealTimeAvailability = async () => {
         occupiedCount = Number(data.real_time_availability) || 0;
       } else if ("currently_occupied_spaces" in data) {
         occupiedCount = Number(data.currently_occupied_spaces) || 0;
-      } else if (
-        data.data &&
-        typeof data.data === "object" &&
-        "occupied" in data.data
-      ) {
+      } else if (data.data && typeof data.data === "object" && "occupied" in data.data) {
         occupiedCount = Number(data.data.occupied) || 0;
       } else {
-        console.warn(
-          "⚠️ Could not find occupied field in availability response:",
-          data,
-        );
+        console.warn("⚠️ Could not find occupied field in availability response:", data);
         occupiedCount = 0;
       }
     }
@@ -310,11 +194,7 @@ const getAnalytics = async () => {
     console.log("📊 Analytics data:", data);
 
     // Parking records
-    if (
-      data &&
-      data.monthly_parking_records &&
-      data.monthly_parking_records.length > 0
-    ) {
+    if (data && data.monthly_parking_records && data.monthly_parking_records.length > 0) {
       parkingRecords.value = data.monthly_parking_records.map((item) => {
         return { [item.month]: item.count };
       });
