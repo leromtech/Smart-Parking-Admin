@@ -1,35 +1,67 @@
 <template>
-  <div
-    :class="[
-      'card p-5 flex items-center gap-4 transition-all duration-250',
-      'hover:shadow-card-hover hover:-translate-y-0.5',
-      'cursor-default animate-slide-up',
-    ]"
-  >
-    <div :class="['flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center', iconBgClass]">
+  <div :class="['card-interactive p-5 flex items-center gap-4', 'animate-fade-in-up', loading ? 'pointer-events-none' : '']">
+    <!-- Icon -->
+    <div :class="['flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300', iconBgClass]">
       <i :class="[icon, 'text-xl', iconColorClass]" />
     </div>
 
+    <!-- Content -->
     <div class="min-w-0 flex-1">
-      <p class="text-xs font-medium text-surface-500 uppercase tracking-wider mb-0.5">
+      <!-- Label -->
+      <p class="text-xs font-medium text-surface-500 uppercase tracking-wider mb-1">
         {{ label }}
       </p>
-      <div class="flex items-baseline gap-2">
-        <span class="text-2xl font-bold text-surface-900 tabular-nums">
-          <slot name="value">{{ value }}</slot>
+
+      <!-- Skeleton or Value -->
+      <div v-if="loading" class="h-7 w-20 skeleton rounded"></div>
+      <div v-else class="flex items-baseline gap-2 flex-wrap">
+        <span class="text-2xl font-bold text-surface-900 tabular-nums tracking-tight">
+          <slot name="value">{{ formattedValue }}</slot>
         </span>
         <span
           v-if="trend !== undefined && trend !== null"
           :class="[
             'inline-flex items-center gap-0.5 text-xs font-semibold px-1.5 py-0.5 rounded-full',
-            trend >= 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600',
+            trend >= 0 ? 'bg-success-50 text-success-700' : 'bg-danger-50 text-danger-700',
           ]"
         >
-          <i :class="trend >= 0 ? 'pi pi-arrow-up text-[10px]' : 'pi pi-arrow-down text-[10px]'" />
+          <svg
+            v-if="trend >= 0"
+            xmlns="http://www.w3.org/2000/svg"
+            width="10"
+            height="10"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="3"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="18 15 12 9 6 15" />
+          </svg>
+          <svg
+            v-else
+            xmlns="http://www.w3.org/2000/svg"
+            width="10"
+            height="10"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="3"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
           {{ Math.abs(trend) }}%
         </span>
       </div>
-      <p v-if="subtitle" class="text-xs text-surface-400 mt-0.5">{{ subtitle }}</p>
+
+      <!-- Subtitle -->
+      <p v-if="subtitle && !loading" class="text-xs text-surface-400 mt-1">
+        {{ subtitle }}
+      </p>
+      <div v-else-if="loading" class="h-3.5 w-24 skeleton rounded mt-1"></div>
     </div>
   </div>
 </template>
@@ -48,16 +80,22 @@ const props = defineProps({
   },
   trend: { type: Number, default: undefined },
   subtitle: { type: String, default: "" },
+  loading: { type: Boolean, default: false },
 });
 
 const variantMap = {
   primary: { bg: "bg-primary-50", color: "text-primary-600" },
-  success: { bg: "bg-emerald-50", color: "text-emerald-600" },
-  warning: { bg: "bg-amber-50", color: "text-amber-600" },
-  danger: { bg: "bg-red-50", color: "text-red-600" },
-  info: { bg: "bg-sky-50", color: "text-sky-600" },
+  success: { bg: "bg-success-50", color: "text-success-600" },
+  warning: { bg: "bg-warning-50", color: "text-warning-600" },
+  danger: { bg: "bg-danger-50", color: "text-danger-600" },
+  info: { bg: "bg-info-50", color: "text-info-600" },
 };
 
 const iconBgClass = computed(() => variantMap[props.variant]?.bg || variantMap.primary.bg);
 const iconColorClass = computed(() => variantMap[props.variant]?.color || variantMap.primary.color);
+
+const formattedValue = computed(() => {
+  if (props.value === "" || props.value === null || props.value === undefined) return "—";
+  return props.value;
+});
 </script>
