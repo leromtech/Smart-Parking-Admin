@@ -348,9 +348,9 @@
             <!-- Menu items -->
             <template v-if="item.items">
               <template v-for="(child, childIdx) in item.items" :key="childIdx">
-                <router-link v-if="child.route" :to="child.route" v-slot="{ isActive }" custom>
+                <router-link v-if="child.route" :to="child.route" v-slot="{ isActive, navigate, href }" custom>
                   <a
-                    :href="child.route"
+                    :href="href"
                     :class="[
                       'flex items-center gap-3 px-3 py-2.5 my-0.5 rounded-lg transition-all duration-200 text-sm font-medium group',
                       isActive
@@ -360,7 +360,10 @@
                     ]"
                     :title="sidebarCollapsed ? child.label : ''"
                     :aria-current="isActive ? 'page' : undefined"
-                    @click="onNavClick"
+                    @click="
+                      navigate;
+                      onNavClick();
+                    "
                   >
                     <span
                       :class="[
@@ -378,9 +381,9 @@
             </template>
 
             <!-- Direct menu item (no group) -->
-            <router-link v-else-if="item.route" :to="item.route" v-slot="{ isActive }" custom>
+            <router-link v-else-if="item.route" :to="item.route" v-slot="{ isActive, navigate, href }" custom>
               <a
-                :href="item.route"
+                :href="href"
                 :class="[
                   'flex items-center gap-3 px-3 py-2.5 my-0.5 rounded-lg transition-all duration-200 text-sm font-medium group',
                   isActive
@@ -390,7 +393,10 @@
                 ]"
                 :title="sidebarCollapsed ? item.label : ''"
                 :aria-current="isActive ? 'page' : undefined"
-                @click="onNavClick"
+                @click="
+                  navigate;
+                  onNavClick();
+                "
               >
                 <span
                   :class="[
