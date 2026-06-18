@@ -16,7 +16,7 @@
 
         <!-- Content -->
         <div
-          class="relative bg-white rounded-xl shadow-2xl border border-surface-100 w-full max-w-lg max-h-[90vh] overflow-auto"
+          class="relative bg-white dark:bg-surface-800 rounded-xl shadow-2xl border border-surface-100 dark:border-surface-700 w-full max-w-lg max-h-[90vh] overflow-auto"
           v-bind="$attrs"
           @click.stop
         >

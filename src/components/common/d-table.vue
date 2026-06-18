@@ -37,7 +37,7 @@
       <div class="overflow-x-auto">
         <table class="w-full" role="table">
           <thead>
-            <tr class="border-b border-surface-100 bg-surface-50/50">
+            <tr class="border-b border-surface-100 dark:border-surface-700 bg-surface-50/50 dark:bg-surface-800/50">
               <!-- Checkbox column -->
               <th v-if="selectable" class="w-12 py-3 px-4 text-left">
                 <input
@@ -52,8 +52,8 @@
                 v-for="column in columns"
                 :key="column.name || column.field"
                 :class="[
-                  'py-3 px-4 text-left text-xs font-semibold text-surface-500 uppercase tracking-wider',
-                  column.sortable ? 'cursor-pointer select-none hover:text-surface-700 transition-colors' : '',
+                  'py-3 px-4 text-left text-xs font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wider',
+                  column.sortable ? 'cursor-pointer select-none hover:text-surface-700 dark:hover:text-surface-300 transition-colors' : '',
                 ]"
                 @click="column.sortable && toggleSort(column)"
               >
@@ -92,14 +92,23 @@
                 </span>
               </th>
               <!-- Actions column -->
-              <th v-if="$slots.actions" class="py-3 px-4 text-right text-xs font-semibold text-surface-500 uppercase tracking-wider w-px">Actions</th>
+              <th
+                v-if="$slots.actions"
+                class="py-3 px-4 text-right text-xs font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wider w-px"
+              >
+                Actions
+              </th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-surface-50">
+          <tbody class="divide-y divide-surface-50 dark:divide-surface-700">
             <tr
               v-for="row in rows"
               :key="row.id"
-              :class="['transition-colors duration-150', 'hover:bg-surface-50/70', isSelected(row) ? 'bg-primary-50/40' : '']"
+              :class="[
+                'transition-colors duration-150',
+                'hover:bg-surface-50/70 dark:hover:bg-surface-700/50',
+                isSelected(row) ? 'bg-primary-50/40 dark:bg-primary-400/10' : '',
+              ]"
             >
               <!-- Checkbox -->
               <td v-if="selectable" class="py-3 px-4">
@@ -112,7 +121,12 @@
                 />
               </td>
               <!-- Data cells -->
-              <td v-for="col in columns" :key="col.name || col.field" class="py-3 px-4 text-sm text-surface-700" :class="col.class || ''">
+              <td
+                v-for="col in columns"
+                :key="col.name || col.field"
+                class="py-3 px-4 text-sm text-surface-700 dark:text-surface-300"
+                :class="col.class || ''"
+              >
                 <slot :name="`cell-${col.field}`" :row="row">
                   {{ typeof col.field === "function" ? col.field(row) : getNestedField(row, col.field) }}
                 </slot>
@@ -127,14 +141,17 @@
       </div>
 
       <!-- Pagination -->
-      <div v-if="paginate && totalPages > 1" class="flex items-center justify-between px-4 py-3 border-t border-surface-100 bg-surface-50/30">
-        <p class="text-xs text-surface-400">
+      <div
+        v-if="paginate && totalPages > 1"
+        class="flex items-center justify-between px-4 py-3 border-t border-surface-100 dark:border-surface-700 bg-surface-50/30 dark:bg-surface-800/30"
+      >
+        <p class="text-xs text-surface-400 dark:text-surface-500">
           Showing {{ (currentPage - 1) * perPage + 1 }}–{{ Math.min(currentPage * perPage, rows.length) }} of {{ rows.length }}
         </p>
         <div class="flex items-center gap-1">
           <button
             :disabled="currentPage === 1"
-            class="p-1.5 rounded-md text-surface-400 hover:bg-surface-100 hover:text-surface-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            class="p-1.5 rounded-md text-surface-400 dark:text-surface-500 hover:bg-surface-100 dark:hover:bg-surface-700 hover:text-surface-600 dark:hover:text-surface-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             aria-label="Previous page"
             @click="goToPage(currentPage - 1)"
           >
@@ -157,7 +174,9 @@
             :key="page"
             :class="[
               'w-8 h-8 text-xs font-medium rounded-md transition-colors',
-              page === currentPage ? 'bg-primary-600 text-white shadow-sm' : 'text-surface-500 hover:bg-surface-100 hover:text-surface-700',
+              page === currentPage
+                ? 'bg-primary-600 text-white shadow-sm'
+                : 'text-surface-500 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-700 hover:text-surface-700 dark:hover:text-surface-200',
             ]"
             @click="goToPage(page)"
           >
@@ -165,7 +184,7 @@
           </button>
           <button
             :disabled="currentPage === totalPages"
-            class="p-1.5 rounded-md text-surface-400 hover:bg-surface-100 hover:text-surface-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            class="p-1.5 rounded-md text-surface-400 dark:text-surface-500 hover:bg-surface-100 dark:hover:bg-surface-700 hover:text-surface-600 dark:hover:text-surface-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             aria-label="Next page"
             @click="goToPage(currentPage + 1)"
           >

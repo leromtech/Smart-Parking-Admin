@@ -4,7 +4,10 @@
       <!-- Breadcrumb -->
       <nav v-if="breadcrumbs?.length" class="flex items-center gap-1.5 mb-1.5" aria-label="Breadcrumb">
         <template v-for="(crumb, idx) in breadcrumbs" :key="idx">
-          <span class="text-xs" :class="idx === breadcrumbs.length - 1 ? 'text-surface-600 font-medium' : 'text-surface-400'">
+          <span
+            class="text-xs"
+            :class="idx === breadcrumbs.length - 1 ? 'text-surface-600 dark:text-surface-300 font-medium' : 'text-surface-400 dark:text-surface-500'"
+          >
             {{ crumb }}
           </span>
           <svg
@@ -18,7 +21,7 @@
             stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
-            class="text-surface-300 flex-shrink-0"
+            class="text-surface-300 dark:text-surface-600 flex-shrink-0"
           >
             <polyline points="9 18 15 12 9 6" />
           </svg>
@@ -26,12 +29,12 @@
       </nav>
 
       <!-- Title -->
-      <h1 class="text-2xl font-bold text-surface-900 tracking-tight">
+      <h1 class="text-2xl font-bold text-surface-900 dark:text-surface-100 tracking-tight">
         {{ title }}
       </h1>
 
       <!-- Subtitle -->
-      <p v-if="subtitle" class="text-sm text-surface-500 mt-1">
+      <p v-if="subtitle" class="text-sm text-surface-500 dark:text-surface-400 mt-1">
         {{ subtitle }}
       </p>
     </div>

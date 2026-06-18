@@ -8,21 +8,23 @@
     <!-- Content -->
     <div class="min-w-0 flex-1">
       <!-- Label -->
-      <p class="text-xs font-medium text-surface-500 uppercase tracking-wider mb-1">
+      <p class="text-xs font-medium text-surface-500 dark:text-surface-400 uppercase tracking-wider mb-1">
         {{ label }}
       </p>
 
       <!-- Skeleton or Value -->
       <div v-if="loading" class="h-7 w-20 skeleton rounded"></div>
       <div v-else class="flex items-baseline gap-2 flex-wrap">
-        <span class="text-2xl font-bold text-surface-900 tabular-nums tracking-tight">
+        <span class="text-2xl font-bold text-surface-900 dark:text-surface-100 tabular-nums tracking-tight">
           <slot name="value">{{ formattedValue }}</slot>
         </span>
         <span
           v-if="trend !== undefined && trend !== null"
           :class="[
             'inline-flex items-center gap-0.5 text-xs font-semibold px-1.5 py-0.5 rounded-full',
-            trend >= 0 ? 'bg-success-50 text-success-700' : 'bg-danger-50 text-danger-700',
+            trend >= 0
+              ? 'bg-success-50 dark:bg-success-400/15 text-success-700 dark:text-success-400'
+              : 'bg-danger-50 dark:bg-danger-400/15 text-danger-700 dark:text-danger-400',
           ]"
         >
           <svg
@@ -58,7 +60,7 @@
       </div>
 
       <!-- Subtitle -->
-      <p v-if="subtitle && !loading" class="text-xs text-surface-400 mt-1">
+      <p v-if="subtitle && !loading" class="text-xs text-surface-400 dark:text-surface-500 mt-1">
         {{ subtitle }}
       </p>
       <div v-else-if="loading" class="h-3.5 w-24 skeleton rounded mt-1"></div>
@@ -84,11 +86,11 @@ const props = defineProps({
 });
 
 const variantMap = {
-  primary: { bg: "bg-primary-50", color: "text-primary-600" },
-  success: { bg: "bg-success-50", color: "text-success-600" },
-  warning: { bg: "bg-warning-50", color: "text-warning-600" },
-  danger: { bg: "bg-danger-50", color: "text-danger-600" },
-  info: { bg: "bg-info-50", color: "text-info-600" },
+  primary: { bg: "bg-primary-50 dark:bg-primary-400/15", color: "text-primary-600 dark:text-primary-400" },
+  success: { bg: "bg-success-50 dark:bg-success-400/15", color: "text-success-600 dark:text-success-400" },
+  warning: { bg: "bg-warning-50 dark:bg-warning-400/15", color: "text-warning-600 dark:text-warning-400" },
+  danger: { bg: "bg-danger-50 dark:bg-danger-400/15", color: "text-danger-600 dark:text-danger-400" },
+  info: { bg: "bg-info-50 dark:bg-info-400/15", color: "text-info-600 dark:text-info-400" },
 };
 
 const iconBgClass = computed(() => variantMap[props.variant]?.bg || variantMap.primary.bg);

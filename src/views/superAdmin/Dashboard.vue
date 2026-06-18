@@ -26,8 +26,8 @@
     <div class="card p-5 md:p-6">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
         <div>
-          <h2 class="text-lg font-semibold text-surface-900">Monthly Revenue</h2>
-          <p class="text-sm text-surface-400">All parking zones combined</p>
+          <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-100">Monthly Revenue</h2>
+          <p class="text-sm text-surface-400 dark:text-surface-500">All parking zones combined</p>
         </div>
       </div>
 
@@ -42,7 +42,7 @@
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
             ></path>
           </svg>
-          <p class="text-sm text-surface-400">Loading chart data...</p>
+          <p class="text-sm text-surface-400 dark:text-surface-500">Loading chart data...</p>
         </div>
       </div>
 

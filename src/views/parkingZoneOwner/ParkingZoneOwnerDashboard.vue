@@ -15,8 +15,8 @@
     <div class="card p-5 md:p-6">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h2 class="text-lg font-semibold text-surface-900">Parking Analytics</h2>
-          <p class="text-sm text-surface-400">Detailed insights for your parking zone</p>
+          <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-100">Parking Analytics</h2>
+          <p class="text-sm text-surface-400 dark:text-surface-500">Detailed insights for your parking zone</p>
         </div>
         <div class="w-full sm:w-48">
           <IftaLabel>

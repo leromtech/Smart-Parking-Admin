@@ -5,40 +5,63 @@ import ToastService from "primevue/toastservice";
 import App from "./App.vue";
 import router from "./routes/router";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { fas } from "@fortawesome/free-solid-svg-icons";
-import { far } from "@fortawesome/free-regular-svg-icons";
+import { faPenToSquare, faCheck, faXmark, faPlus, faChartLine, faCalendarCheck, faCar } from "@fortawesome/free-solid-svg-icons";
+import { faTrashCan } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import dTable from "./components/common/d-table.vue";
 import clickOutside from "./directives/clickOutside";
 import api from "./boot/api";
 import Modal from "./components/common/Modal.vue";
 
-library.add(fas);
-library.add(far);
+library.add(faPenToSquare, faCheck, faXmark, faPlus, faChartLine, faCalendarCheck, faCar, faTrashCan);
 
-import Echo from "laravel-echo";
-import Pusher from "pusher-js";
 import PrimeVue from "primevue/config";
 import { Noir } from "./assets/myPreset";
-import useMap from "./scripts/map";
 import Tooltip from "primevue/tooltip";
+import useMap from "./scripts/map";
 
 const { googleMapInit } = useMap();
-googleMapInit();
+
+// Lazy-load Google Maps only when needed
+let mapsInitialized = false;
+const initMapsOnDemand = () => {
+  if (!mapsInitialized) {
+    googleMapInit();
+    mapsInitialized = true;
+  }
+};
+
 const app = createApp(App);
 
-window.Pusher = Pusher;
+// Lazy-load Pusher/Echo only when user is authenticated
+router.isReady().then(() => {
+  const currentRoute = router.currentRoute.value;
+  const requiresAuth = currentRoute.matched.some((r) => r.meta.requiresAuth);
+  if (requiresAuth) {
+    import("pusher-js").then((PusherModule) => {
+      const Pusher = PusherModule.default;
+      window.Pusher = Pusher;
 
-window.Echo = new Echo({
-  broadcaster: "reverb",
-  key: import.meta.env.VITE_REVERB_APP_KEY,
-  wsHost: import.meta.env.VITE_REVERB_HOST,
-  wsPort: import.meta.env.VITE_REVERB_PORT,
-  forceTLS: false,
-  enabledTransports: ["ws"],
+      import("laravel-echo").then((EchoModule) => {
+        const Echo = EchoModule.default;
+        window.Echo = new Echo({
+          broadcaster: "reverb",
+          key: import.meta.env.VITE_REVERB_APP_KEY,
+          wsHost: import.meta.env.VITE_REVERB_HOST,
+          wsPort: import.meta.env.VITE_REVERB_PORT,
+          forceTLS: false,
+          enabledTransports: ["ws"],
+        });
+      });
+    });
+  }
+
+  // Initialize maps if the current route uses them
+  const mapRoutes = ["/admin/parking-zones", "/admin/vehicles"];
+  if (mapRoutes.some((path) => currentRoute.path.startsWith(path))) {
+    initMapsOnDemand();
+  }
 });
-
-console.log(window.Echo);
 
 app.directive("tooltip", Tooltip);
 

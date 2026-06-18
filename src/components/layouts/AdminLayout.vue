@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col h-screen bg-surface-50 overflow-hidden">
+  <div class="flex flex-col h-screen bg-surface-50 dark:bg-surface-900 overflow-hidden">
     <!-- ===== Skip to Content (Accessibility) ===== -->
     <a
       href="#main-content"
@@ -202,17 +202,17 @@
               <div
                 v-if="userMenuOpen"
                 v-click-outside="closeUserMenu"
-                class="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-dropdown border border-surface-100 py-1.5 z-50"
+                class="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-surface-800 rounded-xl shadow-dropdown border border-surface-100 dark:border-surface-700 py-1.5 z-50"
                 role="menu"
                 aria-label="User menu"
               >
-                <div class="px-4 py-2.5 border-b border-surface-100">
-                  <p class="text-sm font-semibold text-surface-800">{{ userName }}</p>
-                  <p class="text-xs text-surface-400">{{ userRole }}</p>
+                <div class="px-4 py-2.5 border-b border-surface-100 dark:border-surface-700">
+                  <p class="text-sm font-semibold text-surface-800 dark:text-surface-200">{{ userName }}</p>
+                  <p class="text-xs text-surface-400 dark:text-surface-500">{{ userRole }}</p>
                 </div>
                 <button
                   role="menuitem"
-                  class="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-surface-600 hover:bg-surface-50 transition-colors duration-150"
+                  class="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-surface-600 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-700/50 transition-colors duration-150"
                   @click="userMenuOpen = false"
                 >
                   <svg
@@ -233,7 +233,7 @@
                 </button>
                 <button
                   role="menuitem"
-                  class="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-surface-600 hover:bg-surface-50 transition-colors duration-150"
+                  class="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-surface-600 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-700/50 transition-colors duration-150"
                   @click="userMenuOpen = false"
                 >
                   <svg
@@ -254,10 +254,10 @@
                   </svg>
                   Settings
                 </button>
-                <div class="border-t border-surface-100 my-1"></div>
+                <div class="border-t border-surface-100 dark:border-surface-700 my-1"></div>
                 <button
                   role="menuitem"
-                  class="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-danger-600 hover:bg-danger-50 transition-colors duration-150"
+                  class="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-danger-600 hover:bg-danger-50 dark:hover:bg-danger-400/15 transition-colors duration-150"
                   @click="handleLogout"
                 >
                   <svg
@@ -294,7 +294,7 @@
       <!-- Sidebar -->
       <aside
         :class="[
-          'flex flex-col bg-white shadow-sidebar z-50 flex-shrink-0',
+          'flex flex-col bg-white dark:bg-surface-800 shadow-sidebar dark:shadow-sidebar-dark z-50 flex-shrink-0',
           'fixed lg:static inset-y-0 left-0',
           'transition-all duration-300 ease-out-expo',
           sidebarCollapsed ? 'w-[--sidebar-collapsed-width]' : 'w-[--sidebar-width]',
@@ -306,13 +306,13 @@
       >
         <!-- Sidebar Header -->
         <div
-          class="flex items-center h-15 px-4 border-b border-surface-100 flex-shrink-0 gap-2"
+          class="flex items-center h-15 px-4 border-b border-surface-100 dark:border-surface-700 flex-shrink-0 gap-2"
           :class="sidebarCollapsed ? 'justify-center' : 'justify-between'"
         >
-          <h2 v-if="!sidebarCollapsed" class="text-xs font-semibold text-surface-400 uppercase tracking-wider">Navigation</h2>
+          <h2 v-if="!sidebarCollapsed" class="text-xs font-semibold text-surface-400 dark:text-surface-500 uppercase tracking-wider">Navigation</h2>
           <button
             v-if="sidebarOpen"
-            class="lg:hidden p-1.5 rounded-md text-surface-400 hover:bg-surface-100 hover:text-surface-600 transition-colors"
+            class="lg:hidden p-1.5 rounded-md text-surface-400 dark:text-surface-500 hover:bg-surface-100 dark:hover:bg-surface-700 hover:text-surface-600 dark:hover:text-surface-300 transition-colors"
             aria-label="Close sidebar"
             @click="sidebarOpen = false"
           >
@@ -339,11 +339,11 @@
             <!-- Section label -->
             <div
               v-if="item.items && !sidebarCollapsed"
-              class="text-2xs font-bold text-surface-400 uppercase tracking-wider px-3 pt-3 pb-1.5 first:pt-0"
+              class="text-2xs font-bold text-surface-400 dark:text-surface-500 uppercase tracking-wider px-3 pt-3 pb-1.5 first:pt-0"
             >
               {{ item.label }}
             </div>
-            <div v-else-if="item.items && sidebarCollapsed" class="border-t border-surface-100 my-2 mx-2"></div>
+            <div v-else-if="item.items && sidebarCollapsed" class="border-t border-surface-100 dark:border-surface-700 my-2 mx-2"></div>
 
             <!-- Menu items -->
             <template v-if="item.items">
@@ -354,8 +354,8 @@
                     :class="[
                       'flex items-center gap-3 px-3 py-2.5 my-0.5 rounded-lg transition-all duration-200 text-sm font-medium group',
                       isActive
-                        ? 'bg-primary-50 text-primary-700 border-l-3 border-l-primary-600 shadow-sm'
-                        : 'text-surface-600 hover:bg-surface-50 hover:text-surface-800 border-l-3 border-l-transparent',
+                        ? 'bg-primary-50 dark:bg-primary-400/15 text-primary-700 dark:text-primary-400 border-l-3 border-l-primary-600 shadow-sm'
+                        : 'text-surface-600 dark:text-surface-400 hover:bg-surface-50 dark:hover:bg-surface-700/50 hover:text-surface-800 dark:hover:text-surface-200 border-l-3 border-l-transparent',
                       sidebarCollapsed ? 'justify-center px-2' : '',
                     ]"
                     :title="sidebarCollapsed ? child.label : ''"
@@ -366,7 +366,9 @@
                       :class="[
                         child.icon,
                         'text-lg flex-shrink-0 transition-colors',
-                        isActive ? 'text-primary-600' : 'text-surface-400 group-hover:text-surface-600',
+                        isActive
+                          ? 'text-primary-600'
+                          : 'text-surface-400 dark:text-surface-500 group-hover:text-surface-600 dark:group-hover:text-surface-300',
                       ]"
                     />
                     <span v-if="!sidebarCollapsed" class="truncate">{{ child.label }}</span>
@@ -382,8 +384,8 @@
                 :class="[
                   'flex items-center gap-3 px-3 py-2.5 my-0.5 rounded-lg transition-all duration-200 text-sm font-medium group',
                   isActive
-                    ? 'bg-primary-50 text-primary-700 border-l-3 border-l-primary-600 shadow-sm'
-                    : 'text-surface-600 hover:bg-surface-50 hover:text-surface-800 border-l-3 border-l-transparent',
+                    ? 'bg-primary-50 dark:bg-primary-400/15 text-primary-700 dark:text-primary-400 border-l-3 border-l-primary-600 shadow-sm'
+                    : 'text-surface-600 dark:text-surface-400 hover:bg-surface-50 dark:hover:bg-surface-700/50 hover:text-surface-800 dark:hover:text-surface-200 border-l-3 border-l-transparent',
                   sidebarCollapsed ? 'justify-center px-2' : '',
                 ]"
                 :title="sidebarCollapsed ? item.label : ''"
@@ -394,7 +396,9 @@
                   :class="[
                     item.icon,
                     'text-lg flex-shrink-0 transition-colors',
-                    isActive ? 'text-primary-600' : 'text-surface-400 group-hover:text-surface-600',
+                    isActive
+                      ? 'text-primary-600'
+                      : 'text-surface-400 dark:text-surface-500 group-hover:text-surface-600 dark:group-hover:text-surface-300',
                   ]"
                 />
                 <span v-if="!sidebarCollapsed" class="truncate">{{ item.label }}</span>
@@ -404,10 +408,10 @@
         </nav>
 
         <!-- Sidebar Footer: Logout -->
-        <div class="flex-shrink-0 border-t border-surface-100 bg-surface-50/50 p-3">
+        <div class="flex-shrink-0 border-t border-surface-100 dark:border-surface-700 bg-surface-50/50 dark:bg-surface-800/50 p-3">
           <button
             :class="[
-              'flex items-center gap-3 w-full rounded-lg transition-all duration-200 text-sm font-medium text-danger-600 hover:bg-danger-50',
+              'flex items-center gap-3 w-full rounded-lg transition-all duration-200 text-sm font-medium text-danger-600 dark:text-danger-400 hover:bg-danger-50 dark:hover:bg-danger-400/15',
               sidebarCollapsed ? 'justify-center p-2.5' : 'px-3 py-2.5',
             ]"
             :title="sidebarCollapsed ? 'Sign Out' : ''"
@@ -434,7 +438,7 @@
       </aside>
 
       <!-- ===== Main Content ===== -->
-      <main id="main-content" class="flex-1 overflow-auto bg-surface-50" role="main">
+      <main id="main-content" class="flex-1 overflow-auto bg-surface-50 dark:bg-surface-900" role="main">
         <div class="p-4 lg:p-6 animate-fade-in-up">
           <router-view />
         </div>
