@@ -42,7 +42,7 @@ const createFloor = async (parkingZoneId, floorData) => {
     fd.append("name", floorData.name);
     fd.append("floor_number", floorData.floor_number);
     fd.append("total_capacity", floorData.total_capacity || 0);
-    fd.append("reserved_for_app", floorData.resrved_for_app || 0);
+    fd.append("reserved_for_app", floorData.reserved_for_app || 0);
     fd.append("declared_for_booking", floorData.declared_for_booking || 0);
 
     // Append vehicle type IDs as array
