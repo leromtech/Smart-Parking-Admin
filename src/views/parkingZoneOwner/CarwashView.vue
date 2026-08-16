@@ -1,6 +1,6 @@
 <template>
   <div class="card flex flex-col w-full gap-4">
-    <Panel header="CARWASH" class="w-[80%] gap-2">
+    <Panel header="CARWASH SETTINGS" class="w-[80%] gap-2">
       <div
         class="flex flex-row gap-2 border border-neutral-200 p-2 rounded-md mb-2">
         <p class="text-blue-500 font-semibold">Note:</p>

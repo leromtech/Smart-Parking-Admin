@@ -31,7 +31,7 @@ const menuItems = ref([
         icon: "pi pi-user",
       },
       {
-        label: "Carwash",
+        label: "Carwash Settings",
         route: "/parking-zone/carwash",
         icon: "pi pi-th-large",
       },
@@ -71,7 +71,7 @@ const menuItems = ref([
         icon: "pi pi-list",
       },
       {
-        label: "Floors",
+        label: "Zone Management",
         route: "/parking-zone/floors",
         icon: "pi pi-building",
       },

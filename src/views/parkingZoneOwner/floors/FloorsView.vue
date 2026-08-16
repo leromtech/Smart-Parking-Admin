@@ -27,10 +27,10 @@
     <Panel class="w-full">
       <template #header>
         <div class="flex flex-row justify-between items-center w-full">
-          <h2 class="text-xl font-semibold">Floors Management</h2>
+          <h2 class="text-xl font-semibold">Zone Management</h2>
           <Button
             icon="pi pi-plus"
-            label="Add Floor"
+            label="Add Zone"
             @click="createOpen = true" />
         </div>
       </template>
@@ -42,7 +42,7 @@
       <div
         v-else-if="floors.length === 0"
         class="p-8 text-center text-gray-500">
-        No floors found. Click "Add Floor" to create one.
+        No zones found. Click "Add Zone" to create one.
       </div>
 
       <DataTable
@@ -50,7 +50,7 @@
         :value="floors"
         tableStyle="min-width: 50rem"
         class="mt-4">
-        <Column field="floor_number" header="Floor Number" sortable>
+        <Column field="floor_number" header="Zone Number" sortable>
           <template #body="slotProps">
             <span class="font-semibold">{{ slotProps.data.floor_number }}</span>
           </template>
@@ -112,7 +112,7 @@
       :style="{ width: '600px' }"
       :closable="true">
       <template #header>
-        <span class="font-semibold">Add Floor</span>
+        <span class="font-semibold">Add Zone</span>
       </template>
       <FloorsCreate
         :parking-zone-id="parkingZoneId"
@@ -126,7 +126,7 @@
       :style="{ width: '600px' }"
       :closable="true">
       <template #header>
-        <span class="font-semibold">Edit Floor</span>
+        <span class="font-semibold">Edit Zone</span>
       </template>
       <FloorsCreate
         :parking-zone-id="parkingZoneId"
@@ -141,7 +141,7 @@
       </template>
       <div class="flex flex-col gap-4">
         <p>
-          Are you sure you want to delete floor "{{ deleteItem?.name }}" (Floor
+          Are you sure you want to delete zone "{{ deleteItem?.name }}" (Zone
           {{ deleteItem?.floor_number }})?
         </p>
         <p class="text-sm text-gray-600">This action cannot be undone.</p>
@@ -228,7 +228,7 @@ const confirmDelete = async () => {
       toast.add({
         severity: "success",
         summary: "Success",
-        detail: "Floor deleted successfully",
+        detail: "Zone deleted successfully",
         life: 3000,
       });
       await refresh();
@@ -237,7 +237,7 @@ const confirmDelete = async () => {
     }
   } catch (error) {
     const errorMessage =
-      error.response?.data?.message || "Failed to delete floor";
+      error.response?.data?.message || "Failed to delete zone";
     toast.add({
       severity: "error",
       summary: "Error",

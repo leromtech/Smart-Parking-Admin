@@ -3,12 +3,12 @@
     <form @submit.prevent="submit" class="flex flex-col gap-4">
       <div class="flex flex-col gap-2">
         <label for="name" class="font-semibold"
-          >Floor Name <span class="text-red-500">*</span></label
+          >Zone Name <span class="text-red-500">*</span></label
         >
         <InputText
           id="name"
           v-model="form.name"
-          placeholder="e.g., Ground Floor, First Floor"
+          placeholder="e.g., Zone A, Zone B"
           class="w-full"
           :class="{ 'p-invalid': errors.name }" />
         <small v-if="errors.name" class="p-error">{{ errors.name }}</small>
@@ -16,21 +16,21 @@
 
       <div class="flex flex-col gap-2">
         <label for="floor_number" class="font-semibold"
-          >Floor Number <span class="text-red-500">*</span></label
+          >Zone Number <span class="text-red-500">*</span></label
         >
         <InputNumber
           id="floor_number"
           v-model="form.floor_number"
           :min="0"
           :max="100"
-          placeholder="Enter floor number"
+          placeholder="Enter zone number"
           class="w-full"
           :class="{ 'p-invalid': errors.floor_number }" />
         <small v-if="errors.floor_number" class="p-error">{{
           errors.floor_number
         }}</small>
         <small class="text-gray-500"
-          >Floor numbers must be unique within a parking zone</small
+          >Zone numbers must be unique within a parking zone</small
         >
       </div>
 
@@ -43,7 +43,7 @@
           placeholder="Enter capacity"
           class="w-full" />
         <small class="text-gray-500"
-          >Total number of parking spaces on this floor</small
+          >Total number of parking spaces on this zone</small
         >
       </div>
 
@@ -104,7 +104,7 @@
           class="w-full"
           :loading="loadingVehicleTypes" />
         <small class="text-gray-500"
-          >Select which vehicle types can park on this floor</small
+          >Select which vehicle types can park on this zone</small
         >
       </div>
 
@@ -219,7 +219,7 @@ const submit = async () => {
 
     // Validation
     if (!form.value.name || form.value.name.trim() === "") {
-      errors.value.name = "Floor name is required";
+      errors.value.name = "Zone name is required";
       return;
     }
 
@@ -227,7 +227,7 @@ const submit = async () => {
       form.value.floor_number === null ||
       form.value.floor_number === undefined
     ) {
-      errors.value.floor_number = "Floor number is required";
+      errors.value.floor_number = "Zone number is required";
       return;
     }
 
@@ -256,8 +256,8 @@ const submit = async () => {
         detail:
           data.message ||
           (form.value.id
-            ? "Floor updated successfully"
-            : "Floor created successfully"),
+            ? "Zone updated successfully"
+            : "Zone created successfully"),
         life: 3000,
       });
       reset();
