@@ -142,6 +142,12 @@ const routes = [
         component: () =>
           import("../views/parkingZoneOwner/floors/FloorsView.vue"),
       },
+      {
+        name: "Parking Zone Driver Instructions",
+        path: "driver-instructions",
+        component: () =>
+          import("../views/parkingZoneOwner/DriverInstructionsView.vue"),
+      },
     ],
   },
 ];

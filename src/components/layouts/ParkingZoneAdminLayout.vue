@@ -75,6 +75,11 @@ const menuItems = ref([
         route: "/parking-zone/floors",
         icon: "pi pi-building",
       },
+      {
+        label: "Driver Instructions",
+        route: "/parking-zone/driver-instructions",
+        icon: "pi pi-bell",
+      },
     ],
   },
 ]);
