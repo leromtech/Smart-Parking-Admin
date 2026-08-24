@@ -14,6 +14,16 @@
             <Column field="name" header="Name"></Column>
             <Column field="email" header="Email"></Column>
             <Column field="phone" header="Phone"></Column>
+            <Column header="Subscription">
+                <template #body="slotProps">
+                    <div class="flex flex-col text-xs">
+                        <span>Limit: {{ slotProps.data.subscription_limit ?? '—' }}</span>
+                        <span v-if="slotProps.data.contract_start_date || slotProps.data.contract_end_date">
+                            {{ slotProps.data.contract_start_date ?? '—' }} → {{ slotProps.data.contract_end_date ?? '—' }}
+                        </span>
+                    </div>
+                </template>
+            </Column>
             <!-- Roles -->
             <Column field="roles" header="Roles">
                 <template #body="slotProps">

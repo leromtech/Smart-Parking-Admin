@@ -23,6 +23,36 @@
       </Message>
     </Panel>
 
+    <Panel header="ACTIVE CAR WASHES" class="w-[90%]">
+      <div class="flex flex-row items-center justify-between mb-3">
+        <p class="text-sm text-gray-500">Current wash list for verification</p>
+        <Button
+          label="Refresh"
+          size="small"
+          icon="pi pi-refresh"
+          @click="fetchActiveCarWashes" />
+      </div>
+
+      <Message
+        v-if="washListError"
+        severity="error"
+        variant="simple"
+        class="mx-1">
+        {{ washListError }}
+      </Message>
+
+      <DataTable
+        :value="washList"
+        :loading="washListLoading"
+        class="text-sm"
+        emptyMessage="No active car washes">
+        <Column field="vehicle.registration_no" header="Vehicle" />
+        <Column field="user.name" header="User" />
+        <Column field="status" header="Status" />
+        <Column field="created_at" header="Started" />
+      </DataTable>
+    </Panel>
+
     <Panel header="CARWASH HISTORY" class="w-[90%]">
       <div class="flex flex-col gap-2 mb-3">
         <InputText v-model="filters.search" placeholder="Search vehicle/user" />
@@ -104,6 +134,10 @@ const filters = ref({
 const submitError = ref(null);
 const historyError = ref(null);
 
+const washList = ref([]);
+const washListLoading = ref(false);
+const washListError = ref(null);
+
 const submit = async () => {
   submitError.value = null;
 
@@ -168,9 +202,31 @@ const onPage = (event) => {
   fetchHistory();
 };
 
+const getActiveCarWashes = async (params = {}) => {
+  const { data } = await api.get("/car-washes", { params });
+  return data?.car_washes ?? data ?? [];
+};
+
+const fetchActiveCarWashes = async () => {
+  washListLoading.value = true;
+  washListError.value = null;
+
+  try {
+    const response = await getActiveCarWashes();
+    washList.value = Array.isArray(response) ? response : response?.data || [];
+  } catch (e) {
+    washListError.value =
+      e?.response?.data?.message || "Failed to load active car washes";
+    washList.value = [];
+  } finally {
+    washListLoading.value = false;
+  }
+};
+
 onMounted(async () => {
   await getParkingZone();
   await getVehicleTypes();
+  await fetchActiveCarWashes();
   await fetchHistory();
   populateCarwashCapacity();
 });
