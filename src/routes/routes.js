@@ -148,6 +148,12 @@ const routes = [
         component: () =>
           import("../views/parkingZoneOwner/DriverInstructionsView.vue"),
       },
+      {
+        name: "Parking Zone Bookable Vehicle Types",
+        path: "bookable-vehicle-types",
+        component: () =>
+          import("../views/parkingZoneOwner/BookableVehicleTypesView.vue"),
+      },
     ],
   },
 ];

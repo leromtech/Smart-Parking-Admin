@@ -80,6 +80,11 @@ const menuItems = ref([
         route: "/parking-zone/driver-instructions",
         icon: "pi pi-bell",
       },
+      {
+        label: "Bookable Vehicle Types",
+        route: "/parking-zone/bookable-vehicle-types",
+        icon: "pi pi-car",
+      },
     ],
   },
 ]);
