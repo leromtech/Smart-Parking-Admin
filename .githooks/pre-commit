@@ -1,0 +1,46 @@
+#!/bin/sh
+# Pre-commit: Vue/Vite auto-format + lint staged files, re-stage fixes.
+# Bypass: SMART_PARKING_SKIP_HOOKS=1 git commit  OR  git commit --no-verify  OR  git config hooks.bypass true
+
+if [ "$SMART_PARKING_SKIP_HOOKS" = "1" ]; then
+  echo "[pre-commit] skipped via SMART_PARKING_SKIP_HOOKS=1"
+  exit 0
+fi
+
+if [ "$(git config --bool hooks.bypass 2>/dev/null)" = "true" ]; then
+  echo "[pre-commit] skipped via git config hooks.bypass=true"
+  exit 0
+fi
+
+STAGED="$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(vue|js|css|html)$' || true)"
+
+if [ -z "$STAGED" ]; then
+  exit 0
+fi
+
+# Prettier (skip gracefully until installed per PLAN.md Phase 2)
+if npx --no-install prettier --version >/dev/null 2>&1; then
+  echo "[pre-commit] prettier --write staged files"
+  # shellcheck disable=SC2086
+  npx --no-install prettier --write $STAGED || exit 1
+  # shellcheck disable=SC2086
+  git add $STAGED
+else
+  echo "[pre-commit] prettier not installed, skipping (see PLAN.md Phase 2)"
+fi
+
+# ESLint --fix (skip gracefully until installed)
+if npx --no-install eslint --version >/dev/null 2>&1; then
+  echo "[pre-commit] eslint --fix staged files"
+  # shellcheck disable=SC2086
+  npx --no-install eslint --fix $STAGED || {
+    echo "[pre-commit] eslint reported errors — fix them or bypass with SMART_PARKING_SKIP_HOOKS=1 / --no-verify"
+    exit 1
+  }
+  # shellcheck disable=SC2086
+  git add $STAGED
+else
+  echo "[pre-commit] eslint not installed, skipping (see PLAN.md Phase 2)"
+fi
+
+exit 0

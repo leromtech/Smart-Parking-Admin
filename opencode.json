@@ -1,0 +1,15 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": ["AGENTS.md", "ARCHITECTURE.md", "PLAN.md"],
+  "maintenance": {
+    "AGENTS.md": "Update only when package.json or package-lock.json (dependencies or scripts) change.",
+    "ARCHITECTURE.md": "Update only when physical project structure or core architecture changes.",
+    "PLAN.md": "Update whenever new feature work or refactoring is planned. Write the detailed plan here before writing or executing code."
+  },
+  "hooksCheck": {
+    "hooksPath": ".githooks",
+    "preCommit": ".githooks/pre-commit (auto-fix + re-stage; bypass via SMART_PARKING_SKIP_HOOKS=1 or --no-verify)",
+    "prePush": ".githooks/pre-push (lint + vitest when present, npm run build gate; bypass via SMART_PARKING_SKIP_HOOKS=1 or --no-verify)",
+    "rule": "Do not commit or push with failing hooks unless an explicit bypass was requested; never change core.hooksPath."
+  }
+}
