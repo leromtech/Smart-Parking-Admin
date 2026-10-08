@@ -18,50 +18,8 @@ library.add(faPenToSquare, faCheck, faXmark, faPlus, faChartLine, faCalendarChec
 import PrimeVue from "primevue/config";
 import { Noir } from "./assets/myPreset";
 import Tooltip from "primevue/tooltip";
-import useMap from "./scripts/map";
-
-const { googleMapInit } = useMap();
-
-// Lazy-load Google Maps only when needed
-let mapsInitialized = false;
-const initMapsOnDemand = () => {
-  if (!mapsInitialized) {
-    googleMapInit();
-    mapsInitialized = true;
-  }
-};
 
 const app = createApp(App);
-
-// Lazy-load Pusher/Echo only when user is authenticated
-router.isReady().then(() => {
-  const currentRoute = router.currentRoute.value;
-  const requiresAuth = currentRoute.matched.some((r) => r.meta.requiresAuth);
-  if (requiresAuth) {
-    import("pusher-js").then((PusherModule) => {
-      const Pusher = PusherModule.default;
-      window.Pusher = Pusher;
-
-      import("laravel-echo").then((EchoModule) => {
-        const Echo = EchoModule.default;
-        window.Echo = new Echo({
-          broadcaster: "reverb",
-          key: import.meta.env.VITE_REVERB_APP_KEY,
-          wsHost: import.meta.env.VITE_REVERB_HOST,
-          wsPort: import.meta.env.VITE_REVERB_PORT,
-          forceTLS: false,
-          enabledTransports: ["ws"],
-        });
-      });
-    });
-  }
-
-  // Initialize maps if the current route uses them
-  const mapRoutes = ["/admin/parking-zones", "/admin/vehicles"];
-  if (mapRoutes.some((path) => currentRoute.path.startsWith(path))) {
-    initMapsOnDemand();
-  }
-});
 
 app.directive("tooltip", Tooltip);
 

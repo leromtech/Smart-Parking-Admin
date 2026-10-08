@@ -1,8 +1,6 @@
 import { ref } from "vue";
 import api from "../boot/api";
-import axios from "axios";
 import router from "../routes/router";
-import { data } from "autoprefixer";
 
 const user = ref(null)
 const roles = ref(null)
@@ -17,17 +15,19 @@ const loggedIn = () => {
     return true
 }
 
+// API returns snake_case relations (parking_zone_owned / parking_zone_managed)
+const setUser = (data) => {
+    user.value = data
+    roles.value = data.roles.map((item) => item.name)
+    const zone = data.parking_zone_owned ?? data.parking_zone_managed ?? null
+    parkingZoneId.value = zone?.id ?? null
+}
+
 const fetchUser = async () => {
     if (!user.value) {
         try {
             const { data } = await api.get('user')
-            user.value = data
-            roles.value = user.value.roles.map((item) => item.name)
-            if (data.parkingZoneOwned) { // Changed from parking_zone_owned to parkingZoneOwned
-                parkingZoneId.value = data.parkingZoneOwned.id
-            } else if (data.parkingZoneManaged) { // Changed from parking_zone_managed to parkingZoneManaged
-                parkingZoneId.value = data.parkingZoneManaged.id
-            }
+            setUser(data)
         } catch (e) {
             localStorage.removeItem('authToken')
         }
@@ -35,13 +35,21 @@ const fetchUser = async () => {
 }
 
 const login = async (formData, callback = null) => { // Changed fd to formData, cb to callback
-    loading.value = true
-    const { data } = await api.post('admin-login', formData);
-    loading.value = false
+    let data
+    try {
+        loading.value = true
+        const response = await api.post('admin-login', formData)
+        data = response.data
+    } catch (e) {
+        const message = e?.response?.data?.message || 'Login failed. Please try again.'
+        callback && callback({ success: false, message })
+        return message
+    } finally {
+        loading.value = false
+    }
     if (data.success) {
         localStorage.setItem('authToken', data.token)
-        user.value = data.user
-        roles.value = user.value.roles.map((item) => item.name)
+        setUser(data.user)
 
         switch (user.value.roles[0].name) {
             case 'customer':
@@ -73,6 +81,7 @@ const logout = async () => {
         localStorage.removeItem('authToken')
         user.value = null
         roles.value = null
+        parkingZoneId.value = null
         router.replace('/')
     } else {
         return data.message
@@ -80,9 +89,14 @@ const logout = async () => {
 }
 
 const register = async (formData, callback = null) => { // Changed fd to formData, cb to callback
-    loading.value = true
-    const { data } = await api.post('register', formData)
-    loading.value = false
+    let data
+    try {
+        loading.value = true
+        const response = await api.post('register', formData)
+        data = response.data
+    } finally {
+        loading.value = false
+    }
     callback && callback(data)
     return data
 }

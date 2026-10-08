@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import routes from "./routes";
 import useAuth from "../scripts/auth";
+import { initEcho } from "../boot/echo";
 
 const { loggedIn, user, fetchUser } = useAuth();
 
@@ -45,10 +46,12 @@ const finishProgress = () => {
 
 // Role-based redirect mapping
 const roleRedirects = {
+  superadmin: "/admin",
   owner: "/parking-zone",
-  customer: "/customer",
-  manager: "/manager",
 };
+
+// Roles served by the external Flutter web app
+const externalRoles = ["customer", "manager"];
 
 router.beforeEach(async (to, from, next) => {
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
@@ -84,6 +87,10 @@ router.beforeEach(async (to, from, next) => {
     if (!hasRequiredRole) {
       // Redirect based on user's primary role
       const primaryRole = userRoles[0];
+      if (externalRoles.includes(primaryRole)) {
+        window.location.href = import.meta.env.VITE_FRONTEND_URL;
+        return next(false);
+      }
       const redirectPath = roleRedirects[primaryRole] || "/";
       return next(redirectPath);
     }
@@ -94,8 +101,13 @@ router.beforeEach(async (to, from, next) => {
   next();
 });
 
-router.afterEach(() => {
+router.afterEach((to) => {
   finishProgress();
+
+  // Start the websocket connection once the user is inside an authenticated area
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    initEcho().catch((error) => console.error("Error initializing Echo:", error));
+  }
 });
 
 export default router;

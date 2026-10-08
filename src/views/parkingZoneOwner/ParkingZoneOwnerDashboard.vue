@@ -63,6 +63,7 @@ import ParkingRecordChart from "../../components/OwnerDashboard/ParkingRecordCha
 import TotalVehicleMonthChart from "../../components/OwnerDashboard/TotalVehicleMonthChart.vue";
 import { useParkingZone } from "../../scripts/parkingZone";
 import api from "../../boot/api";
+import { initEcho } from "../../boot/echo";
 import BookingChart from "../../components/OwnerDashboard/BookingChart.vue";
 import useFloors from "../../scripts/floors";
 import StatCard from "../../components/common/StatCard.vue";
@@ -94,12 +95,13 @@ const occupiedSpace = computed(() => {
 const setupRealTimeAvailability = async () => {
   if (!parking_zone.value?.id) return;
   try {
+    const echo = await initEcho();
     const channelName = `parking-zone.${parking_zone.value.id}`;
     if (echoChannel) {
-      window.Echo.leave(channelName);
+      echo.leave(channelName);
       echoChannel = null;
     }
-    echoChannel = window.Echo.channel(channelName);
+    echoChannel = echo.channel(channelName);
     echoChannel.listen(".parking.updated", (payload) => {
       let occupiedCount = 0;
       if (typeof payload === "object" && payload !== null) {
@@ -108,6 +110,10 @@ const setupRealTimeAvailability = async () => {
       }
       availability.value = occupiedCount;
     });
+  } catch (error) {
+    console.error("Error subscribing to real-time availability:", error);
+  }
+  try {
     const { data } = await api.get(`availability/${parking_zone.value.id}`);
     let occupiedCount = 0;
     if (data && typeof data === "object" && !Array.isArray(data)) {
@@ -118,7 +124,7 @@ const setupRealTimeAvailability = async () => {
     }
     availability.value = typeof occupiedCount === "number" ? occupiedCount : 0;
   } catch (error) {
-    console.error("Error setting up real-time availability:", error);
+    console.error("Error fetching availability:", error);
     availability.value = 0;
   }
 };
@@ -181,7 +187,7 @@ watch(yearFilter, async () => {
 onBeforeUnmount(() => {
   if (echoChannel) {
     const channelName = `parking-zone.${parking_zone.value?.id}`;
-    window.Echo.leave(channelName);
+    window.Echo?.leave(channelName);
     echoChannel = null;
   }
 });
