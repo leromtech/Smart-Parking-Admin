@@ -71,24 +71,19 @@
       </div>
 
       <div class="flex flex-col gap-2">
-        <label for="reserved-for-app" class="font-semibold">
+        <label for="reserved-for-booking" class="font-semibold">
           Reserved for booking
         </label>
 
         <InputNumber
           id="reserved-for-booking"
-          v-model="form.declared_for_booking"
-          :min="0"
-          placeholder="Enter capacity reserved for booking"
-          class="w-full"
-          :class="{ 'p-invalid': reservedExceedsCapacity }" />
+          :model-value="declaredForBooking"
+          disabled
+          class="w-full" />
 
-        <small v-if="reservedExceedsCapacity" class="p-error">
-          Reserved capacity cannot exceed total capacity
-        </small>
-
-        <small v-else class="text-gray-500">
-          Total number of booking reserved for the app
+        <small class="text-gray-500">
+          Calculated automatically: (Total capacity − Reserved for app) ÷ 2,
+          rounded down
         </small>
       </div>
 
@@ -179,7 +174,7 @@ const reset = () => {
     id: null,
     name: "",
     floor_number: null,
-    capacity: 0,
+    total_capacity: 0,
     reserved_for_app: 0,
     declared_for_booking: 0,
     vehicle_type_ids: [],
@@ -236,7 +231,7 @@ const submit = async () => {
       floor_number: form.value.floor_number,
       total_capacity: form.value.total_capacity || 0,
       reserved_for_app: form.value.reserved_for_app || 0,
-      declared_for_booking: form.value.declared_for_booking || 0,
+      declared_for_booking: declaredForBooking.value,
       vehicle_type_ids: form.value.vehicle_type_ids || [],
     };
     
@@ -288,6 +283,14 @@ const reservedExceedsCapacity = computed(() => {
   const reserved = Number(form.value.reserved_for_app ?? 0);
 
   return reserved > total;
+});
+
+// Half of the spaces not reserved for the app can be booked
+const declaredForBooking = computed(() => {
+  const total = Number(form.value.total_capacity ?? 0);
+  const reserved = Number(form.value.reserved_for_app ?? 0);
+
+  return Math.max(0, Math.floor((total - reserved) / 2));
 });
 
 onMounted(async () => {
