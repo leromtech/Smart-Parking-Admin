@@ -16,7 +16,7 @@
 - `src/scripts/` — API/composable layer (no Pinia/Vuex; module-scope `ref` singletons):
   - `auth.js` (user/roles/parkingZoneId, login/logout/fetchUser), `admin.js`, `floors.js`, `map.js` (lazy Google Maps loader, `VITE_GOOGLE_MAP_API_KEY`), `parking.js`, `parkingZone.js`, `chart.js`, `notification.js`, `utils.js`, `menu_items.js` (legacy, roles use `super_admin` spelling — do not trust for guard logic).
   - `admin/{users,vehicles,vehicleTypes,wallet,walletRechargePromotions}.js` — superadmin CRUD + wallet/promo API wrappers.
-  - `parkingZoneOwner/{rate,closedDays,driverInstructions,longParkingAlert,bookableVehicleTypes}.js` — owner domain wrappers (note: `rate.js:deleteInterval` history of wrong endpoint — see `BUG_REPORT.md`).
+  - `parkingZoneOwner/{rate,closedDays,driverInstructions,longParkingAlert,subscriptionsEnabled,bookableVehicleTypes}.js` — owner domain wrappers (note: `rate.js:deleteInterval` history of wrong endpoint — see `BUG_REPORT.md`).
   - `customer/{booking,login}.js`, `payments/payment.js`.
 - `src/components/common/` — `d-table.vue` (global `d-table`), `Modal.vue` (global `Modal`), `d-input.vue`, `d-select.vue`, `dDrawer.vue`, `PageHeader.vue`, `StatCard.vue`, `Navbar.vue`, `Login.vue`, `Register.vue`, `tooltip.vue`, `divider.vue`.
 - `src/components/layouts/` — `AuthLayout.vue`, `AdminLayout.vue` (legacy), `SuperAdminLayout.vue` (`/admin` shell), `ParkingZoneAdminLayout.vue` (`/parking-zone` shell).

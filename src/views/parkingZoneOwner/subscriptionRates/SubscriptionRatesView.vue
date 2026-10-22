@@ -9,9 +9,23 @@
                 </div>
             </template>
             <template #header>
-                <div class="flex flex-row justify-between">
-                    <InputText icon="pi pi-search" placeholder="Search" v-model="search" />
-                    <Button icon="pi pi-plus" @click="openCreateDialog()"></Button>
+                <div class="flex flex-col gap-3">
+                    <div class="flex flex-wrap items-center justify-between gap-3 border border-neutral-200 p-3 rounded-md">
+                        <div class="flex flex-col">
+                            <label for="subscriptions-enabled" class="font-semibold">Accept new subscriptions</label>
+                            <span class="text-xs text-gray-500">
+                                When off, customers cannot request new subscriptions for this zone. Existing
+                                subscriptions keep working until they expire.
+                            </span>
+                        </div>
+                        <ToggleSwitch :modelValue="subscriptionsEnabled" input-id="subscriptions-enabled"
+                            :disabled="subscriptionsEnabledLoading || subscriptionsEnabledSaving"
+                            @update:modelValue="toggleSubscriptionsEnabled" />
+                    </div>
+                    <div class="flex flex-row justify-between">
+                        <InputText icon="pi pi-search" placeholder="Search" v-model="search" />
+                        <Button icon="pi pi-plus" @click="openCreateDialog()"></Button>
+                    </div>
                 </div>
             </template>
             <Column header="Name">
@@ -90,9 +104,37 @@ import create from './SubscriptionRatesCreate.vue';
 import useAuth from '../../../scripts/auth';
 import { normalizeTimestamp, humanizeString, debounce } from '../../../scripts/utils';
 import { useToast } from 'primevue';
+import useSubscriptionsEnabled from '../../../scripts/parkingZoneOwner/subscriptionsEnabled';
 
 const { user } = useAuth()
 const toast = useToast();
+
+const {
+    subscriptionsEnabled,
+    loading: subscriptionsEnabledLoading,
+    saving: subscriptionsEnabledSaving,
+    getSubscriptionsEnabled,
+    updateSubscriptionsEnabled,
+} = useSubscriptionsEnabled()
+
+const toggleSubscriptionsEnabled = async (enabled) => {
+    try {
+        const data = await updateSubscriptionsEnabled(user.value.parking_zone_owned.id, enabled)
+        toast.add({
+            severity: data?.success ? 'success' : 'error',
+            summary: data?.success ? 'Success' : 'Error',
+            detail: data?.message || (enabled ? 'Subscriptions enabled' : 'Subscriptions disabled'),
+            life: 3000
+        })
+    } catch (error) {
+        toast.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error?.response?.data?.message || 'Failed to update subscription setting',
+            life: 3000
+        })
+    }
+}
 
 const createDialogOpen = ref(false)
 const subscriptions = ref([]) // Initialize as empty array
@@ -198,6 +240,14 @@ const confirmDelete = async () => {
 }
 
 onMounted(async () => {
+    getSubscriptionsEnabled(user.value.parking_zone_owned.id).catch(() => {
+        toast.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to load subscription setting',
+            life: 3000
+        })
+    })
     await fetchSubscriptionRates()
 })
 </script>
