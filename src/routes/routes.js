@@ -149,6 +149,12 @@ const routes = [
           import("../views/parkingZoneOwner/DriverInstructionsView.vue"),
       },
       {
+        name: "Parking Zone Long Parking Alert",
+        path: "long-parking-alert",
+        component: () =>
+          import("../views/parkingZoneOwner/LongParkingAlertView.vue"),
+      },
+      {
         name: "Parking Zone Bookable Vehicle Types",
         path: "bookable-vehicle-types",
         component: () =>

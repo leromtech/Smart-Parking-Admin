@@ -81,6 +81,11 @@ const menuItems = ref([
         icon: "pi pi-bell",
       },
       {
+        label: "Long Parking Alert",
+        route: "/parking-zone/long-parking-alert",
+        icon: "pi pi-clock",
+      },
+      {
         label: "Bookable Vehicle Types",
         route: "/parking-zone/bookable-vehicle-types",
         icon: "pi pi-car",
