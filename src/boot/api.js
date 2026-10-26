@@ -1,8 +1,6 @@
 import axios from 'axios'
 
 const api = axios.create({
-    withXSRFToken: true,
-    withCredentials: true,
     baseURL: import.meta.env.VITE_API_URL,
     timeout: 10000, // Add timeout for better UX
     headers: {
