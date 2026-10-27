@@ -42,6 +42,7 @@ const intervalForm = ref({
 });
 
 const reset = () => {
+  currentlyEditing.value = null;
   ratePolicyForm.value = {
     rate_id: null,
     vehicle_type: null,
@@ -63,7 +64,8 @@ const editRatePolicy = (rate) => {
   currentlyEditing.value = rate;
   ratePolicyForm.value.name = rate.name;
   ratePolicyForm.value.rate_id = rate.id;
-  ratePolicyForm.value.vehicle_type = rate.vehicle_type.id;
+  ratePolicyForm.value.vehicle_type =
+    rate.vehicle_type?.id ?? rate.vehicle_type;
   ratePolicyForm.value.from = parseTimeToDate(rate.from) ?? null;
   ratePolicyForm.value.to = parseTimeToDate(rate.to) ?? null;
   timingToggle.value = rate.from === "" && rate.to === "";
@@ -144,12 +146,14 @@ const submitRatePolicy = async () => {
       fd.append("fixed_rate", "0"); // Default value
     }
 
+    let url = "rates";
     if (currentlyEditing.value) {
       fd.append("_method", "PUT");
+      url = `rates/${currentlyEditing.value.id}`;
     }
 
     fd.append("parking_zone_id", useParkingZone().parking_zone.value.id);
-    const { data } = await api.post("rates", fd);
+    const { data } = await api.post(url, fd);
     reset();
     this_toast.value.add({
       severity: data.success ? "success" : "error",
@@ -216,5 +220,6 @@ export default function useCreateRate(
     submitRatePolicy,
     editRatePolicy,
     deleteInterval,
+    reset,
   };
 }

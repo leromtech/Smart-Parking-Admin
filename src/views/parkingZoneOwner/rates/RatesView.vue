@@ -7,7 +7,7 @@
           <Button
             icon="pi pi-plus"
             rounded
-            @click="addingPolicy = true"></Button>
+            @click="openCreatePolicy"></Button>
         </div>
       </template>
     </Panel>
@@ -31,7 +31,7 @@
 
       <Column header="Vehicle Type" style="width: 15%">
         <template #body="slotProps">
-          <span>{{ slotProps.data.vehicle_type?.name ?? "--N/A--" }}</span>
+          <span>{{ vehicleTypeName(slotProps.data) }}</span>
         </template>
       </Column>
 
@@ -296,7 +296,7 @@
         <Button
           icon="pi pi-plus"
           label="Create First Rate"
-          @click="addingPolicy = true" />
+          @click="openCreatePolicy" />
       </div>
     </Panel>
 
@@ -359,7 +359,15 @@ const {
   addInterval,
   saveInterval: originalSaveInterval,
   updateInterval,
+  reset,
 } = useCreateRate(parking_zone.value?.id, toast, refresh);
+
+// Rates carry the vehicle type id; the zone's rate_intervals carry its name.
+const vehicleTypeName = (rate) =>
+  parking_zone.value?.rate_intervals?.find((item) => item.rate_id === rate.id)
+    ?.vehicle_type ??
+  rate.vehicle_type?.name ??
+  "--N/A--";
 
 // Wrap the saveInterval function to reset activeRateId when done
 const saveInterval = async () => {
@@ -368,6 +376,11 @@ const saveInterval = async () => {
 };
 
 const addingPolicy = ref(false);
+
+const openCreatePolicy = () => {
+  reset();
+  addingPolicy.value = true;
+};
 
 const dailyIntervals = ["second", "minute", "hour"];
 
