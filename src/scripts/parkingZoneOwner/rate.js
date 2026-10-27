@@ -126,6 +126,26 @@ const deleteInterval = async (rate) => {
   await this_refresh.value();
 };
 
+const deleteRate = async (rate) => {
+  try {
+    const { data } = await api.delete(`rates/${rate}`);
+    this_toast.value.add({
+      severity: data.success ? "success" : "error",
+      summary: data.success ? "Success" : "Error",
+      detail: data.message,
+      life: 3000,
+    });
+  } catch (error) {
+    this_toast.value.add({
+      severity: "error",
+      summary: "Error",
+      detail: error.response?.data?.message ?? error,
+      life: 3000,
+    });
+  }
+  await this_refresh.value();
+};
+
 const submitRatePolicy = async () => {
   try {
     const fd = new FormData();
@@ -220,6 +240,7 @@ export default function useCreateRate(
     submitRatePolicy,
     editRatePolicy,
     deleteInterval,
+    deleteRate,
     reset,
   };
 }

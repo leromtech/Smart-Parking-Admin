@@ -82,7 +82,7 @@
               rounded
               size="small"
               severity="danger"
-              @click="() => deleteInterval(slotProps.data.id)"
+              @click="() => deleteRate(slotProps.data.id)"
               variant="outlined" />
           </div>
         </template>
@@ -355,6 +355,7 @@ const removeInterval = async (rateId, intervalIndex) => {
 const {
   editRatePolicy,
   deleteInterval,
+  deleteRate,
   intervalForm,
   addInterval,
   saveInterval: originalSaveInterval,
