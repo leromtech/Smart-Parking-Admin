@@ -21,7 +21,7 @@
             <Column field="phone" header="Phone"></Column>
             <Column header="Role">
                 <template #body="slotProps">
-                    <span>{{ slotProps.data.roles[0].name }}</span>
+                    <span>{{ primaryRole(slotProps.data.roles) }}</span>
                 </template>
             </Column>
             <Column>
@@ -46,6 +46,7 @@
 import { useToast } from 'primevue'
 import api from '../../../boot/api'
 import { onMounted, ref, watch } from 'vue'
+import { primaryRole } from '../../../scripts/roles'
 
 const emit = defineEmits(['save'])
 

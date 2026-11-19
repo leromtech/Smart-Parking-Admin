@@ -32,7 +32,7 @@
                             <Column field="phone" header="Phone"></Column>
                             <Column header="Role">
                                 <template #body="slotProps">
-                                    {{ slotProps.data.roles[0].name }}
+                                    {{ primaryRole(slotProps.data.roles) }}
                                 </template>
                             </Column>
                             <Column>
@@ -76,6 +76,7 @@ import api from '../../../boot/api';
 import { useParkingZone } from '../../../scripts/parkingZone';
 import { useToast } from 'primevue';
 import useAuth from '../../../scripts/auth';
+import { primaryRole } from '../../../scripts/roles';
 
 const { addManager: addManagerToZone, refresh, getParkingZone } = useParkingZone()
 const { user } = useAuth()

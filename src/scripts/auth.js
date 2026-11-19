@@ -1,6 +1,7 @@
 import { ref } from "vue";
 import api from "../boot/api";
 import router from "../routes/router";
+import { primaryRole } from "./roles";
 
 const user = ref(null)
 const roles = ref(null)
@@ -51,7 +52,7 @@ const login = async (formData, callback = null) => { // Changed fd to formData, 
         localStorage.setItem('authToken', data.token)
         setUser(data.user)
 
-        switch (user.value.roles[0].name) {
+        switch (primaryRole(user.value.roles)) {
             case 'customer':
             case 'manager':
                 // Redirect to external Flutter web app using window.location

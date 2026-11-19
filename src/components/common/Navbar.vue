@@ -205,6 +205,7 @@
 <script setup>
 import { computed, onMounted, ref, watch } from "vue";
 import useAuth from "../../scripts/auth";
+import { primaryRole } from "../../scripts/roles";
 
 const { loggedIn, user, logout } = useAuth();
 
@@ -219,7 +220,7 @@ const isMenuOpen = ref(false);
 const dashboardRoute = computed(() => {
   if (!user.value?.roles) return "/";
 
-  switch (user.value.roles[0].name) {
+  switch (primaryRole(user.value.roles)) {
     case "customer":
       return "/customer";
     case "superadmin":
