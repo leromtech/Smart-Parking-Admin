@@ -100,6 +100,7 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import api from "../../../boot/api";
+import { fetchAllParkingZones } from "../../../scripts/admin";
 import useUsers from "../../../scripts/admin/users";
 import { primaryRole } from "../../../scripts/roles";
 import { Select, useToast } from "primevue";
@@ -206,13 +207,9 @@ const submit = async () => {
 
 const getParkingZone = async () => {
   try {
-    const { data } = await api.get("parking-zones", {
-      params: { filters: { all: 1 } },
-    });
+    const zones = await fetchAllParkingZones();
 
-    console.log(data.parking_zones);
-
-    parkingZones.value = data.parking_zones.data.map((item) => ({
+    parkingZones.value = zones.map((item) => ({
       label: item.name,
       value: item.id,
     }));

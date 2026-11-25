@@ -101,7 +101,7 @@ const setupRealTimeAvailability = async () => {
       echo.leave(channelName);
       echoChannel = null;
     }
-    echoChannel = echo.channel(channelName);
+    echoChannel = echo.private(channelName);
     echoChannel.listen(".parking.updated", (payload) => {
       let occupiedCount = 0;
       if (typeof payload === "object" && payload !== null) {

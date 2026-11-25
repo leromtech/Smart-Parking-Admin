@@ -1,7 +1,7 @@
 <template>
     <form action="">
         <DataTable :value="rows" tableStyle="min-width: 50rem" paginator :rows="pagination.per_page" :lazy="true"
-            stripedRows totalRecords="pagination.total" :rowsPerPageOptions="[5, 10, 15, 30]" @page="onPageChange">
+            stripedRows :totalRecords="totalRecords" :loading="loading" :rowsPerPageOptions="[5, 10, 15, 30]" @page="onPageChange">
             <template #header>
                 <div class="flex flex-row justify-between">
                     <IconField>
@@ -59,26 +59,24 @@ const form = ref({
 })
 
 const filters = ref({
-    free_parking: false,
     search: '',
-    role: '',
 })
 
 const pagination = ref({
-    total: 0,
     per_page: 10,
     page: 1
 })
+
+const totalRecords = ref(0)
 
 const loading = ref(false)
 
 const getUsers = async () => {
     try {
         loading.value = true;
-        // Match the backend's expected format for pagination and filters
-        const { data } = await api.get('users', { params: { filters: filters.value, per_page: pagination.value.per_page, page: pagination.value.page } })
-        rows.value = data.data
-        pagination.value.total = data.meta?.total || data.total || 0
+        const { data } = await api.get('users', { params: { filters: filters.value, pagination: pagination.value } })
+        rows.value = data.data ?? []
+        totalRecords.value = data.total ?? 0
 
     } catch (error) {
         toast.add({

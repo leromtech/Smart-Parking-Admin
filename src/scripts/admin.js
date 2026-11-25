@@ -35,6 +35,23 @@ const getParkingZones = async (pageParams = null, searchTerm = '') => {
     }
 }
 
+// The zone list is paginated (100 per page at most), so screens that need
+// every zone walk the pages until the last one.
+export const fetchAllParkingZones = async () => {
+    const zones = []
+    let page = 1
+    let lastPage = 1
+    do {
+        const { data } = await api.get('parking-zones', {
+            params: { pagination: { per_page: 100, page } }
+        })
+        zones.push(...(data.parking_zones?.data ?? []))
+        lastPage = data.parking_zones?.last_page ?? 1
+        page += 1
+    } while (page <= lastPage)
+    return zones
+}
+
 const parking_zone_edit = ref()
 
 const parking_zone_delete = ref()
