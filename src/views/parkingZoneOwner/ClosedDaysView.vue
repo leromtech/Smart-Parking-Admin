@@ -25,7 +25,7 @@ import { useToast } from 'primevue';
 import useAuth from '../../scripts/auth';
 import { useParkingZone } from '../../scripts/parkingZone';
 
-const { parking_zone } = useParkingZone()
+const { parking_zone, getParkingZone } = useParkingZone()
 const toast = useToast();
 
 // Days of the week
@@ -36,15 +36,15 @@ const recurring = ref([0, 6]); // Sunday and Saturday closed by default
 
 const submit = async () => {
     try {
-        const fd = new FormData();
-        fd.append('recurring_days', JSON.stringify(recurring.value));
-        fd.append('parking_zone_id', parking_zone.value.id)
-        const { data } = await api.post('parking-closed-days', fd); // Adjust the endpoint as needed
+        const { data } = await api.post('parking-closed-days', {
+            parking_zone_id: parking_zone.value.id,
+            recurring_days: recurring.value.map(Number),
+        });
 
         // Show success toast
         toast.add({
             severity: 'success',
-            summary: 'Succeßss',
+            summary: 'Success',
             detail: data.message || 'Recurring closed days saved successfully',
             life: 3000,
         });
@@ -53,23 +53,31 @@ const submit = async () => {
         toast.add({
             severity: 'error',
             summary: 'Error',
-            detail: e.response?.data?.error || 'Failed to save recurring closed days',
+            detail: e.response?.data?.message || 'Failed to save recurring closed days',
             life: 3000,
         });
     }
 };
 
 const getRecurringDays = async () => {
+    if (!parking_zone.value?.id) {
+        return
+    }
     const { data } = await api.get('parking-closed-days', {
         params: {
             parking_zone_id: parking_zone.value.id
         }
     })
-    recurring.value = data.recurring_days
+    recurring.value = (data.recurring_days ?? []).map(Number)
 }
 watch(parking_zone, () => {
     getRecurringDays()
-    console.log('here')
 }, { immediate: true })
+
+onMounted(async () => {
+    if (!parking_zone.value?.id) {
+        await getParkingZone()
+    }
+})
 
 </script>
