@@ -262,6 +262,7 @@
 import { computed, onMounted, ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import api from '../../boot/api';
+import { fetchAllParkingZones } from '../../scripts/admin';
 import SettlementBreakdown from './settlement/SettlementBreakdown.vue';
 
 const toast = useToast();
@@ -603,8 +604,7 @@ const clearFilters = async () => {
 };
 
 const getParkingZonesData = async () => {
-    const { data } = await api.get('parking-zones');
-    parkingZones.value = data.parking_zones?.data ?? data?.data ?? [];
+    parkingZones.value = await fetchAllParkingZones();
 };
 
 const getVehicleTypes = async () => {
