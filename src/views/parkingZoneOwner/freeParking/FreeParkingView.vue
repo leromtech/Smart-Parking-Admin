@@ -10,28 +10,20 @@
                 </div>
             </template>
             <DataTable striped-rows :value="rows" scrollable scrollHeight="400px" tableStyle="min-width: 50rem"
-                :loading="loading" lazy>
-                <Column field="id" header="Id"></Column>
-                <Column field="name" header="Name"></Column>
+                :loading="loading" paginator :rows="10" :rowsPerPageOptions="[10, 25, 50]">
+                <Column header="Name">
+                    <template #body="slotProps">{{ slotProps.data.user?.name ?? '—' }}</template>
+                </Column>
+                <Column header="Phone">
+                    <template #body="slotProps">{{ slotProps.data.user?.phone ?? '—' }}</template>
+                </Column>
                 <Column header="Remove">
                     <template #body="slotProps">
-                        <div class="flex flex-row items-center justify-between w-full">
-                            <Button rounded icon="pi pi-trash" severity="danger"
-                                @click="deleteUser(slotProps.data.id)"></Button>
-                        </div>
+                        <Button rounded icon="pi pi-trash" severity="danger"
+                            @click="initiateDelete(slotProps.data)"></Button>
                     </template>
                 </Column>
-                <template #footer>
-                    <div class="flex flex-row items-center justify-between w-full">
-                        <div class="flex flex-row items-center gap-2">
-                            <Button icon="pi pi-angle-double-left" @click="pagination.page = 1"></Button>
-                            <span>Page {{ pagination.page }} of {{ Math.ceil(pagination.total / pagination.per_page)
-                                }}</span>
-                            <Button icon="pi pi-angle-double-right"
-                                @click="pagination.page = Math.ceil(pagination.total / pagination.per_page)"></Button>
-                        </div>
-                    </div>
-                </template>
+                <template #empty>No free parking grants yet</template>
             </DataTable>
         </Panel>
 
@@ -40,11 +32,11 @@
                 <div class="pr-6">Confirm Delete</div>
             </template>
             <div class="flex flex-col items-center justify-center">
-                <span>Do you want to remove {{ deleteName.toUpperCase() }} from free parking list?</span>
+                <span>Do you want to remove {{ deleteTarget?.user?.name ?? 'this user' }} from the free parking list?</span>
                 <div class="flex flex-row items-center justify-end w-full mt-6 gap-3">
                     <Button icon="pi pi-times" severity="info" outlined label="Cancel"
                         @click="openDelete = false"></Button>
-                    <Button icon="pi pi-trash" severity="danger" outlined label="Confirm"
+                    <Button icon="pi pi-trash" severity="danger" outlined label="Confirm" :loading="deleting"
                         @click="confirmDelete"></Button>
                 </div>
             </div>
@@ -62,78 +54,71 @@
 <script setup>
 import create from './FreeParkingCreate.vue'
 import { useToast } from 'primevue'
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref } from 'vue'
 import api from '../../../boot/api'
+import useAuth from '../../../scripts/auth'
 
 const toast = useToast()
-
-const pagination = ref({
-    page: 1,
-    per_page: 10,
-    total: 0,
-})
-
-const filters = ref({
-    free_parking: 'true',
-    search: '',
-    role: '',
-})
+const { user } = useAuth()
 
 const rows = ref([])
+const loading = ref(false)
 const openDelete = ref(false)
 const createOpen = ref(false)
+const deleteTarget = ref(null)
+const deleting = ref(false)
 
 const getAllFreeParkingList = async () => {
+    if (!user.value?.id) {
+        return
+    }
+    loading.value = true
     try {
-        const { data } = await api.get('users', {
-            params: {
-                page: pagination.value.page,
-                per_page: pagination.value.per_page,
-                filters: filters.value
-            }
-        })
-        console.log(data)
-        rows.value = data.data
-        if (data.data.length === 0) {
-            toast.add({
-                severity: 'info',
-                summary: 'No Data',
-                detail: 'No free parking list found',
-                life: 3000
-            })
-        }
-        console.log(data)
+        const { data } = await api.get('free-parking', { params: { user_id: user.value.id } })
+        rows.value = Array.isArray(data) ? data : []
     } catch (error) {
         toast.add({
             severity: 'error',
             summary: 'Error',
-            detail: 'Failed to fetch free parking list : ' + error,
+            detail: error.response?.data?.message ?? 'Failed to fetch free parking list',
             life: 3000
         })
+    } finally {
+        loading.value = false
     }
 }
 
-const deleteUser = async (userId) => {
+const initiateDelete = (grant) => {
+    deleteTarget.value = grant
+    openDelete.value = true
+}
+
+const confirmDelete = async () => {
+    if (!deleteTarget.value) {
+        return
+    }
+    deleting.value = true
     try {
-        const { data } = await api.delete(`users/${userId}`)
-        if (data.success) {
-            toast.add({
-                severity: 'success',
-                summary: 'Success',
-                detail: 'User deleted successfully',
-                life: 3000
-            })
-            getAllFreeParkingList()
-        }
+        const { data } = await api.delete(`free-parking/${deleteTarget.value.id}`)
+        toast.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: data.message ?? 'Free parking removed',
+            life: 3000
+        })
+        openDelete.value = false
+        deleteTarget.value = null
+        await getAllFreeParkingList()
     } catch (error) {
         toast.add({
             severity: 'error',
             summary: 'Error',
-            detail: 'Failed to delete user : ' + error,
+            detail: error.response?.data?.message ?? 'Failed to remove free parking',
             life: 3000
         })
+    } finally {
+        deleting.value = false
     }
-    await getAllFreeParkingList()
 }
 
 const handleCreateSave = async () => {
