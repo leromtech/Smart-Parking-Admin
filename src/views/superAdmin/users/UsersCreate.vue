@@ -102,6 +102,7 @@ import { onMounted, ref } from "vue";
 import api from "../../../boot/api";
 import { fetchAllParkingZones } from "../../../scripts/admin";
 import useUsers from "../../../scripts/admin/users";
+import { primaryRole } from "../../../scripts/roles";
 import { Select, useToast } from "primevue";
 const message = ref();
 const { getUsers, editItem } = useUsers();
@@ -251,7 +252,7 @@ onMounted(async () => {
     form.value.email = editItem.value.email || "";
     form.value.phone = editItem.value.phone || "";
     form.value.password = editItem.value.password || "";
-    form.value.role = editItem.value.roles?.[0]?.name || "";
+    form.value.role = primaryRole(editItem.value.roles) || "";
     form.value.parkingZone = selectedParkingZoneId || "";
     form.value.subscriptionLimit = editItem.value.subscription_limit ?? null;
     form.value.contractStartDate = parseDate(editItem.value.contract_start_date);

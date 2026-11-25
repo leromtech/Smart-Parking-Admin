@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import routes from "./routes";
 import useAuth from "../scripts/auth";
+import { primaryRole } from "../scripts/roles";
 import { initEcho } from "../boot/echo";
 
 const { loggedIn, user, fetchUser } = useAuth();
@@ -86,12 +87,12 @@ router.beforeEach(async (to, from, next) => {
 
     if (!hasRequiredRole) {
       // Redirect based on user's primary role
-      const primaryRole = userRoles[0];
-      if (externalRoles.includes(primaryRole)) {
+      const userPrimaryRole = primaryRole(userRoles);
+      if (externalRoles.includes(userPrimaryRole)) {
         window.location.href = import.meta.env.VITE_FRONTEND_URL;
         return next(false);
       }
-      const redirectPath = roleRedirects[primaryRole] || "/";
+      const redirectPath = roleRedirects[userPrimaryRole] || "/";
       return next(redirectPath);
     }
   }
